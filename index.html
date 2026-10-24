@@ -157,8 +157,6 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .opt.fig{flex-direction:column;align-items:stretch;padding:8px;gap:6px;border:1px solid var(--line)!important;border-radius:3px}
 .opt.fig svg{display:block;width:100%;height:auto}
 .opt.fig .k{align-self:flex-start}
-.ddrow{display:flex;gap:10px;flex-wrap:wrap}
-.ddrow select{flex:1 1 260px;min-width:0;font:inherit;font-size:15px;padding:11px 12px;border-radius:2px;border:1px solid var(--line2);background:var(--card);color:var(--ink)}
 .btn{font:inherit;font-weight:700;font-size:15px;padding:11px 20px;border-radius:2px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;letter-spacing:.03em}
 .btn:hover:not(:disabled){background:var(--seal);color:var(--seal-ink)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
@@ -347,11 +345,6 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
       <div class="field">Famiglia
         <div class="seg" id="famSeg">
           <button data-v="all">Tutte</button><button data-v="inv">Inversione</button><button data-v="cont">Continuazione</button>
-        </div>
-      </div>
-      <div class="field" id="ansField">Risposta
-        <div class="seg" id="ansSeg">
-          <button data-v="btn">4 scelte</button><button data-v="dd">Menu a tendina</button>
         </div>
       </div>
       <label class="switch field"><input type="checkbox" id="hlToggle" checked> Evidenzia la figura</label>

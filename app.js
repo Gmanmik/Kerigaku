@@ -367,7 +367,7 @@ function setTab(t){
   $("#barTitle").textContent = MODE_TITLE[t];
   const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
   $("#barCfg").innerHTML = t === "studia" || t === "scen" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
-    `<span class="chip n">${famTxt}</span>` + (t === "f2n" ? `<span class="chip n">${prefs.ans === "dd" ? "Menu a tendina" : "4 scelte"}</span>` : "") +
+    `<span class="chip n">${famTxt}</span>` +
     `<span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>`;
   $("#view-studia").hidden = t !== "studia";
   $("#view-quiz").hidden = t === "studia";
@@ -391,7 +391,6 @@ function selectMode(m, quiet){
   prefs.mode = m; if(!quiet) savePrefs();
   document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
   $("#settings").hidden = m === "studia" || m === "scen";
-  $("#ansField").hidden = m !== "f2n";
   $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : m === "scen" ? "Apri gli scenari " : "Inizia il giro ";
   $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : "10 domande di allenamento libero.";
 }
@@ -497,7 +496,7 @@ const heroAnim = (() => {
 })();
 
 function syncControls(){
-  [["#famSeg","fam"],["#ansSeg","ans"],["#studySeg","sfilter"]].forEach(([id, k]) =>
+  [["#famSeg","fam"],["#studySeg","sfilter"]].forEach(([id, k]) =>
     $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[k])));
   $("#hlToggle").checked = prefs.hl;
   selectMode(["srs","studia","f2n","n2f","scen"].includes(prefs.mode) ? prefs.mode : "srs", true);
@@ -561,12 +560,7 @@ function renderQuestion(){
   if(mode === "f2n"){
     body += `<h2 class="prompt">Che figura è questa?<small>${prefs.hl ? "La figura è nella zona evidenziata. Le candele prima mostrano il trend." : "Le prime candele mostrano il trend, poi arriva la figura."}</small></h2>`;
     body += `<div class="bigchart">${chartSVG(t, {context: Q.cur.ctx, hl: prefs.hl, w: 560, h: 260, maxSlot: 52, maxBody: 22, aria: "Grafico da riconoscere"})}</div>`;
-    if(prefs.ans === "dd"){
-      const opts = Q.list.slice().sort((a, b) => a.name.localeCompare(b.name) || (a.bull ? -1 : 1));
-      body += `<div class="ddrow"><select id="dd" aria-label="Scegli la figura" ${Q.answered?"disabled":""}><option value="">Scegli la figura…</option>${opts.map(p => `<option value="${p.id}" ${Q.pick===p.id?"selected":""}>${esc(p.name)} — ${dirWord(p)}</option>`).join("")}</select><button class="btn" id="ddGo" ${Q.answered?"disabled":""}>Conferma</button></div>`;
-    } else {
-      body += `<div class="opts">${Q.cur.opts.map((p, i) => `<button class="opt ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""}><span class="nm">${esc(p.name)}</span><span style="display:flex;gap:6px;align-items:center">${chipDir(p)}<span class="k">${i+1}</span></span></button>`).join("")}</div>`;
-    }
+    body += `<div class="opts">${Q.cur.opts.map((p, i) => `<button class="opt ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""}><span class="nm">${esc(p.name)}</span><span style="display:flex;gap:6px;align-items:center">${chipDir(p)}<span class="k">${i+1}</span></span></button>`).join("")}</div>`;
   } else {
     body += `<h2 class="prompt">Trova: ${esc(t.name)} ${chipDir(t)}<small>Scegli il grafico giusto. In ogni grafico la zona evidenziata è la figura.</small></h2>`;
     body += `<div class="opts figs">${Q.cur.opts.map((p, i) => {
@@ -577,7 +571,6 @@ function renderQuestion(){
   if(Q.answered) body += feedback(t);
   box.innerHTML = `<div class="qhead"><div class="pips" aria-label="Avanzamento">${pips}</div><div class="streak">Di fila <b>${Q.streak}</b> · Record <b>${Q.best}</b></div></div><div class="panel qcard">${body}</div>`;
   box.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(b.dataset.id));
-  const go = $("#ddGo"); if(go) go.onclick = () => { const v = $("#dd").value; if(v) answer(v); };
   const nx = $("#next"); if(nx) { nx.onclick = next; nx.focus({preventScroll:true}); }
 }
 function optClass(p, t){
@@ -691,7 +684,7 @@ document.addEventListener("keydown", e => {
   if(view === "home" || view === "studia" || view === "auth" || view === "account" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
   if(Q.mode === "scen") return Scenari.key(e);
   if(Q.mode === "srs" && Q.intro && Q.qs[Q.i] && Q.intro.has(Q.qs[Q.i].id)) return;
-  if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || prefs.ans === "btn")){
+  if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || curMode() === "f2n")){
     const o = Q.cur && Q.cur.opts[+e.key - 1]; if(o) answer(o.id);
   } else if(Q.answered && e.key === "Enter" && document.activeElement?.id !== "next"){ next(); }
 });
@@ -921,7 +914,6 @@ async function showAccount(){
 /* ---------- boot ---------- */
 function start(data){
   bindSeg("#famSeg", "fam", () => {});
-  bindSeg("#ansSeg", "ans", () => {});
   bindSeg("#studySeg", "sfilter", renderStudy);
   $("#hlToggle").checked = prefs.hl;
   $("#hlToggle").onchange = e => { prefs.hl = e.target.checked; savePrefs(); };
