@@ -210,6 +210,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 #authForm input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);width:100%;min-width:0}
 #authForm input:focus-visible{border-color:var(--accent)}
 .pwrow{display:grid;gap:6px}
+.cf-ts:empty{display:none}
+.cf-ts{margin-top:8px}
 .au-err{margin:6px 0 0;min-height:1.4em;font-size:13.5px;color:var(--bear)}
 #au-go{justify-content:center;margin-top:4px}
 .authcard .linkbtn{justify-self:center}
@@ -410,6 +412,35 @@ if(!prefs.srsSeen){ prefs.mode = "srs"; prefs.srsSeen = true; }
 const CFG = window.DOJO_CONFIG || {};
 const USER_DOMAIN = "utenti.dojo-delle-candele.app";
 const isLegacy = email => !email || email.endsWith("@" + USER_DOMAIN);
+/* controllo anti-robot di Cloudflare Turnstile, attivo solo se config.js ha turnstileSiteKey.
+   Ogni gettone vale una volta sola: dopo l'uso il widget ne prepara subito un altro. */
+const captcha = (() => {
+  const key = CFG.turnstileSiteKey;
+  let id = null, el = null, token = "", waiters = [];
+  if(key){
+    window.dojoTurnstile = () => mount(el);
+    const sc = document.createElement("script");
+    sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=dojoTurnstile"; sc.async = true;
+    document.head.appendChild(sc);
+  }
+  function mount(box){
+    el = box; token = "";
+    if(id !== null && window.turnstile){ try{ turnstile.remove(id); }catch(e){} id = null; }
+    if(!key || !box || !window.turnstile || !box.isConnected) return;
+    id = turnstile.render(box, {sitekey: key, size: "flexible", appearance: "interaction-only", language: "it",
+      theme: document.documentElement.dataset.theme || "auto",
+      callback: t => { token = t; waiters.splice(0).forEach(f => f(t)); },
+      "expired-callback": () => { token = ""; }, "error-callback": () => { token = ""; }});
+  }
+  async function take(){
+    if(!key) return undefined;
+    if(!window.turnstile) throw "Il controllo anti-robot non si è caricato: ricarica la pagina.";
+    const t = token || await new Promise((res, rej) => { waiters.push(res); setTimeout(() => rej("Completa il controllo anti-robot qui sotto, poi riprova."), 10000); });
+    token = ""; if(id !== null) try{ turnstile.reset(id); }catch(e){}
+    return t;
+  }
+  return {mount, take};
+})();
 const cloud = (() => {
   const ready = !!(window.supabase && CFG.supabaseUrl && CFG.supabaseAnonKey && !/INSERISCI/.test(CFG.supabaseUrl + CFG.supabaseAnonKey));
   const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
@@ -494,32 +525,48 @@ const cloud = (() => {
   }
   function errText(e){
     const m = (e && e.message || "").toLowerCase();
-    if(m.includes("invalid login")) return "Credenziali sbagliate. Se hai aggiunto la tua email all'account, entra con quella.";
+    if(m.includes("captcha")) return "Il controllo anti-robot non è passato: riprova tra qualche secondo.";
+    if(m.includes("invalid login")) return "Username, email o password sbagliati.";
+    if(m.includes("troppi tentativi")) return "Troppi tentativi sbagliati con questo username: riprova tra 15 minuti o entra con l'email.";
     if(m.includes("already registered") || m.includes("already been registered")) return "Questa email ha già un account: prova ad accedere.";
     if(m.includes("database error saving new user")) return "Questo username è già preso: scegline un altro.";
     if(m.includes("token has expired") || m.includes("invalid") && m.includes("otp") || m.includes("token")) return "Codice sbagliato o scaduto: controlla l'ultima email o fattene mandare un altro.";
     if(m.includes("rate limit") || m.includes("security purposes")) return "Troppe richieste in poco tempo: aspetta un minuto e riprova.";
     if(m.includes("should be different")) return "La nuova password deve essere diversa da quella attuale.";
-    if(m.includes("password")) return "La password deve avere almeno 6 caratteri.";
+    if(m.includes("aal2")) return "Prima inserisci il codice della tua app di autenticazione.";
+    if(m.includes("password")) return "La password deve avere almeno 8 caratteri, con lettere e numeri.";
     if(m.includes("email") && m.includes("invalid")) return "Questo indirizzo email non sembra valido.";
     return "Qualcosa non ha funzionato: " + (e && e.message || "riprova tra poco.");
   }
   const must = async p => { const {data, error} = await p; if(error) throw errText(error); return data; };
   window.addEventListener("pagehide", () => { if(timer) flush(); });
-  const toLogin = id => id.includes("@") ? id : id + "@" + USER_DOMAIN;
+  // con lo username chiede al database l'email dell'account, che arriva solo se la password è giusta (login.sql)
+  async function toLogin(id, pw){
+    if(id.includes("@")) return id;
+    const {data, error} = await sb.rpc("login_email", {u: id, pw});
+    if(error && /troppi tentativi/i.test(error.message)) throw errText(error);
+    if(error) return id + "@" + USER_DOMAIN;   // login.sql non ancora eseguito
+    if(!data) throw errText({message: "invalid login"});
+    return data;
+  }
   return {
     get ready(){ return ready; }, get on(){ return !!user; }, get user(){ return user; }, sb, schedule, flush, logout, errText,
-    async signIn(id, pw){ const d = await must(sb.auth.signInWithPassword({email: toLogin(id), password: pw})); await enter(d.user); },
+    async signIn(id, pw){
+      const email = await toLogin(id, pw);
+      const {data, error} = await sb.auth.signInWithPassword({email, password: pw, options: {captchaToken: await captcha.take()}});
+      if(error){ if(/email not confirmed/i.test(error.message)){ AUTH.email = email; await this.resendSignup(email); return paintAuth("code"); } throw errText(error); }
+      await enter(data.user);
+    },
     async signUp(name, email, pw, marketing){
       const free = await must(sb.rpc("username_available", {u: name}));
       if(!free) throw "Questo username è già preso: scegline un altro.";
-      const d = await must(sb.auth.signUp({email, password: pw, options: {data: {username: name, marketing: !!marketing}}}));
+      const d = await must(sb.auth.signUp({email, password: pw, options: {data: {username: name, marketing: !!marketing}, captchaToken: await captcha.take()}}));
       if(d.session) await enter(d.user);   // conferma email disattivata
       return !d.session;
     },
     async verifySignup(email, code){ const d = await must(sb.auth.verifyOtp({email, token: code, type: "signup"})); await enter(d.user); },
-    resendSignup: email => must(sb.auth.resend({type: "signup", email})),
-    sendReset: email => must(sb.auth.resetPasswordForEmail(email)),
+    resendSignup: async email => must(sb.auth.resend({type: "signup", email, options: {captchaToken: await captcha.take()}})),
+    sendReset: async email => must(sb.auth.resetPasswordForEmail(email, {captchaToken: await captcha.take()})),
     async resetWithCode(email, code, pw){
       const d = await must(sb.auth.verifyOtp({email, token: code, type: "recovery"}));
       if(await needsMfa()) return "mfa";   // con la verifica in due passaggi la password si cambia dopo il codice dell'app
@@ -1047,6 +1094,7 @@ $("#search").addEventListener("input", renderStudy);
 
 /* ---------- schermata di accesso ---------- */
 const AUTH = {step: "in", email: ""};
+const weakPw = p => p.length < 8 || !/[a-z]/i.test(p) || !/\d/.test(p);
 const fieldHTML = (id, label, attrs) => `<label for="${id}">${label}</label><input id="${id}" ${attrs}>`;
 function showAuth(step){
   view = "auth";
@@ -1080,7 +1128,7 @@ function paintAuth(step){
   const go = {in: "Entra", up: "Crea account", code: "Conferma", forgot: "Mandami il codice", reset: "Salva e entra", mfa: "Verifica"}[step];
   card.innerHTML = `<div class="eyebrow">Dojo delle candele · 道場</div><h2></h2><p class="hint au-sub"></p>
     ${tabs ? `<div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati"><button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button></div>` : ""}
-    <form id="authForm" novalidate>${f}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
+    <form id="authForm" novalidate>${f}${["in", "up", "code", "forgot"].includes(step) ? `<div class="cf-ts" id="au-ts"></div>` : ""}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
     <div class="au-links">
       ${step === "in" ? `<button class="linkbtn" type="button" data-s="forgot">Password dimenticata?</button>` : ""}
       ${step === "code" ? `<button class="linkbtn" type="button" id="au-resend">Mandami un altro codice</button>` : ""}
@@ -1097,6 +1145,7 @@ function paintAuth(step){
     catch(m){ $("#au-err").textContent = m; }
   };
   $("#authForm").addEventListener("submit", submitAuth);
+  captcha.mount($("#au-ts"));
   const first = card.querySelector("input"); if(first) first.focus({preventScroll:true});
 }
 async function submitAuth(e){
@@ -1111,15 +1160,14 @@ async function submitAuth(e){
     if(!/^[a-z0-9_.-]{3,24}$/.test(v("au-name").toLowerCase())) return fail("Lo username va da 3 a 24 caratteri: lettere, numeri, punto, trattino o trattino basso.");
     if(!okEmail(v("au-email"))) return fail("Scrivi un indirizzo email valido.");
   }
-  if((step === "up" || step === "reset") && pw.length < 6) return fail("La password deve avere almeno 6 caratteri.");
+  if((step === "up" || step === "reset") && weakPw(pw)) return fail("La password deve avere almeno 8 caratteri, con lettere e numeri.");
   if((step === "up" || step === "reset") && pw !== $("#au-pw2").value) return fail("Le due password non coincidono.");
   if((step === "code" || step === "reset" || step === "mfa") && !/^\d{6}$/.test(v("au-code"))) return fail("Il codice è fatto di 6 cifre.");
   if(step === "forgot" && !okEmail(v("au-email"))) return fail("Scrivi l'email del tuo account.");
   go.disabled = true; err.textContent = "";
   try{
     if(step === "in"){
-      try{ await cloud.signIn(v("au-id").toLowerCase(), pw); }
-      catch(m){ if(/email not confirmed/i.test(m)){ AUTH.email = v("au-id"); await cloud.resendSignup(AUTH.email); return paintAuth("code"); } throw m; }
+      await cloud.signIn(v("au-id").toLowerCase(), pw);
     }
     if(step === "up"){
       AUTH.email = v("au-email").toLowerCase();
@@ -1221,7 +1269,7 @@ async function showAccount(){
   $("#f-pw").onsubmit = async e => {
     e.preventDefault();
     const a = $("#ac-pw").value, b = $("#ac-pw2").value;
-    if(a.length < 6) return say("#m-pw", "La password deve avere almeno 6 caratteri.");
+    if(weakPw(a)) return say("#m-pw", "La password deve avere almeno 8 caratteri, con lettere e numeri.");
     if(a !== b) return say("#m-pw", "Le due password non coincidono.");
     const {error} = await sb.auth.updateUser({password: a});
     if(error) return say("#m-pw", cloud.errText(error));

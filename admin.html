@@ -128,15 +128,24 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
 
   <section class="panel gate" id="gate" hidden>
     <h2 id="gateTitle">Accesso admin</h2>
-    <p id="gateText">Entra con il tuo username e la tua password del Dojo.</p>
+    <p id="gateText">Entra con il tuo username (o la tua email) e la password del Dojo.</p>
     <form id="loginForm" novalidate>
       <div style="display:grid;gap:6px">
-        <label for="lg-name">Username</label>
-        <input id="lg-name" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24">
+        <label for="lg-name">Username o email</label>
+        <input id="lg-name" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="120">
         <label for="lg-pw">Password</label>
         <input id="lg-pw" type="password" autocomplete="current-password">
+        <div id="lg-ts"></div>
         <p class="err" id="lg-err" role="alert"></p>
         <button class="btn" id="lg-go" type="submit">Entra</button>
+      </div>
+    </form>
+    <form id="mfaForm" novalidate hidden>
+      <div style="display:grid;gap:6px">
+        <label for="mf-code">Codice dell'app di autenticazione</label>
+        <input id="mf-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+        <p class="err" id="mf-err" role="alert"></p>
+        <button class="btn" id="mf-go" type="submit">Verifica</button>
       </div>
     </form>
     <a href="./">Torna al Dojo</a>
@@ -175,6 +184,14 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const ready = !!(window.supabase && CFG.supabaseUrl && CFG.supabaseAnonKey && !/INSERISCI/.test(CFG.supabaseUrl + CFG.supabaseAnonKey));
 const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
 let me = null, users = [], open = null;
+// controllo anti-robot di Cloudflare Turnstile, attivo solo se config.js ha turnstileSiteKey
+let tsId = null;
+if(CFG.turnstileSiteKey){
+  window.dojoTurnstile = () => { tsId = turnstile.render("#lg-ts", {sitekey: CFG.turnstileSiteKey, size: "flexible", appearance: "interaction-only", language: "it", theme: document.documentElement.dataset.theme || "auto"}); };
+  const sc = document.createElement("script");
+  sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=dojoTurnstile"; sc.async = true;
+  document.head.appendChild(sc);
+}
 
 const fmtDate = d => d ? new Date(d).toLocaleDateString("it-IT", {day:"numeric", month:"short", year:"numeric"}) : "mai";
 function ago(d){
@@ -195,10 +212,12 @@ function summary(u){
   return {known, fixing, learning, r, w, dots};
 }
 
-function gate(title, text, showForm){
+function gate(title, text, showForm, showMfa){
   $("#main").hidden = true; $("#gate").hidden = false;
   $("#gateTitle").textContent = title; $("#gateText").textContent = text;
   $("#loginForm").hidden = !showForm;
+  $("#mfaForm").hidden = !showMfa;
+  if(showMfa) $("#mf-code").focus();
   paintWho();
 }
 function paintWho(){
@@ -207,17 +226,23 @@ function paintWho(){
   const n = (me.user_metadata && me.user_metadata.username) || me.email.split("@")[0];
   w.innerHTML = `<span>Sei entrato come <b></b></span><a href="./">Vai al Dojo</a><button class="linkbtn" id="out" type="button">Esci</button>`;
   w.querySelector("b").textContent = n;
-  $("#out").onclick = async () => { await sb.auth.signOut(); me = null; gate("Accesso admin", "Entra con il tuo username e la tua password del Dojo.", true); };
+  $("#out").onclick = async () => { await sb.auth.signOut(); me = null; gate("Accesso admin", "Entra con il tuo username (o la tua email) e la password del Dojo.", true); };
 }
 
 async function boot(){
   if(!ready) return gate("Configurazione mancante", "Inserisci URL e chiave di Supabase in config.js.", false);
   const {data} = await sb.auth.getSession();
-  if(!data.session) return gate("Accesso admin", "Entra con il tuo username e la tua password del Dojo.", true);
+  if(!data.session) return gate("Accesso admin", "Entra con il tuo username (o la tua email) e la password del Dojo.", true);
   me = data.session.user;
   await enter();
 }
+// il pannello chiede sempre la verifica in due passaggi (security.sql)
 async function enter(){
+  const st = await sb.rpc("admin_status");
+  if(!st.error){
+    if(st.data === "setup") return gate("Attiva la verifica in due passaggi", "Per proteggere il pannello serve la verifica in due passaggi. Attivala nella pagina Account del Dojo, poi torna qui.", false);
+    if(st.data === "code") return gate("Verifica in due passaggi", "Scrivi il codice a 6 cifre che vedi nella tua app di autenticazione.", false, true);
+  }
   const {data: isAdmin, error} = await sb.rpc("is_admin");
   if(error) return gate("Pannello non installato", "Esegui admin.sql nel SQL Editor di Supabase, poi ricarica.", false);
   if(!isAdmin) return gate("Non sei admin", "Questo account non ha i permessi per il pannello. Un admin può darteli dall'elenco degli allievi.", false);
@@ -283,14 +308,14 @@ function ask(u, a, el){
     admin: [u.is_admin ? `Tolgo a ${u.username} l'accesso a questo pannello?` : `Do a ${u.username} l'accesso a questo pannello, con gli stessi poteri tuoi?`, u.is_admin ? "Sì, togli" : "Sì, rendi admin", "btn", false],
     del: [`Elimino l'account di ${u.username} e tutti i suoi progressi? Non si può annullare.`, "Sì, elimina", "btn danger", false]
   }[a];
-  slot.innerHTML = `<div class="confirm"><p></p>${t[3] ? `<input type="text" autocomplete="off" placeholder="Almeno 6 caratteri" aria-label="Nuova password">` : ""}<button class="${t[2]}" type="button" data-ok>${t[1]}</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
+  slot.innerHTML = `<div class="confirm"><p></p>${t[3] ? `<input type="text" autocomplete="off" placeholder="Almeno 8 caratteri, lettere e numeri" aria-label="Nuova password">` : ""}<button class="${t[2]}" type="button" data-ok>${t[1]}</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
   slot.querySelector("p").textContent = t[0];
   const inp = slot.querySelector("input"); if(inp) inp.focus();
   slot.querySelector("[data-no]").onclick = () => slot.innerHTML = "";
   slot.querySelector("[data-ok]").onclick = async e => {
     const msg = slot.querySelector(".msg");
     let call;
-    if(a === "pw"){ if(inp.value.length < 6){ msg.className = "msg ko"; msg.textContent = "La password deve avere almeno 6 caratteri."; return; } call = sb.rpc("admin_reset_password", {target: u.id, new_password: inp.value}); }
+    if(a === "pw"){ if(inp.value.length < 8 || !/[a-z]/i.test(inp.value) || !/\d/.test(inp.value)){ msg.className = "msg ko"; msg.textContent = "La password deve avere almeno 8 caratteri, con lettere e numeri."; return; } call = sb.rpc("admin_reset_password", {target: u.id, new_password: inp.value}); }
     if(a === "reset") call = sb.rpc("admin_reset_progress", {target: u.id});
     if(a === "admin") call = sb.rpc("admin_set_admin", {target: u.id, make: !u.is_admin});
     if(a === "del") call = sb.rpc("admin_delete_user", {target: u.id});
@@ -318,10 +343,35 @@ $("#loginForm").addEventListener("submit", async e => {
   const n = $("#lg-name").value.trim().toLowerCase(), pw = $("#lg-pw").value, err = $("#lg-err");
   if(!n || !pw) return err.textContent = "Inserisci username e password.";
   $("#lg-go").disabled = true; err.textContent = "";
-  const {data, error} = await sb.auth.signInWithPassword({email: n + "@" + USER_DOMAIN, password: pw});
+  let email = n;
+  if(!n.includes("@")){
+    const r = await sb.rpc("login_email", {u: n, pw});
+    email = r.error ? (/troppi tentativi/i.test(r.error.message) ? null : n + "@" + USER_DOMAIN) : r.data;
+    if(!email){ $("#lg-go").disabled = false; return err.textContent = r.error ? "Troppi tentativi sbagliati: riprova tra 15 minuti." : "Username o password sbagliati."; }
+  }
+  let captchaToken;
+  if(CFG.turnstileSiteKey){
+    captchaToken = window.turnstile && tsId !== null ? turnstile.getResponse(tsId) : "";
+    if(!captchaToken){ $("#lg-go").disabled = false; return err.textContent = "Un attimo: aspetta che finisca il controllo anti-robot, poi riprova."; }
+    turnstile.reset(tsId);
+  }
+  const {data, error} = await sb.auth.signInWithPassword({email, password: pw, options: {captchaToken}});
   $("#lg-go").disabled = false;
   if(error) return err.textContent = /invalid login/i.test(error.message) ? "Username o password sbagliati." : "Accesso non riuscito: " + error.message;
   me = data.user; $("#loginForm").reset();
+  await enter();
+});
+$("#mfaForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const code = $("#mf-code").value.trim(), err = $("#mf-err");
+  if(!/^\d{6}$/.test(code)) return err.textContent = "Il codice è fatto di 6 cifre.";
+  $("#mf-go").disabled = true; err.textContent = "";
+  const f = await sb.auth.mfa.listFactors();
+  const totp = ((f.data && f.data.totp) || [])[0];
+  const r = totp ? await sb.auth.mfa.challengeAndVerify({factorId: totp.id, code}) : {error: {message: "nessuna app collegata"}};
+  $("#mf-go").disabled = false;
+  if(r.error) return err.textContent = "Codice sbagliato o scaduto: riprova con quello nuovo.";
+  $("#mfaForm").reset();
   await enter();
 });
 boot();
