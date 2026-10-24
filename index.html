@@ -500,9 +500,19 @@ const cloud = (() => {
   }
   function schedule(){ if(!user) return; clearTimeout(timer); timer = setTimeout(flush, 700); }
   // unisce i progressi del server con quelli locali: per ogni figura vince quella più avanti
-  function merge(r){
+  // i dati arrivano dal server: tiene solo le figure conosciute e solo numeri
+  const num = v => Number.isFinite(+v) ? +v : 0;
+  function clean(r){
+    const srs = {}, stats = {}, ids = new Set(P.map(p => p.id));
+    for(const [id, c] of Object.entries(r.srs || {})) if(ids.has(id) && c) srs[id] = {b: num(c.b), due: num(c.due)};
+    for(const [id, c] of Object.entries(r.stats || {})) if(ids.has(id) && c) stats[id] = {r: num(c.r), w: num(c.w)};
+    const d = r.daily || {};
+    return {srs, stats, daily: {day: num(d.day), newCount: num(d.newCount)}, prefs: r.prefs && typeof r.prefs === "object" ? r.prefs : null};
+  }
+  function merge(raw){
     let changed = false;
-    const rs = r.srs || {}, out = Object.assign({}, rs);
+    const r = clean(raw);
+    const rs = r.srs, out = Object.assign({}, rs);
     for(const [id, c] of Object.entries(srs)){
       const o = rs[id];
       if(!o || c.b > o.b || (c.b === o.b && c.due > o.due)){ out[id] = c; changed = true; }
@@ -517,11 +527,10 @@ const cloud = (() => {
     let d = r.daily || {day:0, newCount:0};
     if(daily.day > d.day || (daily.day === d.day && daily.newCount > d.newCount)){ d = daily; changed = true; }
     srs = out; stats = st; daily = d;
-    if(r.prefs) Object.assign(prefs, r.prefs);
+    if(r.prefs) for(const k of Object.keys(prefs)) if(k in r.prefs && typeof r.prefs[k] === typeof prefs[k]) prefs[k] = r.prefs[k];
     saveLocal();
     return changed;
   }
-  // dopo la password: se l'account ha la verifica in due passaggi, chiede il codice dell'app
   // il database ha rifiutato: l'accesso può essere scaduto, o la 2FA è stata attivata dopo questo accesso
   async function recover(err, loading){
     lastErr = (err && err.message) || "";
@@ -530,6 +539,7 @@ const cloud = (() => {
     if(await needsMfa()){ if(loading) user = null; showAuth("mfa"); return true; }
     return false;
   }
+  // dopo la password: se l'account ha la verifica in due passaggi, chiede il codice dell'app
   async function needsMfa(){
     const {data} = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
     return !!data && data.nextLevel === "aal2" && data.currentLevel !== "aal2";
@@ -560,7 +570,7 @@ const cloud = (() => {
     if(m.includes("banned")) return "Questo account è sospeso. Per informazioni scrivi ad admin@dojodellecandele.com.";
     if(m.includes("troppi tentativi")) return "Troppi tentativi sbagliati con questo username: riprova tra 15 minuti o entra con l'email.";
     if(m.includes("already registered") || m.includes("already been registered")) return "Questa email ha già un account: prova ad accedere.";
-    if(m.includes("database error saving new user")) return "Questo username è già preso: scegline un altro.";
+    if(m.includes("database error saving new user")) return "Questo username è già preso o non è valido: scegline un altro.";
     if(m.includes("token has expired") || m.includes("invalid") && m.includes("otp") || m.includes("token")) return "Codice sbagliato o scaduto: controlla l'ultima email o fattene mandare un altro.";
     if(m.includes("rate limit") || m.includes("security purposes")) return "Troppe richieste in poco tempo: aspetta un minuto e riprova.";
     if(m.includes("should be different")) return "La nuova password deve essere diversa da quella attuale.";
@@ -575,8 +585,7 @@ const cloud = (() => {
   async function toLogin(id, pw){
     if(id.includes("@")) return id;
     const {data, error} = await sb.rpc("login_email", {u: id, pw});
-    if(error && /troppi tentativi/i.test(error.message)) throw errText(error);
-    if(error) return id + "@" + USER_DOMAIN;   // login.sql non ancora eseguito
+    if(error) throw errText(error);
     if(!data) throw errText({message: "invalid login"});
     return data;
   }

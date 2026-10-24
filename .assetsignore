@@ -1,0 +1,9 @@
+# File che restano su GitHub ma che Cloudflare non pubblica sul sito.
+*.sql
+*.md
+email/
+zip/
+redesign/
+archivio/
+wrangler.jsonc
+.assetsignore

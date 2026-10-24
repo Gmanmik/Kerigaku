@@ -239,7 +239,6 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 <script>
 const PL = [["hammer_p","Hammer",1,"inv"],["hanging_m","Hanging man",0,"inv"],["invhammer_p","Inverted hammer",1,"inv"],["shooting_m","Shooting star",0,"inv"],["belthold_p","Belt hold",1,"inv"],["belthold_m","Belt hold",0,"inv"],["engulf_p","Engulfing",1,"inv"],["engulf_m","Engulfing",0,"inv"],["harami_p","Harami",1,"inv"],["harami_m","Harami",0,"inv"],["haramix_p","Harami cross",1,"inv"],["haramix_m","Harami cross",0,"inv"],["piercing_p","Piercing line",1,"inv"],["darkcloud_m","Dark cloud cover",0,"inv"],["dojistar_p","Doji star",1,"inv"],["dojistar_m","Doji star",0,"inv"],["meeting_p","Meeting line",1,"inv"],["meeting_m","Meeting line",0,"inv"],["3soldiers_p","Three white soldiers",1,"inv"],["3crows_m","Three black crows",0,"inv"],["mstar_p","Morning star",1,"inv"],["estar_m","Evening star",0,"inv"],["mdoji_p","Morning doji star",1,"inv"],["edoji_m","Evening doji star",0,"inv"],["abandoned_p","Abandoned baby",1,"inv"],["abandoned_m","Abandoned baby",0,"inv"],["tristar_p","Tri-star",1,"inv"],["tristar_m","Tri-star",0,"inv"],["breakaway_p","Breakaway",1,"inv"],["breakaway_m","Breakaway",0,"inv"],["3inside_p","Three inside up",1,"inv"],["3inside_m","Three inside down",0,"inv"],["3outside_p","Three outside up",1,"inv"],["3outside_m","Three outside down",0,"inv"],["kicking_p","Kicking",1,"inv"],["kicking_m","Kicking",0,"inv"],["matchlow_p","Matching low",1,"inv"],["matchhigh_m","Matching high",0,"inv"],["ladderbot_p","Ladder bottom",1,"inv"],["laddertop_m","Ladder top",0,"inv"],["u3river_p","Unique three river bottom",1,"inv"],["upgap2crows_m","Upside gap two crows",0,"inv"],["3stars_p","Three stars in the south",1,"inv"],["ident3crows_m","Identical three crows",0,"inv"],["swallow_p","Concealing baby swallow",1,"inv"],["deliberation_m","Deliberation",0,"inv"],["sandwich_p","Stick sandwich",1,"inv"],["advblock_m","Advance block",0,"inv"],["homing_p","Homing pigeon",1,"inv"],["2crows_m","Two crows",0,"inv"],["seplines_p","Separating lines",1,"cont"],["seplines_m","Separating lines",0,"cont"],["rising3_p","Rising three methods",1,"cont"],["falling3_m","Falling three methods",0,"cont"],["uptasuki_p","Upside tasuki gap",1,"cont"],["dntasuki_m","Downside tasuki gap",0,"cont"],["sbswhite_p","Side by side white lines",1,"cont"],["sbswhite_m","Side by side white lines",0,"cont"],["3strike_p","Three line strike",1,"cont"],["3strike_m","Three line strike",0,"cont"],["upgap3m_p","Upside gap three methods",1,"cont"],["dngap3m_m","Downside gap three methods",0,"cont"],["onneck_p","On neck line",1,"cont"],["onneck_m","On neck line",0,"cont"],["inneck_p","In neck line",1,"cont"],["inneck_m","In neck line",0,"cont"]]; // [id, nome, rialzista, famiglia] nell'ordine del Dojo
 const ORDER = ["inv","cont"].flatMap(f => [1,0].flatMap(b => PL.filter(p => p[3] === f && p[2] === b)));
-const USER_DOMAIN = "utenti.dojo-delle-candele.app";
 const CFG = window.DOJO_CONFIG || {};
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -268,9 +267,11 @@ function ago(d){
 function summary(u){
   const d = u.progress || {}, srs = d.srs || {}, st = d.stats || {};
   let known = 0, fixing = 0, learning = 0, r = 0, w = 0;
-  for(const c of Object.values(srs)){ if(c.b >= 5) known++; else if(c.b >= 3) fixing++; else if(c.b >= 1) learning++; }
-  for(const c of Object.values(st)){ r += c.r || 0; w += c.w || 0; }
-  const dots = ORDER.map(p => { const b = (srs[p[0]] || {}).b || 0; const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || st[p[0]]) ? "l1" : ""; return `<i class="${cls}" title="${esc(p[1] + (p[2] ? " +" : " –"))}"></i>`; }).join("");
+  // i progressi li scrive ogni allievo: si contano solo numeri, così nessun testo finisce nella pagina
+  const num = v => Number.isFinite(+v) ? +v : 0;
+  for(const c of Object.values(srs)){ const b = num(c && c.b); if(b >= 5) known++; else if(b >= 3) fixing++; else if(b >= 1) learning++; }
+  for(const c of Object.values(st)){ r += num(c && c.r); w += num(c && c.w); }
+  const dots = ORDER.map(p => { const b = num((srs[p[0]] || {}).b); const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || st[p[0]]) ? "l1" : ""; return `<i class="${cls}" title="${esc(p[1] + (p[2] ? " +" : " –"))}"></i>`; }).join("");
   return {known, fixing, learning, r, w, dots};
 }
 
@@ -417,8 +418,8 @@ $("#loginForm").addEventListener("submit", async e => {
   let email = n;
   if(!n.includes("@")){
     const r = await sb.rpc("login_email", {u: n, pw});
-    email = r.error ? (/troppi tentativi/i.test(r.error.message) ? null : n + "@" + USER_DOMAIN) : r.data;
-    if(!email){ $("#lg-go").disabled = false; return err.textContent = r.error ? "Troppi tentativi sbagliati: riprova tra 15 minuti." : "Username o password sbagliati."; }
+    email = r.error ? null : r.data;
+    if(!email){ $("#lg-go").disabled = false; return err.textContent = r.error ? (/troppi tentativi/i.test(r.error.message) ? "Troppi tentativi sbagliati: riprova tra 15 minuti." : "Accesso non riuscito: " + r.error.message) : "Username o password sbagliati."; }
   }
   let captchaToken;
   if(CFG.turnstileSiteKey){
