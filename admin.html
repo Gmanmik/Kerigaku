@@ -171,6 +171,26 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 .legend i{border-radius:50%}
 .tile{border-top:3px solid var(--seal)}
 .gate{border-top:3px solid var(--seal)}
+/* Tasto «Sostieni il Dojo» (grafica Sumi). Usa solo le variabili già presenti nel sito:
+   --seal, --seal-ink, --muted, --line, --display, --body. */
+.support{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-weight:700;font-size:14.5px;letter-spacing:.03em;
+  color:var(--seal);background:transparent;border:1.5px solid var(--seal);border-radius:2px;padding:7px 16px 7px 7px;text-decoration:none;
+  transition:background .15s,color .15s}
+.support .cha{display:grid;place-items:center;width:26px;height:26px;border-radius:3px;background:var(--seal);color:var(--seal-ink);
+  font-family:var(--display);font-weight:800;font-size:16px;line-height:1;transform:rotate(-3deg)}
+.support:hover{background:var(--seal);color:var(--seal-ink)}
+.support:hover .cha{background:var(--seal-ink);color:var(--seal)}
+.support:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
+/* nel piè di pagina: un link discreto con il piccolo 茶 */
+.sitefoot .foot-support{display:inline-flex;align-items:center;gap:6px;color:var(--seal)!important;text-decoration:none}
+.sitefoot .foot-support .cha{font-family:var(--display);font-weight:800;font-size:13px;line-height:1}
+.sitefoot .foot-support:hover{text-decoration:underline;text-underline-offset:3px}
+/* fine del Ripasso del giorno: una riga piccola, mai un popup */
+.support-line{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;border-top:1px dashed var(--line2,var(--line));padding-top:14px;margin-top:4px}
+.support-line p{margin:0;font-size:13.5px;color:var(--muted);max-width:52ch}
+.support-line .support{font-size:13.5px;padding:5px 14px 5px 5px}
+.support-line .support .cha{width:22px;height:22px;font-size:14px}
+@media (max-width:600px){.support-line .support{width:100%;justify-content:center}}
 </style>
 </head>
 <body>
@@ -231,7 +251,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
       <div class="list" id="list"><p class="empty">Carico gli allievi…</p></div>
     </div>
   </main>
-  <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a><a href="about.html#contatti">Contatti</a><a href="privacy.html">Privacy</a><a href="privacy.html#cookie">Cookie</a></footer>
+  <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a><a href="about.html#contatti">Contatti</a><a href="privacy.html">Privacy</a><a href="privacy.html#cookie">Cookie</a><a class="foot-support" href="https://paypal.me/Gmanmik" target="_blank" rel="noopener noreferrer"><span class="cha" aria-hidden="true">茶</span>Sostieni il Dojo</a></footer>
 </div>
 
 <script src="supabase.js"></script>

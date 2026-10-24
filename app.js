@@ -651,6 +651,12 @@ function memePop(){
   el.style.setProperty("--r1", (r0 + side() * (8 + Math.random() * 6)).toFixed(1) + "deg");
   document.body.appendChild(el); setTimeout(() => el.remove(), 1600);
 }
+// la riga «Sostieni il Dojo» compare al massimo una volta al giorno
+function supportToday(){
+  const d = new Date().toISOString().slice(0, 10);
+  try{ if(localStorage.getItem("dojo-support-day") === d) return false; localStorage.setItem("dojo-support-day", d); }catch(e){}
+  return true;
+}
 function feedback(t){
   const ok = Q.pick === t.id, picked = BYID[Q.pick];
   let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3>${Q.levelUp ? `<p class="levelup">Sei salito di livello: <b>${esc(Q.levelUp)}</b></p>` : ""}<p>${esc(t.d)}</p>`;
@@ -703,6 +709,7 @@ function renderSrsSummary(){
     <div class="pips">${Q.res.map(r => `<span class="pip ${r ? "ok" : "ko"}"></span>`).join("")}</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Quando le rivedrai</div>
     <div class="sched">${keys.map(k => `<div><b>${k[0].toUpperCase() + k.slice(1)}</b><span>${groups[k].map(p => esc(label(p))).join(", ")}</span></div>`).join("")}</div></div>
+    ${supportToday() ? `<div class="support-line"><p>Ti è piaciuto il ripasso? Il Dojo è gratis e senza pubblicità. Se vuoi, offrimi un tè.</p><a class="support" href="https://paypal.me/Gmanmik" target="_blank" rel="noopener noreferrer"><span class="cha" aria-hidden="true">茶</span>Sostieni il Dojo</a></div>` : ""}
     <div class="actions"><button class="btn" id="homeGo">Torna al menu</button><button class="btn ghost" id="freeGo">Allenamento libero</button></div></div>`;
   $("#homeGo").onclick = goHome;
   $("#freeGo").onclick = () => setTab("f2n");
