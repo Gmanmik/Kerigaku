@@ -113,6 +113,65 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
 .sitefoot a{color:var(--muted)}
 @media (max-width:600px){body{background-image:none}.side{justify-items:start}.tile .v{font-size:26px}.user{padding:12px}}
 </style>
+<style>
+/* Grafica Sumi per le pagine secondarie (About, Privacy, Admin): carta washi, inchiostro, timbro vermiglio.
+   Viene dopo lo stile della pagina e ne ridefinisce colori, caratteri e forme. */
+:root{
+  --paper:#F3EEE4; --grain:rgba(60,40,10,.035); --grid:transparent; --card:#FBF8F2; --well:#F7F2E9;
+  --ink:#1D1A16; --muted:#6E665A; --line:#DCD2C1; --line2:#C9BDA8;
+  --bull:#2E6A4E; --bull-soft:#E1EBDF; --bear:#BF3A22; --bear-soft:#F5E0D7;
+  --accent:#BF3A22; --accent-soft:#F5E0D7; --hl:#F1E6C6; --hl-line:#B8963E; --seal:#C0392B; --seal-ink:#FFFFFF;
+  --display:"Shippori Mincho", "Hiragino Mincho ProN", Georgia, serif;
+  --body:"Zen Kaku Gothic New", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"Zen Kaku Gothic New", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15130F; --grain:rgba(255,240,210,.03); --grid:transparent; --card:#201C17; --well:#1A1713;
+  --ink:#F4EEE3; --muted:#C4BBAC; --line:#4D463B; --line2:#6A6152;
+  --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B;
+  --accent:#E8714F; --accent-soft:#35201A; --hl:#2E2817; --hl-line:#9C8236; --seal:#D9503A; --seal-ink:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#15130F; --grain:rgba(255,240,210,.03); --grid:transparent; --card:#201C17; --well:#1A1713;
+  --ink:#F4EEE3; --muted:#C4BBAC; --line:#4D463B; --line2:#6A6152;
+  --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B;
+  --accent:#E8714F; --accent-soft:#35201A; --hl:#2E2817; --hl-line:#9C8236; --seal:#D9503A; --seal-ink:#FFFFFF; color-scheme:dark}
+body{line-height:1.65;background-image:radial-gradient(var(--grain) 1px,transparent 1.2px)!important;background-size:7px 7px!important}
+h1,h2,.gate h2,.tile .v{font-family:var(--display);font-weight:800;letter-spacing:.01em}
+h2{font-weight:700}
+h1 em{color:var(--seal)}
+h3{font-family:var(--display);font-weight:700}
+.eyebrow{font-family:var(--body);font-weight:500;font-size:11.5px;letter-spacing:.28em}
+a{color:var(--seal)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline-color:var(--seal)}
+.back{border:0;background:none;padding:6px 0;color:var(--muted);font-weight:500;border-radius:0}
+.back:hover{color:var(--ink)}
+.seg,.themes{border:0;border-radius:2px;background:transparent}
+.seg button{border-radius:2px}
+.seg button+button{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:700}
+.chapter,.panel{border-radius:4px;border-color:var(--line)}
+.chapter{border-top:3px solid var(--seal)}
+.note{border-left-color:var(--seal)}
+.boxes span{font-family:var(--body);border-radius:2px;border-color:var(--line2)}
+.steps .n{font-family:var(--display);font-weight:800;color:var(--seal)}
+.credits div,.tbl th,.tbl td,.tbl tr{border-color:var(--line)}
+.tbl code,.secret,.exportbox textarea{font-family:ui-monospace,Menlo,Consolas,monospace}
+.sitefoot{padding-top:18px;border-top:1px solid var(--line)}
+.sitefoot a{text-decoration:none}
+.sitefoot a:hover{color:var(--seal)}
+/* admin */
+.btn{border-radius:2px;font-weight:700;letter-spacing:.02em}
+.btn:hover:not(:disabled){background:var(--seal);color:var(--seal-ink)}
+.btn.ghost{border:1px solid var(--line2)}
+.btn.ghost:hover:not(:disabled){background:var(--well);color:var(--ink)}
+input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-color:var(--line2)}
+.chip{border-radius:2px;font-weight:700}
+.chip.me{border-color:var(--line2)}
+.dots i{border-radius:50%}
+.legend i{border-radius:50%}
+.tile{border-top:3px solid var(--seal)}
+.gate{border-top:3px solid var(--seal)}
+</style>
 </head>
 <body>
 <div class="wrap">
