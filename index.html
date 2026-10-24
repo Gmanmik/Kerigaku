@@ -447,7 +447,7 @@ const captcha = (() => {
 const cloud = (() => {
   const ready = !!(window.supabase && CFG.supabaseUrl && CFG.supabaseAnonKey && !/INSERISCI/.test(CFG.supabaseUrl + CFG.supabaseAnonKey));
   const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
-  let user = null, state = ready ? "guest" : "local", timer = 0, writing = false, dirty = false;
+  let user = null, state = ready ? "guest" : "local", timer = 0, writing = false, dirty = false, lastErr = "";
   const uname = u => (u && u.user_metadata && u.user_metadata.username) || (u && u.email ? u.email.split("@")[0] : "");
   const payload = () => ({v:1, srs, stats, daily, prefs});
   function paint(s){
@@ -465,7 +465,7 @@ const cloud = (() => {
     box.innerHTML = `<span class="who noav"><span class="st ${dot}"></span><span class="txt">${user ? "<b></b> · " : ""}<span class="m"></span></span></span>` +
       (ready ? (user ? `<button class="linkbtn" id="accountBtn">Account</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "");
     if(user) box.querySelector("b").textContent = uname(user);
-    box.querySelector(".m").textContent = msg;
+    box.querySelector(".m").textContent = msg + (state === "error" && lastErr ? ` (${lastErr})` : "");
     const ab = $("#accountBtn"); if(ab) ab.onclick = showAccount;
     const li = $("#loginBtn"); if(li) li.onclick = () => showAuth("in");
   }
@@ -475,6 +475,8 @@ const cloud = (() => {
     if(writing){ dirty = true; return; }
     writing = true; dirty = false; paint("saving");
     const {error} = await sb.from("progress").upsert({user_id: user.id, data: payload(), updated_at: new Date().toISOString()});
+    if(error && await recover(error)){ writing = false; return; }
+    if(!error) lastErr = "";
     paint(error ? "error" : "ok");
     writing = false;
     if(dirty && user) flush();
@@ -503,17 +505,25 @@ const cloud = (() => {
     return changed;
   }
   // dopo la password: se l'account ha la verifica in due passaggi, chiede il codice dell'app
+  // il database ha rifiutato: l'accesso può essere scaduto, o la 2FA è stata attivata dopo questo accesso
+  async function recover(err, loading){
+    lastErr = (err && err.message) || "";
+    const r = await sb.auth.refreshSession();
+    if(r.error || !r.data.session){ await sb.auth.signOut().catch(() => {}); user = null; setSpace(null); paint("guest"); showAuth("in"); return true; }
+    if(await needsMfa()){ if(loading) user = null; showAuth("mfa"); return true; }
+    return false;
+  }
   async function needsMfa(){
     const {data} = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
     return !!data && data.nextLevel === "aal2" && data.currentLevel !== "aal2";
   }
   async function enter(u){
     if(await needsMfa()) return showAuth("mfa");
-    if(user && user.id === u.id){ goHome(); return; }
+    if(user && user.id === u.id){ goHome(); schedule(); return; }
     const guest = {srs, stats, daily};
     user = u; setSpace(u.id); paint("loading");
     const {data, error} = await sb.from("progress").select("data").eq("user_id", u.id).maybeSingle();
-    if(error){ paint("error"); }
+    if(error){ if(await recover(error, true)) return; paint("error"); }
     else if(data){ if(merge(data.data || {})) flush(); else paint("ok"); }
     else {
       // primo accesso: porta nell'account quello che hai fatto senza account
