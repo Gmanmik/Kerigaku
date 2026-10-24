@@ -374,7 +374,7 @@ const cloud = (() => {
     const box = $("#acct"); if(!box) return;
     const dot = {ok:"ok", saving:"busy", loading:"busy", error:"ko"}[state] || "";
     const msg = {
-      local: "Progressi salvati solo su questo dispositivo",
+      local: !window.supabase ? "Login non attivo: la libreria di Supabase non si è caricata" : "Login non attivo: inserisci URL e chiave di Supabase in config.js",
       guest: "Senza account: progressi salvati solo su questo dispositivo",
       loading: "Carico i tuoi progressi…",
       saving: "Salvataggio…",
