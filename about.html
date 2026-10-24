@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem("dojo-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dojo delle candele · About e crediti</title>
+<meta name="description" content="Cos'è il Dojo delle candele, come funziona e chi ha contribuito.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M10 4v24M22 4v24' stroke='%2336423C' stroke-width='2'/%3E%3Crect x='6' y='9' width='8' height='12' rx='1' fill='%2312875C'/%3E%3Crect x='18' y='12' width='8' height='10' rx='1' fill='%23CF3F48'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column on the dojo's chart-paper; two chapters, About and Crediti. */
+:root{
+  color-scheme:light;
+  --paper:#F1F4F0; --grid:rgba(24,48,36,.055); --card:#FFFFFF; --well:#FAFBF9;
+  --ink:#17201C; --muted:#5A6660; --line:#D7DDD8;
+  --bull:#12875C; --bull-soft:#DCF0E5; --bear:#CF3F48;
+  --accent:#2C46A6; --accent-soft:#E2E7F7; --hl-line:#D9B54A;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:22px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.back{font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px 7px 11px;border-radius:999px;text-decoration:none}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:12.5px;font-weight:500;border:0;background:transparent;color:var(--muted);padding:5px 10px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,52px);line-height:1.02;margin:6px 0 0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--bull)}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4vw,30px);line-height:1.1;margin:0;text-wrap:balance}
+h3{font-size:16px;margin:0}
+p{margin:0;max-width:65ch}
+a{color:var(--accent)}
+.lead{color:var(--muted);font-size:clamp(16px,2.4vw,18px)}
+.chapter{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,30px);display:grid;gap:14px;scroll-margin-top:16px}
+.steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.steps .n{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:20px}
+.boxes{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.boxes span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:var(--well);font-variant-numeric:tabular-nums}
+.boxes span:nth-child(n+4){border-color:var(--bull);color:var(--bull)}
+.note{border-left:3px solid var(--hl-line);padding:4px 0 4px 14px;color:var(--muted);font-size:14.5px}
+.credits{display:grid;gap:0;margin:0}
+.credits div{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.credits div:first-child{border-top:0;padding-top:0}
+.credits dt{font-weight:600;font-size:14px}
+.credits dd{margin:0;font-size:14.5px;color:var(--muted)}
+.credits dd b{color:var(--ink);font-weight:600}
+.sitefoot{display:flex;gap:6px 16px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--muted)}
+.sitefoot a{color:var(--muted)}
+@media (max-width:600px){
+  body{background-image:none;font-size:15.5px}
+  .credits div{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" href="./">← Torna al Dojo</a>
+    <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
+      <button type="button" data-t="auto" title="Segue il giorno o la notte del tuo dispositivo">Auto</button><button type="button" data-t="light">Giorno</button><button type="button" data-t="dark">Notte</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="eyebrow">Dojo delle candele · 道場</div>
+    <h1>Un dojo per allenare <em>l'occhio</em></h1>
+  </header>
+
+  <section class="chapter" id="about">
+    <div class="eyebrow">About</div>
+    <h2>Cos'è il Dojo</h2>
+    <p class="lead">Il Dojo delle candele è una palestra per imparare a riconoscere le 66 figure classiche dei grafici a candele giapponesi: dalle più comuni, come hammer ed engulfing, alle più rare, come tri-star e concealing baby swallow.</p>
+    <p>Nelle arti marziali il dojo è il luogo dove si ripete un gesto finché diventa naturale. Qui il gesto è guardare un grafico e dare il nome giusto alla figura che hai davanti, in pochi secondi.</p>
+
+    <h3>Come si allena</h3>
+    <ol class="steps">
+      <li><span class="n">1</span><span><b>Studia.</b> Ogni figura ha il suo disegno, il trend da cui nasce e una spiegazione breve, con la sua gemella di segno opposto.</span></li>
+      <li><span class="n">2</span><span><b>Figura → Nome e Nome → Figura.</b> Giri da 10 domande su grafici generati ogni volta in modo diverso, così riconosci la forma e non il disegno a memoria.</span></li>
+      <li><span class="n">3</span><span><b>Ripasso del giorno.</b> Ogni giorno 5 figure nuove e quelle da ripassare. Una figura che sai torna dopo sempre più tempo; una che sbagli torna subito.</span></li>
+    </ol>
+    <p>Il ripasso usa il metodo Leitner: ogni figura sta in una scatola, e ogni risposta giusta la sposta in quella successiva.</p>
+    <div class="boxes" aria-label="Intervalli di ripasso"><span>oggi</span><span>1 giorno</span><span>3 giorni</span><span>7 giorni</span><span>16 giorni</span><span>35 giorni</span></div>
+
+    <h3>I tuoi dati</h3>
+    <p>Con un account, il Dojo salva i tuoi progressi (quali figure conosci, quando ripassarle, le risposte giuste e sbagliate) e le preferenze di allenamento. Li vedi solo tu, più gli amministratori del Dojo, che possono aiutarti a reimpostare la password o ad azzerare i progressi. Senza account, tutto resta solo nel tuo browser.</p>
+
+    <p class="note">Il Dojo serve a imparare a leggere i grafici, non dà consigli di investimento. Nessuna figura garantisce come si muoverà il prezzo: usale sempre insieme al contesto e a una gestione prudente del rischio.</p>
+  </section>
+
+  <section class="chapter" id="crediti">
+    <div class="eyebrow">Crediti</div>
+    <h2>Chi ha costruito il Dojo</h2>
+    <dl class="credits">
+      <div><dt>Idea e direzione</dt><dd><b>Michele</b> (gmanmik)</dd></div>
+      <div><dt>Progetto e codice</dt><dd>Scritto insieme a <b>Claude</b>, l'assistente di Anthropic</dd></div>
+      <div><dt>Le figure</dt><dd>La tradizione delle candele giapponesi nasce nel Settecento con <b>Munehisa Homma</b>, mercante di riso a Osaka, ed è arrivata in Occidente con i libri di <b>Steve Nison</b>. Nomi e descrizioni seguono la terminologia inglese ormai standard.</dd></div>
+      <div><dt>Caratteri</dt><dd><b>Young Serif</b> di Bastien Sozeau, <b>Figtree</b> di Erik Kennedy e <b>IBM Plex Mono</b> di IBM, tutti con licenza SIL Open Font License, tramite Google Fonts</dd></div>
+      <div><dt>Account e database</dt><dd><b>Supabase</b>, con la libreria supabase-js (licenza MIT)</dd></div>
+      <div><dt>Hosting</dt><dd><b>GitHub Pages</b></dd></div>
+    </dl>
+  </section>
+
+  <footer class="sitefoot"><span>Dojo delle candele</span><a href="./">Dojo</a><a href="#about">About</a><a href="#crediti">Crediti</a></footer>
+</div>
+<script>
+/* tema: automatico (segue il dispositivo), giorno o notte */
+(function(){
+  const seg = document.getElementById("themeSeg"); if(!seg) return;
+  let t = "auto";
+  try{ t = localStorage.getItem("dojo-theme") || "auto"; }catch(e){}
+  function apply(v, save){
+    t = v;
+    if(v === "light" || v === "dark") document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme;
+    if(save) try{ v === "auto" ? localStorage.removeItem("dojo-theme") : localStorage.setItem("dojo-theme", v); }catch(e){}
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === v));
+    window.dispatchEvent(new Event("dojo-theme"));
+  }
+  seg.querySelectorAll("button").forEach(b => b.onclick = () => apply(b.dataset.t, true));
+  apply(t, false);
+})();
+</script>
+</body>
+</html>

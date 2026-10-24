@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<script>try{var t=localStorage.getItem("dojo-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dojo delle candele</title>
 <meta name="description" content="Allenamento sulle 66 figure candlestick giapponesi, con account e progressi salvati.">
@@ -190,6 +191,22 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .authcard .seg{width:fit-content}
 #authForm{display:grid;gap:6px}
 #authForm label{font-size:13px;font-weight:600;margin-top:6px}
+.check{display:flex!important;gap:10px;align-items:flex-start;font-weight:500!important;font-size:13.5px!important;color:var(--muted);margin-top:10px!important;cursor:pointer}
+.check input{width:18px!important;height:18px;flex:none;margin:2px 0 0;accent-color:var(--accent);padding:0!important}
+.au-ok{margin:0;font-size:13.5px;color:var(--bull);min-height:0}
+.au-ok:empty{display:none}
+.au-links{display:flex;flex-direction:column;align-items:center;gap:10px}
+.accountbox{display:grid;gap:12px;max-width:620px}
+.acard{padding:16px 18px;display:grid;gap:10px}
+.acard p{margin:0}
+.acard b{overflow-wrap:anywhere}
+.acard .row{display:flex;gap:8px;flex-wrap:wrap}
+.acard .stack{display:grid;gap:8px;max-width:360px}
+.acard input:not([type=checkbox]){font:inherit;font-size:16px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);min-width:0;flex:1 1 200px}
+.acard .au-err:empty{display:none}
+.mfasteps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.secret{font-family:var(--mono);font-size:12.5px;background:var(--well);border:1px solid var(--line);border-radius:5px;padding:1px 6px;overflow-wrap:anywhere}
+.qr{width:180px;height:180px;background:#fff;border-radius:8px;padding:8px}
 #authForm input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);width:100%;min-width:0}
 #authForm input:focus-visible{border-color:var(--accent)}
 .pwrow{display:grid;gap:6px}
@@ -197,7 +214,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 #au-go{justify-content:center;margin-top:4px}
 .authcard .linkbtn{justify-self:center}
 .acct .linkbtn{white-space:nowrap}
-.acct{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:30px;margin-bottom:8px;font-size:13px;color:var(--muted)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-bottom:8px}
+.themes button{padding:5px 10px;font-size:12.5px}
+.acct{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:30px;font-size:13px;color:var(--muted);min-width:0;flex:0 1 auto}
+.sitefoot{display:flex;gap:6px 16px;flex-wrap:wrap;justify-content:center;margin-top:40px;font-size:13px;color:var(--muted)}
+.sitefoot a{color:var(--muted)}
+.sitefoot a:hover{color:var(--ink)}
 .acct .who{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 4px;max-width:100%;min-width:0}
 .acct .who.noav{padding-left:12px}
 .acct img{width:22px;height:22px;border-radius:50%;flex:none;object-fit:cover}
@@ -214,11 +236,50 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
   .qcard{padding:14px}
 }
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- versione minimal per telefoni ---------- */
+@media (max-width:600px){
+  body{background-image:none;font-size:15px}
+  .wrap{padding-block:12px 40px}
+  .topbar{margin-bottom:12px}
+  .acct .who{padding:2px 10px}
+  .hero{padding:18px 18px 20px;border-radius:14px;margin-top:0}
+  .hero canvas,.hero .kanji,.hero::after{display:none}
+  .hero h1{font-size:38px;max-width:none}
+  .hero .lead{font-size:14.5px;margin-top:8px}
+  .menu-h{font-size:19px;margin:22px 0 10px}
+  .modes{gap:8px}
+  .mode{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:12px 14px;border-width:1.5px;border-radius:12px}
+  .mode:hover{transform:none;box-shadow:none}
+  .mode .ill{display:none}
+  .mode h3{font-size:16px}
+  .mode .rec{margin:0}
+  .settings{padding:12px;gap:10px 16px}
+  .startrow{margin-top:12px}
+  .btn.big{width:100%;justify-content:center;padding:13px 20px}
+  .startrow .hint{width:100%;text-align:center}
+  .progress{margin-top:22px;padding:14px}
+  .progress .dots{gap:4px}
+  .progress .dots i{width:10px;height:10px}
+  .legend{gap:6px 12px}
+  .panel{box-shadow:none}
+  .qcard{gap:12px}
+  .bigchart,.intro .big{padding:4px}
+  .opt{padding:11px 12px}
+  .bar .t{font-size:19px}
+  .bar .cfg{display:none}
+  .sitefoot{margin-top:28px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="acct" id="acct" aria-live="polite"></div>
+  <div class="topbar">
+    <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
+      <button type="button" data-t="auto" title="Segue il giorno o la notte del tuo dispositivo">Auto</button><button type="button" data-t="light">Giorno</button><button type="button" data-t="dark">Notte</button>
+    </div>
+    <div class="acct" id="acct" aria-live="polite"></div>
+  </div>
   <section id="view-home">
     <div class="hero">
       <canvas id="heroCanvas" aria-hidden="true"></canvas>
@@ -287,29 +348,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
   </section>
 
   <section id="view-auth" hidden>
-    <div class="authwrap">
-      <div class="panel authcard">
-        <div class="eyebrow">Dojo delle candele · 道場</div>
-        <h2 id="au-title">Bentornato nel dojo</h2>
-        <p class="hint" style="margin:0;font-size:13.5px">Con un account i tuoi progressi ti seguono su ogni dispositivo.</p>
-        <div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati">
-          <button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button>
-        </div>
-        <form id="authForm" novalidate>
-          <label for="au-name">Username</label>
-          <input id="au-name" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24" required>
-          <label for="au-pw">Password</label>
-          <input id="au-pw" name="password" type="password" autocomplete="current-password" minlength="6" required>
-          <div id="au-pw2-row" class="pwrow" hidden>
-            <label for="au-pw2">Ripeti la password</label>
-            <input id="au-pw2" name="password2" type="password" autocomplete="new-password" minlength="6">
-          </div>
-          <p class="au-err" id="au-err" role="alert"></p>
-          <button class="btn big" id="au-go" type="submit">Entra</button>
-        </form>
-        <button class="linkbtn" id="au-guest" type="button">Continua senza account</button>
-      </div>
-    </div>
+    <div class="authwrap"><div class="panel authcard" id="authCard"></div></div>
   </section>
 
   <div class="bar" id="bar" hidden>
@@ -317,6 +356,10 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
     <span class="t" id="barTitle"></span>
     <span class="cfg" id="barCfg"></span>
   </div>
+
+  <section id="view-account" hidden>
+    <div class="accountbox" id="accountBox"></div>
+  </section>
 
   <section id="view-quiz" hidden>
     <div id="quiz"></div>
@@ -332,6 +375,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
     <p class="hint">Verde: il prezzo dovrebbe salire. Rosso: dovrebbe scendere. La freccia grigia mostra da dove arriva il prezzo. I pallini sotto ogni scheda si accendono man mano che la fissi con il Ripasso del giorno.</p>
     <div id="study"></div>
   </section>
+  <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a></footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -355,14 +399,17 @@ let prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}));
 function savePrefs(){ store.set(K("dojo-prefs-v1"), prefs); cloud.schedule(); }
 function saveStats(){ store.set(K("dojo-stats-v1"), stats); cloud.schedule(); }
 if(!prefs.srsSeen){ prefs.mode = "srs"; prefs.srsSeen = true; }
-/* ---------- account: login con username e password su Supabase ----------
-   Supabase vuole un'email, quindi lo username diventa <username>@USER_DOMAIN.
-   I progressi stanno nella tabella progress, una riga per utente, protetta da
-   regole che fanno leggere e scrivere a ciascuno solo la propria (schema.sql).
-   Sul dispositivo resta una copia per ogni utente, più quella di chi usa il
-   Dojo senza account. */
+/* ---------- account: login su Supabase ----------
+   Ci si registra con username, email e password; l'email riceve un codice a 6 cifre
+   che conferma l'account. Chi si è registrato prima delle email ha un indirizzo
+   interno <username>@USER_DOMAIN: entra con lo username e può aggiungere l'email
+   dalla pagina Account. I progressi stanno nella tabella progress, una riga per
+   utente, protetta da regole che fanno leggere e scrivere a ciascuno solo la
+   propria (schema.sql, account.sql). Sul dispositivo resta una copia per ogni
+   utente, più quella di chi usa il Dojo senza account. */
 const CFG = window.DOJO_CONFIG || {};
 const USER_DOMAIN = "utenti.dojo-delle-candele.app";
+const isLegacy = email => !email || email.endsWith("@" + USER_DOMAIN);
 const cloud = (() => {
   const ready = !!(window.supabase && CFG.supabaseUrl && CFG.supabaseAnonKey && !/INSERISCI/.test(CFG.supabaseUrl + CFG.supabaseAnonKey));
   const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
@@ -382,11 +429,11 @@ const cloud = (() => {
       error: "Non riesco a salvare online: riprovo alla prossima risposta"
     }[state];
     box.innerHTML = `<span class="who noav"><span class="st ${dot}"></span><span class="txt">${user ? "<b></b> · " : ""}<span class="m"></span></span></span>` +
-      (ready ? (user ? `<button class="linkbtn" id="logoutBtn">Esci</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "");
+      (ready ? (user ? `<button class="linkbtn" id="accountBtn">Account</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "");
     if(user) box.querySelector("b").textContent = uname(user);
     box.querySelector(".m").textContent = msg;
-    const lo = $("#logoutBtn"); if(lo) lo.onclick = logout;
-    const li = $("#loginBtn"); if(li) li.onclick = showAuth;
+    const ab = $("#accountBtn"); if(ab) ab.onclick = showAccount;
+    const li = $("#loginBtn"); if(li) li.onclick = () => showAuth("in");
   }
   async function flush(){
     clearTimeout(timer); timer = 0;
@@ -421,8 +468,14 @@ const cloud = (() => {
     saveLocal();
     return changed;
   }
+  // dopo la password: se l'account ha la verifica in due passaggi, chiede il codice dell'app
+  async function needsMfa(){
+    const {data} = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    return !!data && data.nextLevel === "aal2" && data.currentLevel !== "aal2";
+  }
   async function enter(u){
-    if(user && user.id === u.id) return;
+    if(await needsMfa()) return showAuth("mfa");
+    if(user && user.id === u.id){ goHome(); return; }
     const guest = {srs, stats, daily};
     user = u; setSpace(u.id); paint("loading");
     const {data, error} = await sb.from("progress").select("data").eq("user_id", u.id).maybeSingle();
@@ -439,38 +492,60 @@ const cloud = (() => {
     await sb.auth.signOut();
     user = null; setSpace(null); paint("guest"); goHome();
   }
-  function toEmail(n){ return n + "@" + USER_DOMAIN; }
   function errText(e){
     const m = (e && e.message || "").toLowerCase();
-    if(m.includes("invalid login")) return "Username o password sbagliati.";
-    if(m.includes("already registered") || m.includes("already been registered")) return "Questo username è già preso: scegline un altro.";
+    if(m.includes("invalid login")) return "Credenziali sbagliate. Se hai aggiunto la tua email all'account, entra con quella.";
+    if(m.includes("already registered") || m.includes("already been registered")) return "Questa email ha già un account: prova ad accedere.";
+    if(m.includes("database error saving new user")) return "Questo username è già preso: scegline un altro.";
+    if(m.includes("token has expired") || m.includes("invalid") && m.includes("otp") || m.includes("token")) return "Codice sbagliato o scaduto: controlla l'ultima email o fattene mandare un altro.";
+    if(m.includes("rate limit") || m.includes("security purposes")) return "Troppe richieste in poco tempo: aspetta un minuto e riprova.";
+    if(m.includes("should be different")) return "La nuova password deve essere diversa da quella attuale.";
     if(m.includes("password")) return "La password deve avere almeno 6 caratteri.";
-    if(m.includes("confirm")) return "Account creato, ma Supabase chiede la conferma via email: disattivala nelle impostazioni (vedi LEGGIMI).";
+    if(m.includes("email") && m.includes("invalid")) return "Questo indirizzo email non sembra valido.";
     return "Qualcosa non ha funzionato: " + (e && e.message || "riprova tra poco.");
   }
-  async function signIn(n, pw){
-    const {data, error} = await sb.auth.signInWithPassword({email: toEmail(n), password: pw});
-    if(error) throw errText(error);
-    await enter(data.user);
-  }
-  async function signUp(n, pw){
-    const {data, error} = await sb.auth.signUp({email: toEmail(n), password: pw, options: {data: {username: n}}});
-    if(error) throw errText(error);
-    if(!data.session) throw errText({message: "confirm"});
-    await enter(data.user);
-  }
-  async function init(){
-    paint();
-    if(!ready) return;
-    const {data} = await sb.auth.getSession();
-    if(data.session) await enter(data.session.user);
-    else if(!store.get("dojo-guest", false)) showAuth();
-    sb.auth.onAuthStateChange((ev, s) => { if(ev === "SIGNED_OUT" && user){ user = null; setSpace(null); paint("guest"); goHome(); } });
-  }
+  const must = async p => { const {data, error} = await p; if(error) throw errText(error); return data; };
   window.addEventListener("pagehide", () => { if(timer) flush(); });
-  return {init, schedule, flush, signIn, signUp, get ready(){ return ready; }, get on(){ return !!user; }};
+  const toLogin = id => id.includes("@") ? id : id + "@" + USER_DOMAIN;
+  return {
+    get ready(){ return ready; }, get on(){ return !!user; }, get user(){ return user; }, sb, schedule, flush, logout, errText,
+    async signIn(id, pw){ const d = await must(sb.auth.signInWithPassword({email: toLogin(id), password: pw})); await enter(d.user); },
+    async signUp(name, email, pw, marketing){
+      const free = await must(sb.rpc("username_available", {u: name}));
+      if(!free) throw "Questo username è già preso: scegline un altro.";
+      const d = await must(sb.auth.signUp({email, password: pw, options: {data: {username: name, marketing: !!marketing}}}));
+      if(d.session) await enter(d.user);   // conferma email disattivata
+      return !d.session;
+    },
+    async verifySignup(email, code){ const d = await must(sb.auth.verifyOtp({email, token: code, type: "signup"})); await enter(d.user); },
+    resendSignup: email => must(sb.auth.resend({type: "signup", email})),
+    sendReset: email => must(sb.auth.resetPasswordForEmail(email)),
+    async resetWithCode(email, code, pw){
+      const d = await must(sb.auth.verifyOtp({email, token: code, type: "recovery"}));
+      if(await needsMfa()) return "mfa";   // con la verifica in due passaggi la password si cambia dopo il codice dell'app
+      await must(sb.auth.updateUser({password: pw}));
+      await enter(d.user);
+    },
+    async verifyMfa(code, newPw){
+      const f = await must(sb.auth.mfa.listFactors());
+      const totp = (f.totp || [])[0]; if(!totp) throw "Nessuna app di autenticazione collegata a questo account.";
+      await must(sb.auth.mfa.challengeAndVerify({factorId: totp.id, code}));
+      if(newPw) await must(sb.auth.updateUser({password: newPw}));
+      const {data} = await sb.auth.getUser(); await enter(data.user);
+    },
+    async init(){
+      paint();
+      if(!ready) return;
+      const {data} = await sb.auth.getSession();
+      if(data.session) await enter(data.session.user);
+      else if(!store.get("dojo-guest", false)) showAuth("in");
+      sb.auth.onAuthStateChange((ev, s) => {
+        if(ev === "SIGNED_OUT" && user){ user = null; setSpace(null); paint("guest"); goHome(); }
+        if(ev === "USER_UPDATED" && s && user){ user = s.user; paint(); }
+      });
+    }
+  };
 })();
-
 
 /* ---------- ripasso a intervalli (Leitner) ---------- */
 const INT = [0, 1, 3, 7, 16, 35];          // giorni di attesa per ogni scatola
@@ -603,7 +678,7 @@ let view = "home";
 const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura"};
 function setTab(t){
   view = t; prefs.mode = t; savePrefs();
-  $("#view-home").hidden = true; $("#view-auth").hidden = true;
+  $("#view-home").hidden = true; $("#view-auth").hidden = true; $("#view-account").hidden = true;
   $("#bar").hidden = false;
   $("#barTitle").textContent = MODE_TITLE[t];
   const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
@@ -619,7 +694,7 @@ function setTab(t){
 function curMode(){ return Q && Q.mode === "srs" ? Q.dirs[Q.i] : Q && Q.mode; }
 function goHome(){
   view = "home";
-  $("#view-auth").hidden = true;
+  $("#view-auth").hidden = true; $("#view-account").hidden = true;
   syncControls();
   $("#view-home").hidden = false; $("#bar").hidden = true;
   $("#view-studia").hidden = true; $("#view-quiz").hidden = true;
@@ -728,9 +803,10 @@ const heroAnim = (() => {
     draw(); raf = requestAnimationFrame(tick);
   }
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.addEventListener("resize", () => { size(); draw(); });
+  window.addEventListener("resize", () => { if(getComputedStyle(cv).display === "none"){ cancelAnimationFrame(raf); raf = 0; return; } size(); draw(); if(!still && !raf && view === "home") raf = requestAnimationFrame(tick); });
+  window.addEventListener("dojo-theme", () => { if(raf || still) draw(); });
   return {
-    start(){ size(); draw(); if(!still && !raf) raf = requestAnimationFrame(tick); },
+    start(){ if(getComputedStyle(cv).display === "none") return; size(); draw(); if(!still && !raf) raf = requestAnimationFrame(tick); },
     stop(){ cancelAnimationFrame(raf); raf = 0; }
   };
 })();
@@ -927,7 +1003,7 @@ function renderSummary(){
   bindTwinLinks($("#quiz"));
 }
 document.addEventListener("keydown", e => {
-  if(view === "home" || view === "studia" || view === "auth" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
+  if(view === "home" || view === "studia" || view === "auth" || view === "account" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
   if(Q.mode === "srs" && Q.intro && Q.qs[Q.i] && Q.intro.has(Q.qs[Q.i].id)) return;
   if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || prefs.ans === "btn")){
     const o = Q.cur && Q.cur.opts[+e.key - 1]; if(o) answer(o.id);
@@ -970,39 +1046,189 @@ function renderStudy(){
 $("#search").addEventListener("input", renderStudy);
 
 /* ---------- schermata di accesso ---------- */
-let authMode = "in";
-function showAuth(){
-  view = "auth"; authMode = "in";
-  ["#view-home", "#view-quiz", "#view-studia", "#bar"].forEach(s => $(s).hidden = true);
+const AUTH = {step: "in", email: ""};
+const fieldHTML = (id, label, attrs) => `<label for="${id}">${label}</label><input id="${id}" ${attrs}>`;
+function showAuth(step){
+  view = "auth";
+  ["#view-home", "#view-quiz", "#view-studia", "#view-account", "#bar"].forEach(s => $(s).hidden = true);
   $("#view-auth").hidden = false;
   heroAnim.stop();
-  paintAuth();
-  $("#au-name").focus({preventScroll:true});
+  paintAuth(step || "in");
 }
-function paintAuth(){
-  const up = authMode === "up";
-  document.querySelectorAll("#authSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === authMode));
-  $("#au-title").textContent = up ? "Crea il tuo account" : "Bentornato nel dojo";
-  $("#au-pw2-row").hidden = !up;
-  $("#au-go").textContent = up ? "Crea account" : "Entra";
-  $("#au-pw").autocomplete = up ? "new-password" : "current-password";
-  $("#au-err").textContent = "";
+function paintAuth(step){
+  AUTH.step = step;
+  const card = $("#authCard");
+  const tabs = step === "in" || step === "up";
+  const T = {
+    in: ["Bentornato nel dojo", "Con un account i tuoi progressi ti seguono su ogni dispositivo."],
+    up: ["Crea il tuo account", "Ti mandiamo un codice via email per confermare che l'indirizzo è tuo."],
+    code: ["Controlla la tua email", ""],
+    forgot: ["Password dimenticata", "Scrivi l'email del tuo account: ti mandiamo un codice per sceglierne una nuova."],
+    reset: ["Scegli la nuova password", ""],
+    mfa: ["Verifica in due passaggi", "Apri l'app di autenticazione e scrivi il codice a 6 cifre del Dojo."]
+  }[step];
+  const code = `inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="123456"`;
+  let f = "";
+  if(step === "in") f = fieldHTML("au-id", "Email o username", `autocomplete="username" autocapitalize="none" spellcheck="false"`) + fieldHTML("au-pw", "Password", `type="password" autocomplete="current-password"`);
+  if(step === "up") f = fieldHTML("au-name", "Username", `autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24"`) +
+    fieldHTML("au-email", "Email", `type="email" autocomplete="email" autocapitalize="none" spellcheck="false"`) +
+    fieldHTML("au-pw", "Password", `type="password" autocomplete="new-password"`) + fieldHTML("au-pw2", "Ripeti la password", `type="password" autocomplete="new-password"`) +
+    `<label class="check"><input type="checkbox" id="au-mkt"> <span>Voglio ricevere via email novità e consigli dal Dojo. Puoi disiscriverti quando vuoi.</span></label>`;
+  if(step === "code" || step === "mfa") f = fieldHTML("au-code", "Codice a 6 cifre", code);
+  if(step === "forgot") f = fieldHTML("au-email", "Email", `type="email" autocomplete="email" autocapitalize="none" spellcheck="false"`);
+  if(step === "reset") f = fieldHTML("au-code", "Codice a 6 cifre", code) + fieldHTML("au-pw", "Nuova password", `type="password" autocomplete="new-password"`) + fieldHTML("au-pw2", "Ripeti la password", `type="password" autocomplete="new-password"`);
+  const go = {in: "Entra", up: "Crea account", code: "Conferma", forgot: "Mandami il codice", reset: "Salva e entra", mfa: "Verifica"}[step];
+  card.innerHTML = `<div class="eyebrow">Dojo delle candele · 道場</div><h2></h2><p class="hint au-sub"></p>
+    ${tabs ? `<div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati"><button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button></div>` : ""}
+    <form id="authForm" novalidate>${f}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
+    <div class="au-links">
+      ${step === "in" ? `<button class="linkbtn" type="button" data-s="forgot">Password dimenticata?</button>` : ""}
+      ${step === "code" ? `<button class="linkbtn" type="button" id="au-resend">Mandami un altro codice</button>` : ""}
+      ${tabs ? `<button class="linkbtn" id="au-guest" type="button">Continua senza account</button>` : `<button class="linkbtn" type="button" data-s="in">Torna all'accesso</button>`}
+    </div>`;
+  card.querySelector("h2").textContent = T[0];
+  card.querySelector(".au-sub").textContent = step === "code" ? `Abbiamo mandato un codice a 6 cifre a ${AUTH.email}. Scrivilo qui per attivare l'account.` :
+    step === "reset" ? `Scrivi il codice che abbiamo mandato a ${AUTH.email} e la nuova password.` : T[1];
+  card.querySelectorAll("#authSeg button").forEach(b => { b.setAttribute("aria-pressed", b.dataset.v === step); b.onclick = () => paintAuth(b.dataset.v); });
+  card.querySelectorAll("[data-s]").forEach(b => b.onclick = async () => { if(step === "mfa") await cloud.sb.auth.signOut(); paintAuth(b.dataset.s); });
+  const guest = $("#au-guest"); if(guest) guest.onclick = () => { store.set("dojo-guest", true); goHome(); };
+  const resend = $("#au-resend"); if(resend) resend.onclick = async () => {
+    try{ await cloud.resendSignup(AUTH.email); $("#au-ok").textContent = "Codice rimandato: controlla anche lo spam."; $("#au-err").textContent = ""; }
+    catch(m){ $("#au-err").textContent = m; }
+  };
+  $("#authForm").addEventListener("submit", submitAuth);
+  const first = card.querySelector("input"); if(first) first.focus({preventScroll:true});
 }
-document.querySelectorAll("#authSeg button").forEach(b => b.onclick = () => { authMode = b.dataset.v; paintAuth(); });
-$("#authForm").addEventListener("submit", async e => {
+async function submitAuth(e){
   e.preventDefault();
-  const n = $("#au-name").value.trim().toLowerCase(), pw = $("#au-pw").value, err = $("#au-err");
-  if(!/^[a-z0-9_.-]{3,24}$/.test(n)) return err.textContent = "Lo username va da 3 a 24 caratteri: lettere, numeri, punto, trattino o trattino basso.";
-  if(pw.length < 6) return err.textContent = "La password deve avere almeno 6 caratteri.";
-  if(authMode === "up" && pw !== $("#au-pw2").value) return err.textContent = "Le due password non coincidono.";
-  const go = $("#au-go"); go.disabled = true; err.textContent = "";
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const err = $("#au-err"), go = $("#au-go"), step = AUTH.step;
+  const fail = m => { err.textContent = m; };
+  const okEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+  const pw = (document.getElementById("au-pw") || {}).value || "";
+  if(step === "in" && (!v("au-id") || !pw)) return fail("Scrivi email (o username) e password.");
+  if(step === "up"){
+    if(!/^[a-z0-9_.-]{3,24}$/.test(v("au-name").toLowerCase())) return fail("Lo username va da 3 a 24 caratteri: lettere, numeri, punto, trattino o trattino basso.");
+    if(!okEmail(v("au-email"))) return fail("Scrivi un indirizzo email valido.");
+  }
+  if((step === "up" || step === "reset") && pw.length < 6) return fail("La password deve avere almeno 6 caratteri.");
+  if((step === "up" || step === "reset") && pw !== $("#au-pw2").value) return fail("Le due password non coincidono.");
+  if((step === "code" || step === "reset" || step === "mfa") && !/^\d{6}$/.test(v("au-code"))) return fail("Il codice è fatto di 6 cifre.");
+  if(step === "forgot" && !okEmail(v("au-email"))) return fail("Scrivi l'email del tuo account.");
+  go.disabled = true; err.textContent = "";
   try{
-    await (authMode === "up" ? cloud.signUp(n, pw) : cloud.signIn(n, pw));
-    $("#authForm").reset();
-  }catch(m){ err.textContent = typeof m === "string" ? m : "Connessione non riuscita: controlla la rete e riprova."; }
-  go.disabled = false;
-});
-$("#au-guest").onclick = () => { store.set("dojo-guest", true); goHome(); };
+    if(step === "in"){
+      try{ await cloud.signIn(v("au-id").toLowerCase(), pw); }
+      catch(m){ if(/email not confirmed/i.test(m)){ AUTH.email = v("au-id"); await cloud.resendSignup(AUTH.email); return paintAuth("code"); } throw m; }
+    }
+    if(step === "up"){
+      AUTH.email = v("au-email").toLowerCase();
+      const pending = await cloud.signUp(v("au-name").toLowerCase(), AUTH.email, pw, $("#au-mkt").checked);
+      if(pending) return paintAuth("code");
+    }
+    if(step === "code") await cloud.verifySignup(AUTH.email, v("au-code"));
+    if(step === "forgot"){ AUTH.email = v("au-email").toLowerCase(); await cloud.sendReset(AUTH.email); return paintAuth("reset"); }
+    if(step === "reset" && await cloud.resetWithCode(AUTH.email, v("au-code"), pw) === "mfa"){ AUTH.newPw = pw; return paintAuth("mfa"); }
+    if(step === "mfa"){ await cloud.verifyMfa(v("au-code"), AUTH.newPw); AUTH.newPw = ""; }
+  }catch(m){ fail(typeof m === "string" ? (/email not confirmed/i.test(m) ? "Conferma prima la tua email." : m) : "Connessione non riuscita: controlla la rete e riprova."); }
+  if(document.body.contains(go)) go.disabled = false;
+}
+
+/* ---------- pagina account ---------- */
+async function showAccount(){
+  view = "account";
+  ["#view-home", "#view-quiz", "#view-studia", "#view-auth"].forEach(s => $(s).hidden = true);
+  $("#bar").hidden = false; $("#barTitle").textContent = "Il tuo account"; $("#barCfg").innerHTML = "";
+  $("#view-account").hidden = false;
+  heroAnim.stop(); window.scrollTo({top:0});
+  const sb = cloud.sb, u = cloud.user, legacy = isLegacy(u.email);
+  const [{data: prof}, {data: fac}] = await Promise.all([
+    sb.from("profiles").select("username, marketing").eq("id", u.id).maybeSingle(),
+    sb.auth.mfa.listFactors()
+  ]);
+  const totp = ((fac && fac.totp) || []).find(f => f.status === "verified");
+  const box = $("#accountBox");
+  box.innerHTML = `
+    <section class="panel acard"><div class="eyebrow">Profilo</div>
+      <p><span class="hint">Username</span><br><b class="u-name"></b></p>
+      <p><span class="hint">Email</span><br><b class="u-mail"></b></p>
+      <form id="f-mail" class="row" novalidate><input id="ac-mail" type="email" autocomplete="email" autocapitalize="none" placeholder="${legacy ? "La tua email" : "Nuova email"}" aria-label="Email"><button class="btn" type="submit">${legacy ? "Aggiungi email" : "Cambia email"}</button></form>
+      <form id="f-mailcode" class="row" novalidate hidden><input id="ac-mailcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Codice a 6 cifre" aria-label="Codice"><button class="btn" type="submit">Conferma</button></form>
+      <p class="au-err" id="m-mail" role="status"></p>
+    </section>
+    <section class="panel acard"><div class="eyebrow">Newsletter</div>
+      <label class="check"><input type="checkbox" id="ac-mkt" ${prof && prof.marketing ? "checked" : ""} ${legacy ? "disabled" : ""}> <span>Voglio ricevere via email novità e consigli dal Dojo.</span></label>
+      <p class="hint">${legacy ? "Aggiungi prima la tua email." : "Puoi cambiare idea quando vuoi, anche dal link in fondo a ogni email."}</p>
+      <p class="au-err" id="m-mkt" role="status"></p>
+    </section>
+    <section class="panel acard"><div class="eyebrow">Verifica in due passaggi</div>
+      <p>${totp ? "<b>Attiva.</b> Ogni volta che entri, oltre alla password ti chiediamo il codice dell'app di autenticazione." : "Oltre alla password, all'accesso ti chiediamo un codice da un'app come Google Authenticator, Microsoft Authenticator o 1Password."}</p>
+      <div id="mfaBox"><button class="btn ${totp ? "ghost" : ""}" type="button" id="ac-mfa">${totp ? "Disattiva" : "Attiva"}</button></div>
+      <p class="au-err" id="m-mfa" role="status"></p>
+    </section>
+    <section class="panel acard"><div class="eyebrow">Password</div>
+      <form id="f-pw" class="stack" novalidate>
+        <input id="ac-pw" type="password" autocomplete="new-password" placeholder="Nuova password" aria-label="Nuova password">
+        <input id="ac-pw2" type="password" autocomplete="new-password" placeholder="Ripeti la nuova password" aria-label="Ripeti la nuova password">
+        <button class="btn" type="submit">Cambia password</button>
+      </form>
+      <p class="au-err" id="m-pw" role="status"></p>
+    </section>
+    <div class="actions"><button class="btn ghost" type="button" id="ac-out">Esci dall'account</button></div>`;
+  box.querySelector(".u-name").textContent = (prof && prof.username) || (u.user_metadata && u.user_metadata.username) || "";
+  box.querySelector(".u-mail").textContent = legacy ? "Nessuna: aggiungila per recuperare la password e ricevere le email" : u.email;
+  const say = (id, m, ok) => { const el = $(id); el.textContent = m; el.className = ok ? "au-ok" : "au-err"; };
+  let newMail = "";
+  $("#f-mail").onsubmit = async e => {
+    e.preventDefault(); newMail = $("#ac-mail").value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newMail)) return say("#m-mail", "Scrivi un indirizzo email valido.");
+    const {error} = await sb.auth.updateUser({email: newMail});
+    if(error) return say("#m-mail", cloud.errText(error));
+    $("#f-mailcode").hidden = false; say("#m-mail", `Ti abbiamo mandato un codice a ${newMail}.`, true);
+  };
+  $("#f-mailcode").onsubmit = async e => {
+    e.preventDefault();
+    const {error} = await sb.auth.verifyOtp({email: newMail, token: $("#ac-mailcode").value.trim(), type: "email_change"});
+    if(error) return say("#m-mail", cloud.errText(error));
+    await sb.auth.refreshSession(); showAccount();
+  };
+  $("#ac-mkt").onchange = async e => {
+    const on = e.target.checked;
+    const {error} = await sb.from("profiles").update({marketing: on, marketing_at: new Date().toISOString()}).eq("id", u.id);
+    if(error){ e.target.checked = !on; return say("#m-mkt", "Non riuscito: " + error.message); }
+    say("#m-mkt", on ? "Iscritto alla newsletter." : "Non riceverai più la newsletter.", true);
+  };
+  $("#ac-mfa").onclick = async () => {
+    if(totp){
+      const {error} = await sb.auth.mfa.unenroll({factorId: totp.id});
+      if(error) return say("#m-mfa", cloud.errText(error));
+      await sb.auth.refreshSession(); return showAccount();
+    }
+    // toglie eventuali attivazioni lasciate a metà, poi ne crea una nuova
+    for(const f of ((fac && fac.all) || []).filter(f => f.status !== "verified")) await sb.auth.mfa.unenroll({factorId: f.id});
+    const {data, error} = await sb.auth.mfa.enroll({factorType: "totp", friendlyName: "Dojo " + Date.now()});
+    if(error) return say("#m-mfa", cloud.errText(error));
+    $("#mfaBox").innerHTML = `<ol class="mfasteps"><li>Inquadra il codice QR con l'app di autenticazione.</li><li>Se non puoi inquadrarlo, inserisci a mano la chiave <code class="secret"></code></li><li>Scrivi qui il codice a 6 cifre che compare nell'app.</li></ol>
+      <img class="qr" alt="Codice QR per l'app di autenticazione"><form id="f-mfa" class="row" novalidate><input id="ac-mfacode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-label="Codice dell'app"><button class="btn" type="submit">Attiva</button></form>`;
+    $("#mfaBox .qr").src = data.totp.qr_code; $("#mfaBox .secret").textContent = data.totp.secret;
+    $("#f-mfa").onsubmit = async e => {
+      e.preventDefault();
+      const r = await sb.auth.mfa.challengeAndVerify({factorId: data.id, code: $("#ac-mfacode").value.trim()});
+      if(r.error) return say("#m-mfa", "Codice sbagliato: controlla l'orario del dispositivo e riprova.");
+      showAccount();
+    };
+  };
+  $("#f-pw").onsubmit = async e => {
+    e.preventDefault();
+    const a = $("#ac-pw").value, b = $("#ac-pw2").value;
+    if(a.length < 6) return say("#m-pw", "La password deve avere almeno 6 caratteri.");
+    if(a !== b) return say("#m-pw", "Le due password non coincidono.");
+    const {error} = await sb.auth.updateUser({password: a});
+    if(error) return say("#m-pw", cloud.errText(error));
+    $("#f-pw").reset(); say("#m-pw", "Password cambiata.", true);
+  };
+  $("#ac-out").onclick = () => cloud.logout();
+}
 
 /* ---------- boot ---------- */
 function start(data){
@@ -1017,6 +1243,23 @@ function start(data){
 }
 start({});
 cloud.init();
+</script>
+<script>
+/* tema: automatico (segue il dispositivo), giorno o notte */
+(function(){
+  const seg = document.getElementById("themeSeg"); if(!seg) return;
+  let t = "auto";
+  try{ t = localStorage.getItem("dojo-theme") || "auto"; }catch(e){}
+  function apply(v, save){
+    t = v;
+    if(v === "light" || v === "dark") document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme;
+    if(save) try{ v === "auto" ? localStorage.removeItem("dojo-theme") : localStorage.setItem("dojo-theme", v); }catch(e){}
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === v));
+    window.dispatchEvent(new Event("dojo-theme"));
+  }
+  seg.querySelectorAll("button").forEach(b => b.onclick = () => apply(b.dataset.t, true));
+  apply(t, false);
+})();
 </script>
 </body>
 </html>

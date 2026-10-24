@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<script>try{var t=localStorage.getItem("dojo-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Dojo delle candele · Admin</title>
@@ -96,6 +97,18 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
 .msg{font-size:13px;color:var(--bull);margin:0}
 .msg.ko{color:var(--bear)}
 .empty{color:var(--muted);text-align:center;padding:24px 0}
+.chip.ok{background:var(--bull-soft);color:var(--bull)}
+.mail{font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+.exportbox{display:grid;gap:6px}
+.exportbox textarea{font-family:var(--mono);font-size:12.5px;width:100%;padding:10px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);resize:vertical}
+.side{display:grid;justify-items:end;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:12.5px;font-weight:500;border:0;background:transparent;color:var(--muted);padding:5px 10px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.sitefoot{display:flex;gap:6px 16px;flex-wrap:wrap;justify-content:center;margin-top:24px;font-size:13px;color:var(--muted)}
+.sitefoot a{color:var(--muted)}
+@media (max-width:600px){body{background-image:none}.side{justify-items:start}.tile .v{font-size:26px}.user{padding:12px}}
 </style>
 </head>
 <body>
@@ -105,7 +118,12 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
       <div class="eyebrow">Dojo delle candele · pannello admin</div>
       <h1>Gli <em>allievi</em> del dojo</h1>
     </div>
-    <div class="who" id="who"></div>
+    <div class="side">
+      <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
+      <button type="button" data-t="auto" title="Segue il giorno o la notte del tuo dispositivo">Auto</button><button type="button" data-t="light">Giorno</button><button type="button" data-t="dark">Notte</button>
+    </div>
+      <div class="who" id="who"></div>
+    </div>
   </header>
 
   <section class="panel gate" id="gate" hidden>
@@ -130,7 +148,9 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
       <div class="bar">
         <input id="q" type="search" placeholder="Cerca un allievo per username" aria-label="Cerca un allievo">
         <button class="btn ghost" id="reload" type="button">Aggiorna</button>
+        <button class="btn ghost" id="mktcopy" type="button">Copia iscritti newsletter</button>
       </div>
+      <div class="exportbox" id="exportBox" hidden><p class="meta" id="exportMsg"></p><textarea id="exportTxt" rows="5" readonly aria-label="Iscritti alla newsletter in formato CSV"></textarea></div>
       <div class="legend">
         <span><i style="background:var(--line)"></i>da scoprire</span>
         <span><i style="background:var(--hl-line);opacity:.65"></i>in apprendimento</span>
@@ -140,6 +160,7 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
       <div class="list" id="list"><p class="empty">Carico gli allievi…</p></div>
     </div>
   </main>
+  <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a></footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -230,9 +251,10 @@ function row(u, s){
   const self = me && u.id === me.id, tot = s.r + s.w;
   return `<article class="panel user" id="u-${u.id}">
     <div class="uhead">
-      <div class="uname"><span class="n"></span>${u.is_admin ? `<span class="chip">admin</span>` : ""}${self ? `<span class="chip me">sei tu</span>` : ""}</div>
+      <div class="uname"><span class="n"></span>${u.is_admin ? `<span class="chip">admin</span>` : ""}${u.mfa ? `<span class="chip ok">2FA</span>` : ""}${u.marketing ? `<span class="chip ok">newsletter</span>` : ""}${self ? `<span class="chip me">sei tu</span>` : ""}</div>
       <div class="meta">Registrato il ${fmtDate(u.created_at)} · ultimo accesso ${ago(u.last_sign_in_at)} · ultimo allenamento ${ago(u.progress_updated_at)}</div>
     </div>
+    <div class="mail"></div>
     <div class="nums">
       <span><b>${s.known}</b> conosciute</span><span><b>${s.fixing}</b> da fissare</span><span><b>${s.learning}</b> in apprendimento</span>
       <span>risposte giuste <b>${s.r}</b> su <b>${tot}</b>${tot ? ` (${Math.round(100 * s.r / tot)}%)` : ""}</span>
@@ -250,6 +272,7 @@ function row(u, s){
 function bindRow(u){
   const el = document.getElementById("u-" + u.id); if(!el) return;
   el.querySelector(".n").textContent = u.username;
+  el.querySelector(".mail").textContent = u.email || "Nessuna email (account creato con il solo username)";
   el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => ask(u, b.dataset.a, el));
 }
 function ask(u, a, el){
@@ -281,6 +304,15 @@ function ask(u, a, el){
 
 $("#q").addEventListener("input", render);
 $("#reload").onclick = load;
+// CSV da importare in Brevo (Contatti → Importa): solo chi ha dato il consenso
+$("#mktcopy").onclick = async () => {
+  const list = users.filter(u => u.marketing && u.email);
+  const csv = "EMAIL;USERNAME\n" + list.map(u => `${u.email};${u.username}`).join("\n");
+  $("#exportBox").hidden = false; $("#exportTxt").value = csv;
+  let copied = false;
+  try{ await navigator.clipboard.writeText(csv); copied = true; }catch(e){ $("#exportTxt").select(); }
+  $("#exportMsg").textContent = `${list.length} iscritt${list.length === 1 ? "o" : "i"} alla newsletter. ` + (copied ? "Elenco copiato: incollalo in Brevo, Contatti → Importa contatti." : "Copia l'elenco qui sotto e incollalo in Brevo, Contatti → Importa contatti.");
+};
 $("#loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   const n = $("#lg-name").value.trim().toLowerCase(), pw = $("#lg-pw").value, err = $("#lg-err");
@@ -293,6 +325,23 @@ $("#loginForm").addEventListener("submit", async e => {
   await enter();
 });
 boot();
+</script>
+<script>
+/* tema: automatico (segue il dispositivo), giorno o notte */
+(function(){
+  const seg = document.getElementById("themeSeg"); if(!seg) return;
+  let t = "auto";
+  try{ t = localStorage.getItem("dojo-theme") || "auto"; }catch(e){}
+  function apply(v, save){
+    t = v;
+    if(v === "light" || v === "dark") document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme;
+    if(save) try{ v === "auto" ? localStorage.removeItem("dojo-theme") : localStorage.setItem("dojo-theme", v); }catch(e){}
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === v));
+    window.dispatchEvent(new Event("dojo-theme"));
+  }
+  seg.querySelectorAll("button").forEach(b => b.onclick = () => apply(b.dataset.t, true));
+  apply(t, false);
+})();
 </script>
 </body>
 </html>
