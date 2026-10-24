@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem("dojo-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dojo delle candele · Privacy e cookie</title>
+<meta name="description" content="Informativa privacy e cookie del Dojo delle candele.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="fonts.css">
+<style>
+/* Layout: one reading column on the dojo's chart-paper; two chapters, About and Crediti. */
+:root{
+  color-scheme:light;
+  --paper:#F1F4F0; --grid:rgba(24,48,36,.055); --card:#FFFFFF; --well:#FAFBF9;
+  --ink:#17201C; --muted:#5A6660; --line:#D7DDD8;
+  --bull:#12875C; --bull-soft:#DCF0E5; --bear:#CF3F48;
+  --accent:#2C46A6; --accent-soft:#E2E7F7; --hl-line:#D9B54A;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:22px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.back{font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px 7px 11px;border-radius:999px;text-decoration:none}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:12.5px;font-weight:500;border:0;background:transparent;color:var(--muted);padding:5px 10px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,52px);line-height:1.02;margin:6px 0 0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--bull)}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4vw,30px);line-height:1.1;margin:0;text-wrap:balance}
+h3{font-size:16px;margin:0}
+p{margin:0;max-width:65ch}
+a{color:var(--accent)}
+.lead{color:var(--muted);font-size:clamp(16px,2.4vw,18px)}
+.chapter{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,30px);display:grid;gap:14px;scroll-margin-top:16px}
+.steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.steps .n{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:20px}
+.boxes{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.boxes span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:var(--well);font-variant-numeric:tabular-nums}
+.boxes span:nth-child(n+4){border-color:var(--bull);color:var(--bull)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-top:1px solid var(--line)}
+.tbl th{font-weight:600;font-size:12.5px;color:var(--muted);border-top:0}
+.tbl code{font-family:var(--mono);font-size:12.5px}
+ul.plain{margin:0;padding-left:18px;display:grid;gap:6px;max-width:65ch}
+.note{border-left:3px solid var(--hl-line);padding:4px 0 4px 14px;color:var(--muted);font-size:14.5px}
+.credits{display:grid;gap:0;margin:0}
+.credits div{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.credits div:first-child{border-top:0;padding-top:0}
+.credits dt{font-weight:600;font-size:14px}
+.credits dd{margin:0;font-size:14.5px;color:var(--muted)}
+.credits dd b{color:var(--ink);font-weight:600}
+.credits dd a{color:var(--accent);text-decoration:none}
+.credits dd a b{color:inherit}
+.sitefoot{display:flex;gap:6px 16px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--muted)}
+.sitefoot a{color:var(--muted)}
+@media (max-width:600px){
+  .tbl thead{display:none}
+  .tbl tr{display:grid;padding:8px 0;border-top:1px solid var(--line)}
+  .tbl td{border:0;padding:2px 0}
+  body{background-image:none;font-size:15.5px}
+  .credits div{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" href="./">← Torna al Dojo</a>
+    <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
+      <button type="button" data-t="auto" title="Segue il giorno o la notte del tuo dispositivo">Auto</button><button type="button" data-t="light">Giorno</button><button type="button" data-t="dark">Notte</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="eyebrow">Dojo delle candele · 道場</div>
+    <h1>Privacy e <em>cookie</em></h1>
+    <p class="lead" style="margin-top:10px">Cosa raccogliamo, perché, dove finisce e come puoi controllarlo. Ultimo aggiornamento: 24 ottobre 2026.</p>
+  </header>
+
+  <section class="chapter" id="titolare">
+    <div class="eyebrow">Chi tratta i tuoi dati</div>
+    <h2>Titolare e contatti</h2>
+    <p>Titolare del trattamento è <b>Michele</b> (gmanmik), che gestisce il Dojo delle candele a titolo personale.</p>
+    <dl class="credits">
+      <div><dt>Privacy e dati personali</dt><dd><a href="mailto:dpo@dojodellecandele.com"><b>dpo@dojodellecandele.com</b></a></dd></div>
+      <div><dt>Assistenza sull'account</dt><dd><a href="mailto:admin@dojodellecandele.com"><b>admin@dojodellecandele.com</b></a></dd></div>
+    </dl>
+  </section>
+
+  <section class="chapter" id="dati">
+    <div class="eyebrow">Quali dati</div>
+    <h2>Cosa raccogliamo e perché</h2>
+    <table class="tbl">
+      <thead><tr><th>Dati</th><th>Perché</th><th>Base giuridica</th></tr></thead>
+      <tbody>
+        <tr><td>Username, email, password (salvata solo in forma cifrata)</td><td>Creare l'account e farti accedere</td><td>Esecuzione del servizio che chiedi (art. 6.1.b GDPR)</td></tr>
+        <tr><td>Progressi di allenamento e preferenze</td><td>Ritrovarli su ogni dispositivo</td><td>Esecuzione del servizio (art. 6.1.b)</td></tr>
+        <tr><td>Verifica in due passaggi (se la attivi)</td><td>Proteggere il tuo account</td><td>Esecuzione del servizio (art. 6.1.b)</td></tr>
+        <tr><td>Consenso alla newsletter e data in cui l'hai dato</td><td>Mandarti novità e consigli, solo se l'hai chiesto</td><td>Consenso, revocabile quando vuoi (art. 6.1.a)</td></tr>
+        <tr><td>Indirizzo IP, data degli accessi, tentativi di accesso sbagliati, controllo anti-robot</td><td>Sicurezza: bloccare bot e tentativi di indovinare le password</td><td>Legittimo interesse alla sicurezza del servizio (art. 6.1.f)</td></tr>
+        <tr><td>Email che ci scrivi</td><td>Risponderti</td><td>Legittimo interesse e tua richiesta (art. 6.1.b e f)</td></tr>
+      </tbody>
+    </table>
+    <p>Non vendiamo i tuoi dati, non li usiamo per pubblicità e non facciamo profilazione. Senza account il Dojo funziona lo stesso e i progressi restano solo nel tuo browser.</p>
+  </section>
+
+  <section class="chapter" id="fornitori">
+    <div class="eyebrow">Chi ci aiuta</div>
+    <h2>Fornitori e dove stanno i dati</h2>
+    <p>Per far funzionare il sito ci appoggiamo a questi servizi, che trattano i dati per nostro conto come responsabili del trattamento:</p>
+    <dl class="credits">
+      <div><dt>Supabase</dt><dd>Account, password cifrate, progressi e verifica in due passaggi. I dati sono conservati nei server del progetto Supabase del Dojo.</dd></div>
+      <div><dt>Brevo (Sendinblue SAS, Francia)</dt><dd>Invio delle email con i codici e, se l'hai chiesta, della newsletter. Dati nell'Unione europea.</dd></div>
+      <div><dt>Cloudflare</dt><dd>Controllo anti-robot (Turnstile), gestione del dominio e inoltro delle email che ci scrivi.</dd></div>
+      <div><dt>GitHub (Microsoft)</dt><dd>Ospita le pagine del sito; registra l'indirizzo IP di chi le visita per motivi tecnici e di sicurezza.</dd></div>
+    </dl>
+    <p>Alcuni di questi fornitori hanno sede negli Stati Uniti. I trasferimenti avvengono sulla base del Data Privacy Framework UE-USA o delle clausole contrattuali standard della Commissione europea.</p>
+    <p>I caratteri e le librerie del sito sono ospitati direttamente qui: aprire il Dojo non manda dati a Google Fonts o ad altre CDN.</p>
+  </section>
+
+  <section class="chapter" id="conservazione">
+    <div class="eyebrow">Per quanto tempo</div>
+    <h2>Conservazione</h2>
+    <ul class="plain">
+      <li><b>Account e progressi</b>: finché tieni l'account. Se chiedi di cancellarlo, eliminiamo account e progressi entro 30 giorni.</li>
+      <li><b>Newsletter</b>: finché non ti disiscrivi, dal link in fondo a ogni email o dalla pagina Account.</li>
+      <li><b>Tentativi di accesso sbagliati</b>: il contatore si azzera dopo 15 minuti o al primo accesso riuscito.</li>
+      <li><b>Registri tecnici dei fornitori</b> (indirizzi IP, orari): per i tempi brevi previsti da ciascun fornitore.</li>
+      <li><b>Email che ci scrivi</b>: il tempo necessario a gestire la richiesta.</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="diritti">
+    <div class="eyebrow">Cosa puoi fare</div>
+    <h2>I tuoi diritti</h2>
+    <p>Puoi chiederci in qualsiasi momento di accedere ai tuoi dati, correggerli, cancellarli, limitarne l'uso, riceverli in un formato leggibile (portabilità), opporti ai trattamenti basati sul legittimo interesse e revocare il consenso alla newsletter. Scrivi a <a href="mailto:dpo@dojodellecandele.com">dpo@dojodellecandele.com</a>: rispondiamo entro un mese.</p>
+    <p>Email, newsletter e password le puoi già cambiare da solo nella pagina Account.</p>
+    <p>Se pensi che i tuoi dati siano trattati in modo scorretto puoi presentare reclamo al <a href="https://www.garanteprivacy.it" rel="noopener">Garante per la protezione dei dati personali</a>.</p>
+    <p class="note">Il Dojo non è pensato per chi ha meno di 14 anni: sotto questa età serve il consenso di un genitore per creare un account.</p>
+  </section>
+
+  <section class="chapter" id="cookie">
+    <div class="eyebrow">Cookie</div>
+    <h2>Cookie e memoria del browser</h2>
+    <p>Il Dojo <b>non usa cookie di profilazione, pubblicità o statistiche</b>. Salva nel tuo browser solo ciò che serve a farlo funzionare. Questi strumenti tecnici, per la direttiva ePrivacy e le linee guida del Garante, non richiedono il tuo consenso: per questo l'avviso ti informa ma non ti chiede di accettare.</p>
+    <table class="tbl">
+      <thead><tr><th>Nome</th><th>A cosa serve</th><th>Durata</th></tr></thead>
+      <tbody>
+        <tr><td><code>sb-…-auth-token</code></td><td>Tiene aperto il tuo accesso (Supabase)</td><td>Fino a quando esci</td></tr>
+        <tr><td><code>dojo-srs-v1</code>, <code>dojo-stats-v1</code>, <code>dojo-daily-v1</code>, <code>dojo-prefs-v1</code></td><td>Progressi e preferenze di allenamento, anche senza account</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td><code>dojo-theme</code></td><td>Ricorda se hai scelto Giorno o Notte</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td><code>dojo-guest</code></td><td>Ricorda che hai scelto di usare il Dojo senza account</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td><code>dojo-cookie-info-v1</code></td><td>Ricorda che hai già letto l'avviso sui cookie</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td>Cloudflare Turnstile</td><td>Controllo anti-robot su accesso, registrazione e reset della password. Non serve a tracciarti.</td><td>Durata della sessione</td></tr>
+      </tbody>
+    </table>
+    <p>Puoi cancellare tutto in qualsiasi momento dalle impostazioni del browser (dati dei siti). Se lo fai senza account, perdi i progressi salvati su quel dispositivo.</p>
+  </section>
+
+  <footer class="sitefoot"><span>Dojo delle candele</span><a href="./">Dojo</a><a href="about.html">About</a><a href="about.html#contatti">Contatti</a><a href="#titolare">Privacy</a><a href="#cookie">Cookie</a></footer>
+</div>
+<script>
+/* tema: automatico (segue il dispositivo), giorno o notte */
+(function(){
+  const seg = document.getElementById("themeSeg"); if(!seg) return;
+  let t = "auto";
+  try{ t = localStorage.getItem("dojo-theme") || "auto"; }catch(e){}
+  function apply(v, save){
+    t = v;
+    if(v === "light" || v === "dark") document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme;
+    if(save) try{ v === "auto" ? localStorage.removeItem("dojo-theme") : localStorage.setItem("dojo-theme", v); }catch(e){}
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === v));
+    window.dispatchEvent(new Event("dojo-theme"));
+  }
+  seg.querySelectorAll("button").forEach(b => b.onclick = () => apply(b.dataset.t, true));
+  apply(t, false);
+})();
+</script>
+<script src="cookie.js" defer></script>
+</body>
+</html>
