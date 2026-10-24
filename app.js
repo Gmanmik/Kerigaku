@@ -203,17 +203,23 @@ const cloud = (() => {
     async verifySignup(email, code){ const d = await must(sb.auth.verifyOtp({email, token: code, type: "signup"})); await enter(d.user); },
     resendSignup: async email => must(sb.auth.resend({type: "signup", email, options: {captchaToken: await captcha.take()}})),
     sendReset: async email => must(sb.auth.resetPasswordForEmail(email, {captchaToken: await captcha.take()})),
+    // prima di cambiare password chiede al database se è una di quelle già usate (password.sql); se la funzione non c'è, va avanti
+    async setPassword(pw){
+      const {data: used, error} = await sb.rpc("password_used_before", {pw});
+      if(!error && used) throw "Hai già usato questa password: scegline una nuova.";
+      await must(sb.auth.updateUser({password: pw}));
+    },
     async resetWithCode(email, code, pw){
       const d = await must(sb.auth.verifyOtp({email, token: code, type: "recovery"}));
       if(await needsMfa()) return "mfa";   // con la verifica in due passaggi la password si cambia dopo il codice dell'app
-      await must(sb.auth.updateUser({password: pw}));
+      await this.setPassword(pw);
       await enter(d.user);
     },
     async verifyMfa(code, newPw){
       const f = await must(sb.auth.mfa.listFactors());
       const totp = (f.totp || [])[0]; if(!totp) throw "Nessuna app di autenticazione collegata a questo account.";
       await must(sb.auth.mfa.challengeAndVerify({factorId: totp.id, code}));
-      if(newPw) await must(sb.auth.updateUser({password: newPw}));
+      if(newPw) await this.setPassword(newPw);
       const {data} = await sb.auth.getUser(); await enter(data.user);
     },
     async init(){
@@ -413,6 +419,24 @@ function srsHint(){
   if(fresh.length) parts.push(fresh.length === 1 ? "1 nuova" : `${fresh.length} nuove`);
   return "Oggi ti aspettano " + parts.join(" e ") + ".";
 }
+// livelli: si sale con le risposte giuste in totale; per l'ultimo servono anche tutte le figure imparate almeno una volta
+const LEVELS = [{n:"Fuffaguru mancato", r:0}, {n:"Amante dei corsi di trading", r:50}, {n:"Fidanzato di Murphy", r:200}, {n:"Figlio di Buffett", r:500, all:true}];
+function levelInfo(){
+  const right = Object.values(stats).reduce((s, c) => s + (+c.r || 0), 0), learned = P.filter(p => sc(p.id).b >= 1).length;
+  let i = 0; LEVELS.forEach((l, k) => { if(right >= l.r && (!l.all || learned === P.length)) i = k; });
+  return {i, right, learned, cur: LEVELS[i], next: LEVELS[i + 1]};
+}
+function renderLevel(){
+  const L = levelInfo(), box = $("#levelBox"); if(!box) return;
+  let pct = 100, txt = "Livello massimo: sei arrivato in cima al Dojo.";
+  if(L.next){
+    pct = Math.min(100, Math.round((L.right - L.cur.r) / (L.next.r - L.cur.r) * 100));
+    const miss = Math.max(0, L.next.r - L.right);
+    txt = `Prossimo livello: ${esc(L.next.n)}. ` + (miss ? (miss === 1 ? "Ti manca 1 risposta giusta" : `Ti mancano ${miss} risposte giuste`) : "Risposte giuste raggiunte") +
+      (L.next.all && L.learned < P.length ? `${miss ? " e" : ", ora"} ${P.length - L.learned} figure da imparare.` : ".");
+  }
+  box.innerHTML = `<div class="lv-name">${esc(L.cur.n)}<small>Livello ${L.i + 1} di ${LEVELS.length}</small></div><div class="lv-bar"><i style="width:${pct}%"></i></div><div class="lv-next">${txt}</div>`;
+}
 function renderHome(){
   const order = ["inv","cont"].flatMap(f => [true,false].flatMap(b => P.filter(p => p.fam === f && p.bull === b)));
   $("#progDots").innerHTML = order.map(p => {
@@ -420,6 +444,7 @@ function renderHome(){
     const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || stats[p.id]) ? "l1" : "";
     return `<i class="${cls}" title="${esc(label(p))}"></i>`;
   }).join("");
+  renderLevel();
   const nd = nextDueDay();
   $("#nextDue").textContent = nd === null ? "Comincia dal Ripasso del giorno: ogni giorno ti presenta 5 figure nuove." : `Prossime figure da ripassare: ${whenText(nd)}.`;
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
@@ -551,7 +576,7 @@ function renderQuestion(){
   const t = Q.qs[Q.i];
   if(!Q.cur || Q.cur.id !== t.id + Q.i){
     Q.cur = {id: t.id + Q.i, ctx: makeContext(t), opts: shuffle([t, ...distractors(t, Q.list.length >= 5 ? Q.list : P, 3)]), ctxFor:{}};
-    Q.answered = false; Q.pick = null;
+    Q.answered = false; Q.pick = null; Q.levelUp = null;
   }
   if(Q.mode === "srs" && Q.intro.has(t.id)) return renderIntro(t);
   const mode = curMode();
@@ -581,7 +606,7 @@ function optClass(p, t){
 }
 function answer(id){
   if(Q.answered) return;
-  const t = Q.qs[Q.i], ok = id === t.id;
+  const t = Q.qs[Q.i], ok = id === t.id, lvBefore = levelInfo().i;
   Q.answered = true; Q.pick = id; Q.res.push(ok);
   const s = stats[t.id] || (stats[t.id] = {r:0, w:0});
   ok ? s.r++ : s.w++;
@@ -605,11 +630,30 @@ function answer(id){
     }
   }
   Q.streak = ok ? Q.streak + 1 : 0; Q.best = Math.max(Q.best, Q.streak);
+  const lvAfter = levelInfo().i; if(lvAfter > lvBefore) Q.levelUp = LEVELS[lvAfter].n;
   renderQuestion();
+  if(ok) memePop();
+}
+// frasi scherzose sulla finanza online, una a caso a ogni risposta giusta (mai la stessa due volte di fila)
+const MEME = ["Sei prossimo alla FIRE!", "Mantieni la mano d'oro!", "Pubblicato su r/wallstreetbets!", "To the moon! 🚀", "Stonks! 📈",
+  "Diamond hands! 💎🙌", "Warren Buffett ha messo like.", "Il tuo commercialista è fiero di te.", "Interesse composto sbloccato.",
+  "Hai battuto l'indice. Almeno oggi.", "Il tuo ETF ti ringrazia.", "Comprato sul minimo, venduto sul massimo.", "Margin call evitata!",
+  "Il mercato ti dà ragione (per ora).", "Altro che fuffaguru.", "Questa la metti nel portafoglio."];
+let lastMeme = -1;
+function memeLine(){ let i; do i = Math.floor(Math.random() * MEME.length); while(i === lastMeme && MEME.length > 1); lastMeme = i; return MEME[i]; }
+// la frase compare grande al centro dello schermo e sfuma da sola (animazione .meme-pop in index.html)
+function memePop(){
+  document.querySelectorAll(".meme-pop").forEach(e => e.remove());
+  const el = document.createElement("div"); el.className = "meme-pop"; el.setAttribute("role", "status"); el.textContent = memeLine();
+  // nasce leggermente inclinata e sparisce ruotando, ogni volta a sinistra o a destra a caso
+  const side = () => Math.random() < .5 ? -1 : 1, r0 = side() * (2 + Math.random() * 3);
+  el.style.setProperty("--r0", r0.toFixed(1) + "deg");
+  el.style.setProperty("--r1", (r0 + side() * (8 + Math.random() * 6)).toFixed(1) + "deg");
+  document.body.appendChild(el); setTimeout(() => el.remove(), 1600);
 }
 function feedback(t){
   const ok = Q.pick === t.id, picked = BYID[Q.pick];
-  let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3><p>${esc(t.d)}</p>`;
+  let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3>${Q.levelUp ? `<p class="levelup">Sei salito di livello: <b>${esc(Q.levelUp)}</b></p>` : ""}<p>${esc(t.d)}</p>`;
   if(Q.lastGrade){
     h += `<span class="nextchip">${ok ? "La rivedrai " + whenText(Q.lastGrade.due) : (Q.requeued[t.id] <= 3 ? "Te la richiedo tra poco" : "La rivedrai oggi stesso")}</span>`;
   }
@@ -904,8 +948,7 @@ async function showAccount(){
     const a = $("#ac-pw").value, b = $("#ac-pw2").value;
     if(weakPw(a)) return say("#m-pw", "La password deve avere almeno 8 caratteri, con lettere e numeri.");
     if(a !== b) return say("#m-pw", "Le due password non coincidono.");
-    const {error} = await sb.auth.updateUser({password: a});
-    if(error) return say("#m-pw", cloud.errText(error));
+    try{ await cloud.setPassword(a); }catch(err){ return say("#m-pw", typeof err === "string" ? err : cloud.errText(err)); }
     $("#f-pw").reset(); say("#m-pw", "Password cambiata.", true);
   };
   $("#ac-out").onclick = () => cloud.logout();

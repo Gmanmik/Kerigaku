@@ -167,6 +167,18 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .fb.ko{background:var(--bear-soft);border-color:var(--bear)}
 .fb h3{margin:0;font-family:var(--display);font-size:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fb p{margin:0;max-width:65ch}
+.level{display:grid;gap:6px;margin:10px 0 14px}
+.level .lv-name{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.2}
+.level .lv-name small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
+.level .lv-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.level .lv-bar i{display:block;height:100%;background:var(--seal);border-radius:3px}
+.level .lv-next{font-size:13px;color:var(--muted)}
+.fb .levelup{font-weight:700}
+.fb .levelup b{color:var(--seal);font-family:var(--display)}
+.meme-pop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;pointer-events:none;width:max-content;max-width:min(88vw,720px);box-sizing:border-box;padding:0;text-align:center;text-wrap:balance;
+  font-family:var(--display);font-weight:800;font-size:clamp(28px,6.5vw,56px);line-height:1.15;color:#ff3b1f;background:none;border:0;
+  text-shadow:0 0 2px #fff,0 0 10px rgba(255,255,255,.9),0 3px 18px rgba(255,120,0,.55);animation:memepop 1.6s linear forwards}
+@keyframes memepop{0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--r0,0deg)) scale(.8)}8%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) rotate(var(--r1,0deg)) scale(1.2)}}
 .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .compare figure{margin:0;background:var(--card);border-radius:2px;padding:8px;border:1px solid var(--line)}
 .compare figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
@@ -256,6 +268,23 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
   .opts.figs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .compare{grid-template-columns:minmax(0,1fr)}
   .qcard{padding:16px}
+}
+/* monitor 16:9: su schermi larghi il quiz sta in una sola schermata, grafico a sinistra e risposte a destra */
+@media (min-width:1280px) and (min-aspect-ratio:4/3){
+  .wrap{max-width:1280px}
+  .hero{padding:30px 0 26px}
+  .qcard{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);column-gap:32px;align-items:start}
+  .qcard > *{grid-column:2}
+  .qcard > .prompt{grid-column:1 / -1}
+  .qcard > .scen-top{grid-column:1 / -1}
+  .qcard.scen > .bigchart{grid-row:3 / span 3}
+  .qcard > .bigchart{grid-column:1;grid-row:2 / span 3}
+  .qcard > .bigchart svg, .qcard.scen > .bigchart svg{max-height:min(58vh,520px)}
+  .qcard > .opts:not(.figs){grid-template-columns:minmax(0,1fr)}
+  .qcard > .opts:not(.figs) .opt{border-right:0}
+  .qcard:has(> .figs){grid-template-columns:minmax(0,1fr)}
+  .qcard:has(> .figs) > *{grid-column:1}
+  .opts.figs{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
@@ -357,6 +386,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 
     <div class="panel progress">
       <div class="eyebrow">I tuoi progressi</div>
+      <div class="level" id="levelBox"></div>
       <div class="dots" id="progDots"></div>
       <div class="legend">
         <span><i style="background:var(--line)"></i>da scoprire</span>
