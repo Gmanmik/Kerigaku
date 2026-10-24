@@ -93,3 +93,14 @@ Protegge registrazione, accesso, reinvio codice e reset password dai bot. L'ordi
 - `.assetsignore`: elenca i file che restano su GitHub ma non vengono pubblicati sul sito (file SQL, guide, modelli email, zip, cartella `redesign`, `archivio`).
 - Se un giorno aggiungi un servizio esterno (statistiche, video, immagini da un altro sito), va aggiunto anche nella riga `Content-Security-Policy` di `_headers`, altrimenti il browser lo blocca.
 - `archivio/` contiene i font del vecchio aspetto grafico, non più usati.
+
+## Statistiche delle visite nella pagina admin (funzione "statistiche")
+
+Il sito usa Cloudflare Web Analytics (senza cookie). La pagina admin mostra i numeri tramite la funzione Supabase `funzioni/statistiche/index.ts`, che chiede i dati a Cloudflare con un token che resta nei segreti di Supabase: il browser non lo vede mai e la funzione risponde solo a un admin con verifica in due passaggi.
+
+1. **Cloudflare, ID account**: nella home del pannello Cloudflare, a destra, "Account ID". Copialo.
+2. **Cloudflare, site tag**: Analytics & Logs → Web Analytics → apri dojodellecandele.com. Il site tag è il codice lungo nell'indirizzo della pagina (dopo `/web-analytics/overview?siteTag~in=`) oppure in "Manage site".
+3. **Cloudflare, token**: icona profilo → My Profile → API Tokens → Create Token → Create Custom Token. Nome "Dojo statistiche", permesso **Account → Account Analytics → Read**, risorse: il tuo account. Crea e copia il token (si vede una volta sola). Non mandarlo a nessuno, nemmeno in chat.
+4. **Supabase, funzione**: Edge Functions → Deploy a new function → Via Editor. Nome `statistiche`, incolla tutto il contenuto di `funzioni/statistiche/index.ts`, Deploy. Lascia attivo "Verify JWT".
+5. **Supabase, segreti**: Edge Functions → Secrets → aggiungi `CF_API_TOKEN` (il token), `CF_ACCOUNT_ID` e `CF_SITE_TAG`.
+6. Apri la pagina admin: sotto i riquadri degli allievi compare "Visite al sito".

@@ -200,6 +200,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
         <tr><td>Verifica in due passaggi (se la attivi)</td><td>Proteggere il tuo account</td><td>Esecuzione del servizio (art. 6.1.b)</td></tr>
         <tr><td>Consenso alla newsletter e data in cui l'hai dato</td><td>Mandarti novità e consigli, solo se l'hai chiesto</td><td>Consenso, revocabile quando vuoi (art. 6.1.a)</td></tr>
         <tr><td>Indirizzo IP, data degli accessi, tentativi di accesso sbagliati, controllo anti-robot</td><td>Sicurezza: bloccare bot e tentativi di indovinare le password</td><td>Legittimo interesse alla sicurezza del servizio (art. 6.1.f)</td></tr>
+        <tr><td>Dati anonimi e aggregati sulle visite: pagine viste, paese, sito di provenienza, tipo di dispositivo (Cloudflare Web Analytics, senza cookie)</td><td>Capire quali pagine servono e migliorare il Dojo</td><td>Legittimo interesse a migliorare il servizio (art. 6.1.f)</td></tr>
         <tr><td>Email che ci scrivi</td><td>Risponderti</td><td>Legittimo interesse e tua richiesta (art. 6.1.b e f)</td></tr>
       </tbody>
     </table>
@@ -213,8 +214,8 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
     <dl class="credits">
       <div><dt>Supabase</dt><dd>Account, password cifrate, progressi e verifica in due passaggi. I dati sono conservati nell'Unione europea, in Irlanda (regione eu-west-1); Supabase Inc. ha sede negli Stati Uniti.</dd></div>
       <div><dt>Brevo (Sendinblue SAS, Francia)</dt><dd>Invio delle email con i codici e, se l'hai chiesta, della newsletter. Dati nell'Unione europea.</dd></div>
-      <div><dt>Cloudflare</dt><dd>Controllo anti-robot (Turnstile), gestione del dominio e inoltro delle email che ci scrivi.</dd></div>
-      <div><dt>GitHub (Microsoft)</dt><dd>Ospita le pagine del sito; registra l'indirizzo IP di chi le visita per motivi tecnici e di sicurezza.</dd></div>
+      <div><dt>Cloudflare</dt><dd>Pubblica le pagine del sito (registra l'indirizzo IP di chi visita per motivi tecnici e di sicurezza), controllo anti-robot (Turnstile), statistiche anonime delle visite senza cookie (Web Analytics), gestione del dominio e inoltro delle email che ci scrivi.</dd></div>
+      <div><dt>GitHub (Microsoft)</dt><dd>Conserva il codice del sito e lo pubblica anche al vecchio indirizzo gmanmik.github.io, dove registra l'indirizzo IP di chi visita per motivi tecnici e di sicurezza.</dd></div>
     </dl>
     <p>Alcuni di questi fornitori hanno sede negli Stati Uniti. I trasferimenti avvengono sulla base del Data Privacy Framework UE-USA o delle clausole contrattuali standard della Commissione europea.</p>
     <p>I caratteri e le librerie del sito sono ospitati direttamente qui: aprire il Dojo non manda dati a Google Fonts o ad altre CDN.</p>
@@ -245,7 +246,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
   <section class="chapter" id="cookie">
     <div class="eyebrow">Cookie</div>
     <h2>Cookie e memoria del browser</h2>
-    <p>Il Dojo <b>non usa cookie di profilazione, pubblicità o statistiche</b>. Salva nel tuo browser solo ciò che serve a farlo funzionare. Questi strumenti tecnici, per la direttiva ePrivacy e le linee guida del Garante, non richiedono il tuo consenso: per questo l'avviso ti informa ma non ti chiede di accettare.</p>
+    <p>Il Dojo <b>non usa cookie di profilazione o pubblicità</b>. Salva nel tuo browser solo ciò che serve a farlo funzionare. Per contare le visite usa Cloudflare Web Analytics, che <b>non usa cookie</b>, non salva nulla sul tuo dispositivo e non ti segue su altri siti: vediamo solo numeri complessivi (pagine viste, paese, sito di provenienza, tipo di dispositivo), mai chi sei. Questi strumenti tecnici, per la direttiva ePrivacy e le linee guida del Garante, non richiedono il tuo consenso: per questo l'avviso ti informa ma non ti chiede di accettare.</p>
     <table class="tbl">
       <thead><tr><th>Nome</th><th>A cosa serve</th><th>Durata</th></tr></thead>
       <tbody>
@@ -255,6 +256,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
         <tr><td><code>dojo-guest</code></td><td>Ricorda che hai scelto di usare il Dojo senza account</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-support-day</code></td><td>Ricorda se oggi ti abbiamo già mostrato l'invito a sostenere il Dojo, per non ripeterlo</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-cookie-info-v1</code></td><td>Ricorda che hai già letto l'avviso sui cookie</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td>Cloudflare Web Analytics</td><td>Conta le visite in forma anonima e aggregata. Non è un cookie e non salva nulla sul dispositivo.</td><td>Nessuna</td></tr>
         <tr><td>Cloudflare Turnstile</td><td>Controllo anti-robot su accesso, registrazione e reset della password. Non serve a tracciarti.</td><td>Durata della sessione</td></tr>
       </tbody>
     </table>

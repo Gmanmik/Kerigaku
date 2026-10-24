@@ -1,8 +1,8 @@
 # Intestazioni di sicurezza che Cloudflare aggiunge a ogni pagina del Dojo.
 # Il browser carica script, stili e font solo dal sito stesso, il CAPTCHA solo da Cloudflare
-# e parla solo con il database Supabase: un eventuale codice iniettato non può spedire dati altrove.
+# e le statistiche anonime solo da Cloudflare Web Analytics, e parla solo con Supabase e Cloudflare: un eventuale codice iniettato non può spedire dati altrove.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://cwlrmzwfkvjhejupirzw.supabase.co wss://cwlrmzwfkvjhejupirzw.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://cloudflareinsights.com https://cwlrmzwfkvjhejupirzw.supabase.co wss://cwlrmzwfkvjhejupirzw.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

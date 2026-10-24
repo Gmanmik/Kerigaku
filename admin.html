@@ -191,6 +191,21 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 .support-line .support{font-size:13.5px;padding:5px 14px 5px 5px}
 .support-line .support .cha{width:22px;height:22px;font-size:14px}
 @media (max-width:600px){.support-line .support{width:100%;justify-content:center}}
+/* statistiche delle visite (Cloudflare Web Analytics, tramite la funzione Supabase "statistiche") */
+.stats{padding:16px 18px;display:grid;gap:14px}
+.stats-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.stats-head h2{margin:0;font-size:20px}
+.stats .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stats .chart{width:100%;height:auto;display:block}
+.stats .chart rect{fill:var(--seal)}
+.stats .chart-dates{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-6px}
+.stats .lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.stats .lists h3{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.stats .lists>div{min-width:0}
+.stats .lists ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:minmax(0,1fr);gap:4px;font-size:13.5px}
+.stats .lists li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:3px}
+.stats .lists li span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats .lists li span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -236,6 +251,12 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
   <main id="main" hidden>
     <div style="display:grid;gap:18px">
       <div class="tiles" id="tiles"></div>
+      <section class="panel stats" id="stats" aria-labelledby="statsTitle">
+        <div class="stats-head"><h2 id="statsTitle">Visite al sito</h2>
+          <div class="seg" id="statsSeg" role="group" aria-label="Periodo"><button type="button" data-d="1">24 ore</button><button type="button" data-d="7" aria-pressed="true">7 giorni</button><button type="button" data-d="30">30 giorni</button><button type="button" data-d="90">90 giorni</button></div>
+        </div>
+        <div id="statsBody"><p class="empty">Carico le statistiche…</p></div>
+      </section>
       <div class="bar">
         <input id="q" type="search" placeholder="Cerca un allievo per username" aria-label="Cerca un allievo">
         <button class="btn ghost" id="reload" type="button">Aggiorna</button>

@@ -1,7 +1,8 @@
 /* Avviso cookie del Dojo delle candele.
    Il sito usa solo strumenti tecnici necessari (accesso, progressi, tema, controllo anti-robot):
    per le regole UE e le linee guida del Garante non serve un consenso, basta informare.
-   L'avviso compare una volta per dispositivo; se un giorno aggiungi statistiche o pubblicità,
+   Le statistiche sono Cloudflare Web Analytics, senza cookie né memoria sul dispositivo, quindi restano fuori dal consenso.
+   L'avviso compare una volta per dispositivo; se un giorno aggiungi statistiche con cookie o pubblicità,
    qui dovrà diventare una richiesta di consenso con "Accetta" e "Rifiuta". */
 (function(){
   var KEY = "dojo-cookie-info-v1";
@@ -18,11 +19,12 @@
     ".ck-bar button:focus-visible{outline:2px solid var(--accent,#BF3A22);outline-offset:2px}";
   var bar = document.createElement("div");
   bar.className = "ck-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Informativa sui cookie");
-  bar.innerHTML = '<p><b>Niente cookie di profilazione.</b> Il Dojo salva sul tuo dispositivo solo ciò che serve a farlo funzionare: accesso, progressi, tema e controllo anti-robot. <a href="privacy.html#cookie">Dettagli</a></p><button type="button">Ho capito</button>';
+  bar.innerHTML = '<p><b>Niente cookie di profilazione.</b> Il Dojo salva sul tuo dispositivo solo ciò che serve a farlo funzionare: accesso, progressi, tema e controllo anti-robot. Le visite le contiamo in forma anonima, senza cookie. <a href="privacy.html#cookie">Dettagli</a></p><button type="button">Ho capito</button>';
   bar.querySelector("button").onclick = function(){
     try{ localStorage.setItem(KEY, new Date().toISOString()); }catch(e){}
-    bar.remove();
+    bar.remove(); document.body.style.paddingBottom = "";
   };
-  function show(){ document.head.appendChild(css); document.body.appendChild(bar); }
+  // spazio in fondo alla pagina grande quanto l'avviso, così non copre mai i pulsanti (per esempio "Entra" sul telefono)
+  function show(){ document.head.appendChild(css); document.body.appendChild(bar); document.body.style.paddingBottom = (bar.offsetHeight + 24) + "px"; }
   if(document.body) show(); else document.addEventListener("DOMContentLoaded", show);
 })();

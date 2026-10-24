@@ -71,6 +71,7 @@ async function enter(){
   if(error) return gate("Pannello non installato", "Esegui admin.sql nel SQL Editor di Supabase, poi ricarica.", false);
   if(!isAdmin) return gate("Non sei admin", "Questo account non ha i permessi per il pannello. Un admin può darteli dall'elenco degli allievi.", false);
   $("#gate").hidden = true; $("#main").hidden = false; paintWho();
+  loadStats(7);
   await load();
 }
 async function load(){
@@ -208,3 +209,26 @@ $("#mfaForm").addEventListener("submit", async e => {
   await enter();
 });
 boot();
+
+// visite al sito: la funzione Supabase "statistiche" chiede i numeri a Cloudflare Web Analytics (il token resta sul server)
+async function loadStats(days){
+  document.querySelectorAll("#statsSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === days)));
+  const box = $("#statsBody");
+  box.innerHTML = `<p class="empty">Carico le statistiche…</p>`;
+  const {data, error} = await sb.functions.invoke("statistiche", {body: {days}});
+  if(error || !data || data.error){
+    box.innerHTML = `<p class="empty">Statistiche non disponibili. Se non hai ancora collegato Cloudflare, segui i passi in LEGGIMI (funzione "statistiche").</p>`;
+    return;
+  }
+  const n = v => Math.max(0, Math.round(Number(v) || 0));
+  const days_ = (data.perGiorno || []).map(d => ({data: String(d.data || ""), v: n(d.visualizzazioni)}));
+  const max = Math.max(1, ...days_.map(d => d.v)), W = 600, H = 120, bw = days_.length ? W / days_.length : W;
+  const bars = days_.map((d, i) => { const h = Math.round((H - 4) * d.v / max); return `<rect x="${(i * bw + 1).toFixed(1)}" y="${H - h}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h}"><title>${esc(d.data)}: ${d.v}</title></rect>`; }).join("");
+  const lab = days_.length ? `<div class="chart-dates"><span>${esc(days_[0].data)}</span><span>${esc(days_[days_.length - 1].data)}</span></div>` : "";
+  const list = (t, rows) => `<div><h3>${t}</h3>${(rows || []).length ? `<ol>${rows.map(r => `<li><span>${esc(r.nome)}</span><span>${n(r.visualizzazioni)}</span></li>`).join("")}</ol>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora niente.</p>`}</div>`;
+  box.innerHTML = `<div style="display:grid;gap:14px">
+    <div class="tiles"><div class="panel tile"><span class="v">${n(data.visite)}</span><span class="l">visite</span></div><div class="panel tile"><span class="v">${n(data.visualizzazioni)}</span><span class="l">pagine viste</span></div></div>
+    ${days_.length > 1 ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pagine viste per giorno">${bars}</svg>${lab}` : ""}
+    <div class="lists">${list("Pagine più viste", data.pagine)}${list("Da dove arrivano", data.provenienza)}${list("Paesi", data.paesi)}${list("Dispositivi", data.dispositivi)}</div></div>`;
+}
+document.querySelectorAll("#statsSeg button").forEach(b => b.onclick = () => loadStats(+b.dataset.d));
