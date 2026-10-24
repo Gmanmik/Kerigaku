@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dojo delle candele</title>
+<meta name="description" content="Allenamento sulle 66 figure candlestick giapponesi, con account e progressi salvati.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M10 4v24M22 4v24' stroke='%2336423C' stroke-width='2'/%3E%3Crect x='6' y='9' width='8' height='12' rx='1' fill='%2312875C'/%3E%3Crect x='18' y='12' width='8' height='10' rx='1' fill='%23CF3F48'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}</style>
+<style>
+/* Layout: a single training column on chart-paper; the chart is the hero of every question. */
+:root{
+  --paper:#F1F4F0; --grid:rgba(24,48,36,.055); --card:#FFFFFF; --well:#FAFBF9;
+  --ink:#17201C; --muted:#5A6660; --line:#D7DDD8;
+  --bull:#12875C; --bull-soft:#DCF0E5; --bear:#CF3F48; --bear-soft:#F7DFE0; --doji:#36423C;
+  --accent:#2C46A6; --accent-soft:#E2E7F7; --hl:#F3E3AE; --hl-line:#D9B54A;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F; --bear-soft:#3A1D20; --doji:#C8D3CD;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl:#3A3420; --hl-line:#9C8233; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
+  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
+  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F; --bear-soft:#3A1D20; --doji:#C8D3CD;
+  --accent:#93A8FF; --accent-soft:#222B48; --hl:#3A3420; --hl-line:#9C8233; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.wrap{max-width:920px;margin:0 auto;padding-block:20px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:8px 18px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand svg{flex:none}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,5vw,40px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- home / menu ---------- */
+.hero{position:relative;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--line);padding:clamp(22px,5vw,44px);margin-top:8px}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,var(--card) 30%,transparent 85%)}
+.hero > *:not(canvas){position:relative;z-index:1}
+.hero h1{font-size:clamp(40px,8vw,72px);line-height:.98;max-width:9ch}
+.hero h1 em{font-style:normal;color:var(--bull)}
+.hero .lead{max-width:40ch;color:var(--muted);font-size:clamp(15px,2.2vw,17px);margin:14px 0 0}
+.hero .kanji{font-family:var(--display);font-size:clamp(70px,14vw,140px);line-height:1;color:var(--bear);opacity:.13;position:absolute;right:clamp(14px,4vw,40px);bottom:-6px;z-index:1}
+.menu-h{font-family:var(--display);font-weight:400;font-size:21px;margin:28px 0 12px}
+.modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.modes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mode .rec{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:-4px}
+.intro{padding:20px;display:grid;gap:14px}
+.intro .big{background:var(--well);border:1px solid var(--line);border-radius:10px;padding:8px}
+.intro .big svg{display:block;width:100%;height:auto;max-height:280px}
+.intro h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4vw,32px);margin:0;line-height:1.1}
+.nextchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;width:fit-content}
+.sched{display:grid;gap:8px}
+.sched div{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.sched b{min-width:110px;font-size:14px}
+.sched span{font-size:13.5px;color:var(--muted)}
+.reset{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.linkbtn{font:inherit;font-size:13px;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+.btn.danger{background:var(--bear);color:#fff;font-size:13px;padding:7px 12px}
+.btn.small{font-size:13px;padding:7px 12px}
+.mode{font:inherit;text-align:left;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 14px 16px;cursor:pointer;display:grid;gap:10px;align-content:start;transition:border-color .15s, transform .15s, box-shadow .15s}
+.mode:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,40,30,.08)}
+.mode[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.mode .ill{background:var(--well);border:1px solid var(--line);border-radius:10px;height:104px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.mode .ill svg{width:100%;height:100%}
+.mode h3{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mode h3 .tick{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center}
+.mode[aria-checked="true"] h3 .tick{border-color:var(--accent);background:var(--accent)}
+.mode[aria-checked="true"] h3 .tick::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--card)}
+.mode p{margin:0;font-size:13px;color:var(--muted)}
+.settings{margin-top:16px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.startrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.btn.big{font-size:17px;padding:14px 26px;border-radius:12px;display:inline-flex;align-items:center;gap:10px}
+.progress{margin-top:28px;padding:16px}
+.progress .dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.progress .dots i{width:12px;height:12px;border-radius:3px;background:var(--line)}
+.progress .dots i.l1{background:var(--hl-line);opacity:.6}
+.progress .dots i.l2{background:var(--bull);opacity:.6}
+.progress .dots i.l3{background:var(--bull)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* in-view bar */
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:4px 14px}
+.back{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px 8px 11px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.bar .t{font-family:var(--display);font-size:22px}
+.bar .cfg{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:640px){.hero canvas{opacity:.22} .modes{grid-template-columns:minmax(0,1fr)!important} .mode{grid-template-columns:120px minmax(0,1fr);align-items:center} .mode .ill{height:84px;grid-row:span 2} .bar .cfg{margin-left:0}}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:18px 0 14px}
+.field{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:13px;font-weight:500;border:0;background:transparent;color:var(--muted);padding:6px 11px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.switch{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.switch input{accent-color:var(--accent);width:16px;height:16px}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.chip.bull{background:var(--bull-soft);color:var(--bull)}
+.chip.bear{background:var(--bear-soft);color:var(--bear)}
+.chip.n{background:var(--well);color:var(--muted);border:1px solid var(--line);font-weight:500}
+.chip.fam{background:transparent;color:var(--muted);border:1px dashed var(--line);font-weight:500}
+
+/* ---------- quiz ---------- */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.pips{display:flex;gap:6px;flex-wrap:wrap}
+.pip{width:22px;height:8px;border-radius:4px;background:var(--line)}
+.pip.cur{background:var(--ink)}
+.pip.ok{background:var(--bull)}
+.pip.ko{background:var(--bear)}
+.streak{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.streak b{color:var(--ink)}
+.qcard{padding:18px;display:grid;gap:16px}
+.prompt{font-family:var(--display);font-size:clamp(20px,3.6vw,26px);line-height:1.2;margin:0;text-wrap:balance}
+.prompt small{display:block;font-family:var(--body);font-size:13px;color:var(--muted);margin-top:4px;font-weight:500}
+.bigchart{background:var(--well);border:1px solid var(--line);border-radius:10px;padding:8px}
+.bigchart svg{display:block;width:100%;height:auto;max-height:340px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;min-width:0;transition:border-color .15s, background .15s}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .nm{font-weight:600;font-size:15px;min-width:0}
+.opt .k{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;flex:none}
+.opt.right{border-color:var(--bull);background:var(--bull-soft)}
+.opt.wrong{border-color:var(--bear);background:var(--bear-soft)}
+.opt:disabled{cursor:default}
+.opt.fig{flex-direction:column;align-items:stretch;padding:8px;gap:6px}
+.opt.fig svg{display:block;width:100%;height:auto}
+.opt.fig .k{align-self:flex-start}
+.ddrow{display:flex;gap:10px;flex-wrap:wrap}
+.ddrow select{flex:1 1 260px;min-width:0;font:inherit;font-size:15px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.btn{font:inherit;font-weight:600;font-size:15px;padding:11px 18px;border-radius:10px;border:0;background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.fb{border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.fb.ok{background:var(--bull-soft)}
+.fb.ko{background:var(--bear-soft)}
+.fb h3{margin:0;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fb p{margin:0;max-width:65ch}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.compare figure{margin:0;background:var(--card);border-radius:8px;padding:8px;border:1px solid var(--line)}
+.compare figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
+.compare figcaption b{color:var(--ink);font-weight:600}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12px;color:var(--muted)}
+.summary{padding:22px;display:grid;gap:16px}
+.summary .score{font-family:var(--display);font-size:30px;margin:0;line-height:1.1}
+
+/* ---------- studio ---------- */
+.studybar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 6px}
+.studybar input{font:inherit;padding:9px 12px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);flex:1 1 220px;min-width:0}
+.sect{margin:26px 0 10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{padding:10px 10px 12px;display:grid;gap:8px;align-content:start;scroll-margin-top:16px}
+.card .well{background:var(--well);border-radius:8px;border:1px solid var(--line)}
+.card .well svg{display:block;width:100%;height:auto}
+.card h3{margin:0;font-size:15.5px;line-height:1.25}
+.card .chips{display:flex;gap:5px;flex-wrap:wrap}
+.card p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.card .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.card .foot button{font:inherit;font-size:12px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;text-align:left}
+.card.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+.meter{display:inline-flex;gap:3px;align-items:center}
+.meter i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.meter i.on{background:var(--bull)}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+/* ---------- account ---------- */
+.authwrap{display:grid;place-items:center;padding-block:clamp(16px,6vw,56px)}
+.authcard{width:100%;max-width:420px;padding:clamp(20px,5vw,32px);display:grid;gap:14px}
+.authcard h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,5vw,34px);line-height:1.05;margin:0;text-wrap:balance}
+.authcard .seg{width:fit-content}
+#authForm{display:grid;gap:6px}
+#authForm label{font-size:13px;font-weight:600;margin-top:6px}
+#authForm input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);width:100%;min-width:0}
+#authForm input:focus-visible{border-color:var(--accent)}
+.pwrow{display:grid;gap:6px}
+.au-err{margin:6px 0 0;min-height:1.4em;font-size:13.5px;color:var(--bear)}
+#au-go{justify-content:center;margin-top:4px}
+.authcard .linkbtn{justify-self:center}
+.acct .linkbtn{white-space:nowrap}
+.acct{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:30px;margin-bottom:8px;font-size:13px;color:var(--muted)}
+.acct .who{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 4px;max-width:100%;min-width:0}
+.acct .who.noav{padding-left:12px}
+.acct img{width:22px;height:22px;border-radius:50%;flex:none;object-fit:cover}
+.acct .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.acct .txt b{color:var(--ink);font-weight:600}
+.acct .st{width:8px;height:8px;border-radius:50%;flex:none;background:var(--line)}
+.acct .st.ok{background:var(--bull)}
+.acct .st.busy{background:var(--hl-line)}
+.acct .st.ko{background:var(--bear)}
+@media (max-width:560px){
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .opts.figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .compare{grid-template-columns:minmax(0,1fr)}
+  .qcard{padding:14px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="acct" id="acct" aria-live="polite"></div>
+  <section id="view-home">
+    <div class="hero">
+      <canvas id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="eyebrow">Allenamento · 66 figure giapponesi</div>
+      <h1 style="margin-top:10px">Dojo delle <em>candele</em></h1>
+      <p class="lead">Impara a riconoscere le formazioni candlestick: prima le studi, poi le alleni su grafici sempre diversi.</p>
+      <div class="kanji" aria-hidden="true">道場</div>
+    </div>
+
+    <h2 class="menu-h">Scegli come allenarti</h2>
+    <div class="modes" role="radiogroup" aria-label="Modalità">
+      <button class="mode" role="radio" data-mode="srs" id="mode-srs">
+        <span class="ill" id="ill-srs"></span>
+        <span class="rec">Consigliato ogni giorno</span>
+        <h3>Ripasso del giorno <span class="tick"></span></h3>
+        <p>Ogni figura torna al momento giusto: quelle che sai dopo giorni, quelle che sbagli subito.</p>
+      </button>
+      <button class="mode" role="radio" data-mode="studia" id="mode-studia">
+        <span class="ill" id="ill-studia"></span>
+        <h3>Studia <span class="tick"></span></h3>
+        <p>Tutte le figure con disegno, nome e spiegazione. Da qui si parte.</p>
+      </button>
+      <button class="mode" role="radio" data-mode="f2n" id="mode-f2n">
+        <span class="ill" id="ill-f2n"></span>
+        <h3>Figura → Nome <span class="tick"></span></h3>
+        <p>Guardi il grafico e scegli il nome giusto.</p>
+      </button>
+      <button class="mode" role="radio" data-mode="n2f" id="mode-n2f">
+        <span class="ill" id="ill-n2f"></span>
+        <h3>Nome → Figura <span class="tick"></span></h3>
+        <p>Leggi il nome e trovi il grafico giusto tra quattro.</p>
+      </button>
+    </div>
+
+    <div class="panel settings" id="settings">
+      <div class="field">Famiglia
+        <div class="seg" id="famSeg">
+          <button data-v="all">Tutte</button><button data-v="inv">Inversione</button><button data-v="cont">Continuazione</button>
+        </div>
+      </div>
+      <div class="field" id="ansField">Risposta
+        <div class="seg" id="ansSeg">
+          <button data-v="btn">4 scelte</button><button data-v="dd">Menu a tendina</button>
+        </div>
+      </div>
+      <label class="switch field"><input type="checkbox" id="hlToggle" checked> Evidenzia la figura</label>
+    </div>
+
+    <div class="startrow">
+      <button class="btn big" id="startBtn">Inizia <span aria-hidden="true">→</span></button>
+      <span class="hint" id="startHint"></span>
+    </div>
+
+    <div class="panel progress">
+      <div class="eyebrow">I tuoi progressi</div>
+      <div class="dots" id="progDots"></div>
+      <div class="legend">
+        <span><i style="background:var(--line)"></i>da scoprire</span>
+        <span><i style="background:var(--hl-line);opacity:.6"></i>in apprendimento</span>
+        <span><i style="background:var(--bull);opacity:.6"></i>la stai fissando</span>
+        <span><i style="background:var(--bull)"></i>la conosci</span>
+      </div>
+      <p class="hint" id="nextDue" style="margin:10px 0 0"></p>
+      <div class="reset" id="resetBox"><button class="linkbtn" id="resetBtn">Azzera i progressi</button></div>
+    </div>
+  </section>
+
+  <section id="view-auth" hidden>
+    <div class="authwrap">
+      <div class="panel authcard">
+        <div class="eyebrow">Dojo delle candele · 道場</div>
+        <h2 id="au-title">Bentornato nel dojo</h2>
+        <p class="hint" style="margin:0;font-size:13.5px">Con un account i tuoi progressi ti seguono su ogni dispositivo.</p>
+        <div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati">
+          <button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button>
+        </div>
+        <form id="authForm" novalidate>
+          <label for="au-name">Username</label>
+          <input id="au-name" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24" required>
+          <label for="au-pw">Password</label>
+          <input id="au-pw" name="password" type="password" autocomplete="current-password" minlength="6" required>
+          <div id="au-pw2-row" class="pwrow" hidden>
+            <label for="au-pw2">Ripeti la password</label>
+            <input id="au-pw2" name="password2" type="password" autocomplete="new-password" minlength="6">
+          </div>
+          <p class="au-err" id="au-err" role="alert"></p>
+          <button class="btn big" id="au-go" type="submit">Entra</button>
+        </form>
+        <button class="linkbtn" id="au-guest" type="button">Continua senza account</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar" id="bar" hidden>
+    <button class="back" id="backBtn"><span aria-hidden="true">←</span> Menu</button>
+    <span class="t" id="barTitle"></span>
+    <span class="cfg" id="barCfg"></span>
+  </div>
+
+  <section id="view-quiz" hidden>
+    <div id="quiz"></div>
+  </section>
+
+  <section id="view-studia" hidden>
+    <div class="studybar">
+      <input id="search" type="search" placeholder="Cerca una figura, per esempio harami" aria-label="Cerca una figura">
+      <div class="seg" id="studySeg">
+        <button data-v="all">Tutte</button><button data-v="bull">Rialziste</button><button data-v="bear">Ribassiste</button>
+      </div>
+    </div>
+    <p class="hint">Verde: il prezzo dovrebbe salire. Rosso: dovrebbe scendere. La freccia grigia mostra da dove arriva il prezzo. I pallini sotto ogni scheda si accendono man mano che la fissi con il Ripasso del giorno.</p>
+    <div id="study"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const P = [{"id":"hammer_p","name":"Hammer","bull":true,"fam":"inv","trend":"d","c":[["b",24,41,52,52]],"n":1,"d":"Dopo un ribasso: corpo piccolo in alto e ombra inferiore lunga almeno il doppio del corpo. I venditori spingono giù, ma i compratori recuperano tutto.","twin":"hanging_m"},{"id":"hanging_m","name":"Hanging man","bull":false,"fam":"inv","trend":"u","c":[["b",46,64,74,74]],"n":1,"d":"Stessa forma del martello, ma arriva dopo un rialzo. Avverte che la pressione di vendita sta crescendo: aspetta la conferma il giorno dopo.","twin":"hammer_p"},{"id":"invhammer_p","name":"Inverted hammer","bull":true,"fam":"inv","trend":"d","c":[["b",18,23,50,55],["b",8,8,18,38]],"n":1,"d":"Dopo un ribasso: corpo piccolo in basso e lunga ombra superiore. È il primo tentativo dei compratori, da confermare con una seduta rialzista.","twin":"shooting_m"},{"id":"shooting_m","name":"Shooting star","bull":false,"fam":"inv","trend":"u","c":[["w",19,28,61,71],["b",64,64,74,95]],"n":1,"d":"Dopo un rialzo: apre in gap, sale molto ma ricade. Corpo piccolo in basso e lunga ombra superiore: i prezzi alti sono stati respinti.","twin":"invhammer_p"},{"id":"belthold_p","name":"Belt hold","bull":true,"fam":"inv","trend":"d","c":[["w",18,18,43,52]],"n":1,"d":"Candela verde lunga che apre esattamente sul minimo (niente ombra inferiore) e sale per tutta la seduta. Più è lunga, più conta.","twin":"belthold_m"},{"id":"belthold_m","name":"Belt hold","bull":false,"fam":"inv","trend":"u","c":[["b",49,58,84,84]],"n":1,"d":"Candela rossa lunga che apre esattamente sul massimo (niente ombra superiore) e scende per tutta la seduta.","twin":"belthold_p"},{"id":"engulf_p","name":"Engulfing","bull":true,"fam":"inv","trend":"d","c":[["b",27,34,50,54],["w",20,24,59,64]],"n":2,"d":"Il corpo verde “ingoia” completamente il corpo rosso del giorno prima. Uno dei segnali d’inversione al rialzo più affidabili.","twin":"engulf_m"},{"id":"engulf_m","name":"Engulfing","bull":false,"fam":"inv","trend":"u","c":[["w",53,58,76,80],["b",49,53,83,87]],"n":2,"d":"Il corpo rosso ingoia completamente il corpo verde del giorno prima. I venditori prendono il controllo.","twin":"engulf_p"},{"id":"harami_p","name":"Harami","bull":true,"fam":"inv","trend":"d","c":[["b",14,21,51,57],["w",22,29,44,50]],"n":2,"d":"Dopo una lunga candela rossa, un piccolo corpo verde tutto dentro il corpo precedente (harami = “incinta”). Il ribasso perde forza.","twin":"harami_m"},{"id":"harami_m","name":"Harami","bull":false,"fam":"inv","trend":"u","c":[["w",35,40,70,75],["b",43,47,66,70]],"n":2,"d":"Dopo una lunga candela verde, un piccolo corpo rosso tutto dentro il corpo precedente. Il rialzo rallenta.","twin":"harami_p"},{"id":"haramix_p","name":"Harami cross","bull":true,"fam":"inv","trend":"d","c":[["b",13,20,55,62],["d",26,37,37,47]],"n":2,"d":"Come l’harami, ma la seconda candela è un doji. L’indecisione è totale: segnale più forte dell’harami normale.","twin":"haramix_m"},{"id":"haramix_m","name":"Harami cross","bull":false,"fam":"inv","trend":"u","c":[["w",43,49,80,86],["d",52,65,65,76]],"n":2,"d":"Un doji tutto dentro il corpo di una lunga candela verde. Il rialzo si blocca nell’indecisione.","twin":"haramix_p"},{"id":"piercing_p","name":"Piercing line","bull":true,"fam":"inv","trend":"d","c":[["b",16,20,49,54],["w",3,8,37,42]],"n":2,"d":"Dopo una candela rossa, la verde apre sotto il minimo e chiude oltre la metà del corpo rosso. Più “perfora”, più è forte.","twin":"darkcloud_m"},{"id":"darkcloud_m","name":"Dark cloud cover","bull":false,"fam":"inv","trend":"u","c":[["w",40,44,73,78],["b",49,54,83,88]],"n":2,"d":"Dopo una candela verde, la rossa apre sopra il massimo e chiude sotto la metà del corpo verde. Una nuvola scura sul rialzo.","twin":"piercing_p"},{"id":"dojistar_p","name":"Doji star","bull":true,"fam":"inv","trend":"d","c":[["b",21,26,55,60],["d",3,16,16,25]],"n":2,"d":"Dopo una lunga candela rossa, un doji che apre in gap al ribasso. Il mercato esita: possibile svolta, da confermare.","twin":"dojistar_m"},{"id":"dojistar_m","name":"Doji star","bull":false,"fam":"inv","trend":"u","c":[["w",34,39,67,72],["d",67,80,80,89]],"n":2,"d":"Dopo una lunga candela verde, un doji in gap al rialzo. Il mercato esita sui massimi.","twin":"dojistar_p"},{"id":"meeting_p","name":"Meeting line","bull":true,"fam":"inv","trend":"d","c":[["b",25,30,58,63],["w",-3,1,30,34]],"n":2,"d":"Candela rossa lunga, poi una verde che apre molto più in basso ma risale fino a chiudere allo stesso prezzo del giorno prima.","twin":"meeting_m"},{"id":"meeting_m","name":"Meeting line","bull":false,"fam":"inv","trend":"u","c":[["w",26,30,59,63],["b",54,59,88,93]],"n":2,"d":"Candela verde lunga, poi una rossa che apre molto più in alto ma ricade fino a chiudere allo stesso prezzo del giorno prima.","twin":"meeting_p"},{"id":"3soldiers_p","name":"Three white soldiers","bull":true,"fam":"inv","trend":"d","c":[["w",20,24,52,57],["w",34,38,67,72],["w",49,53,82,86]],"n":3,"d":"Tre candele verdi lunghe, con chiusure sempre più alte. Ognuna apre dentro il corpo della precedente. Ripresa decisa.","twin":"3crows_m"},{"id":"3crows_m","name":"Three black crows","bull":false,"fam":"inv","trend":"u","c":[["b",48,52,83,87],["b",32,36,67,71],["b",17,21,51,55]],"n":3,"d":"Tre candele rosse lunghe, con chiusure sempre più basse. Ognuna apre dentro il corpo della precedente.","twin":"3soldiers_p"},{"id":"mstar_p","name":"Morning star","bull":true,"fam":"inv","trend":"d","c":[["b",23,28,56,60],["w",4,9,18,23],["w",17,22,43,47]],"n":3,"d":"Candela rossa lunga, poi un piccolo corpo in gap al ribasso (la “stella”), poi una verde che chiude ben dentro il primo corpo.","twin":"estar_m"},{"id":"estar_m","name":"Evening star","bull":false,"fam":"inv","trend":"u","c":[["w",36,40,68,73],["b",71,75,85,90],["b",45,49,70,75]],"n":3,"d":"Candela verde lunga, poi un piccolo corpo in gap al rialzo, poi una rossa che chiude ben dentro il primo corpo.","twin":"mstar_p"},{"id":"mdoji_p","name":"Morning doji star","bull":true,"fam":"inv","trend":"d","c":[["b",20,24,52,57],["d",7,14,14,22],["w",14,18,40,44]],"n":3,"d":"Come la morning star, ma la stella centrale è un doji. Segnale ancora più forte.","twin":"edoji_m"},{"id":"edoji_m","name":"Evening doji star","bull":false,"fam":"inv","trend":"u","c":[["w",37,41,68,73],["d",74,80,80,87],["b",45,49,73,78]],"n":3,"d":"Come la evening star, ma la stella centrale è un doji. Segnale ancora più forte.","twin":"mdoji_p"},{"id":"abandoned_p","name":"Abandoned baby","bull":true,"fam":"inv","trend":"d","c":[["b",20,24,52,57],["d",7,14,14,21],["w",13,17,39,43]],"n":3,"d":"Il doji centrale è isolato da due gap: le sue ombre non toccano quelle delle candele vicine. Raro ma molto potente.","twin":"abandoned_m"},{"id":"abandoned_m","name":"Abandoned baby","bull":false,"fam":"inv","trend":"u","c":[["w",36,40,67,72],["d",81,86,86,92],["b",46,50,73,77]],"n":3,"d":"Doji isolato in alto da due gap, tra una candela verde e una rossa. Raro ma molto potente.","twin":"abandoned_p"},{"id":"tristar_p","name":"Tri-star","bull":true,"fam":"inv","trend":"d","c":[["d",37,43,43,50],["d",26,32,32,39],["d",33,39,39,46]],"n":3,"d":"Tre doji di fila, con quello centrale più in basso degli altri due. Rarissimo: indecisione estrema dopo il ribasso.","twin":"tristar_m"},{"id":"tristar_m","name":"Tri-star","bull":false,"fam":"inv","trend":"u","c":[["d",50,57,57,63],["d",61,68,68,74],["d",56,62,62,69]],"n":3,"d":"Tre doji di fila, con quello centrale più in alto degli altri due, dopo un rialzo.","twin":"tristar_p"},{"id":"breakaway_p","name":"Breakaway","bull":true,"fam":"inv","trend":"d","c":[["b",38,42,63,67],["b",20,23,33,36],["b",14,18,30,33],["b",11,15,24,28],["w",17,20,41,45]],"n":5,"d":"Rossa lunga, gap al ribasso, tre candele che scendono sempre più piano. La quinta, verde, risale e chiude dentro il gap.","twin":"breakaway_m"},{"id":"breakaway_m","name":"Breakaway","bull":false,"fam":"inv","trend":"u","c":[["w",36,39,60,65],["w",70,72,83,86],["b",71,74,85,89],["w",75,77,87,90],["b",57,61,82,84]],"n":5,"d":"Verde lunga, gap al rialzo, tre candele che salgono sempre più piano. La quinta, rossa, ricade e chiude dentro il gap.","twin":"breakaway_p"},{"id":"3inside_p","name":"Three inside up","bull":true,"fam":"inv","trend":"d","c":[["b",12,17,43,48],["w",19,23,36,40],["w",26,30,50,55]],"n":3,"d":"Un harami rialzista seguito da una terza candela verde che chiude sopra la prima. È l’harami confermato.","twin":"3inside_m"},{"id":"3inside_m","name":"Three inside down","bull":false,"fam":"inv","trend":"u","c":[["w",44,49,76,81],["b",51,56,69,73],["b",36,40,62,66]],"n":3,"d":"Un harami ribassista seguito da una terza candela rossa che chiude sotto la prima. È l’harami confermato.","twin":"3inside_p"},{"id":"3outside_p","name":"Three outside up","bull":true,"fam":"inv","trend":"d","c":[["b",13,18,33,37],["w",7,11,40,45],["w",21,26,51,55]],"n":3,"d":"Un engulfing rialzista seguito da una terza candela verde con chiusura più alta. È l’engulfing confermato.","twin":"3outside_m"},{"id":"3outside_m","name":"Three outside down","bull":false,"fam":"inv","trend":"u","c":[["w",46,50,64,69],["b",35,40,69,74],["b",27,32,57,61]],"n":3,"d":"Un engulfing ribassista seguito da una terza candela rossa con chiusura più bassa. È l’engulfing confermato.","twin":"3outside_p"},{"id":"kicking_p","name":"Kicking","bull":true,"fam":"inv","trend":null,"c":[["b",2,2,37,37],["w",48,48,86,86]],"n":2,"d":"Marubozu rosso (senza ombre) e poi marubozu verde in gap al rialzo. Cambio d’umore netto, conta poco il trend precedente.","twin":"kicking_m"},{"id":"kicking_m","name":"Kicking","bull":false,"fam":"inv","trend":null,"c":[["w",47,47,85,85],["b",1,1,36,36]],"n":2,"d":"Marubozu verde (senza ombre) e poi marubozu rosso in gap al ribasso. Cambio d’umore netto.","twin":"kicking_p"},{"id":"matchlow_p","name":"Matching low","bull":true,"fam":"inv","trend":"d","c":[["b",15,15,47,52],["b",14,14,35,43]],"n":2,"d":"Due candele rosse che chiudono esattamente allo stesso prezzo. Quel livello fa da supporto: il prezzo non scende oltre.","twin":"matchhigh_m"},{"id":"matchhigh_m","name":"Matching high","bull":false,"fam":"inv","trend":"u","c":[["w",41,48,80,80],["w",51,60,80,80]],"n":2,"d":"Due candele verdi che chiudono esattamente allo stesso prezzo. Quel livello fa da resistenza.","twin":"matchlow_p"},{"id":"ladderbot_p","name":"Ladder bottom","bull":true,"fam":"inv","trend":"d","c":[["b",43,43,67,67],["b",32,32,57,57],["b",22,22,47,47],["b",13,13,26,43],["w",28,28,62,62]],"n":5,"d":"Tre rosse in discesa, una quarta rossa con ombra superiore lunga, poi una verde che apre in gap al rialzo.","twin":"laddertop_m"},{"id":"laddertop_m","name":"Ladder top","bull":false,"fam":"inv","trend":"u","c":[["w",39,39,64,64],["w",50,50,75,75],["w",60,60,86,86],["w",64,80,92,92],["b",42,42,75,75]],"n":5,"d":"Tre verdi in salita, una quarta verde con ombra inferiore lunga, poi una rossa che apre in gap al ribasso.","twin":"ladderbot_p"},{"id":"u3river_p","name":"Unique three river bottom","bull":true,"fam":"inv","trend":"d","c":[["b",25,30,56,60],["b",13,44,52,53],["w",26,26,37,46]],"n":3,"d":"Rossa lunga, poi una rossa piccola con lunga ombra inferiore (nuovo minimo, subito respinto), infine una verde piccola.","twin":null},{"id":"upgap2crows_m","name":"Upside gap two crows","bull":false,"fam":"inv","trend":"u","c":[["w",29,33,63,67],["b",70,73,82,85],["b",64,68,84,88]],"n":3,"d":"Verde lunga, una rossa piccola in gap al rialzo, poi una rossa più grande che la avvolge ma resta sopra la verde.","twin":null},{"id":"3stars_p","name":"Three stars in the south","bull":true,"fam":"inv","trend":"d","c":[["b",8,36,68,68],["b",15,28,39,41],["b",22,22,30,30]],"n":3,"d":"Tre candele rosse sempre più piccole, con minimi sempre più alti. L’ultima è un piccolo marubozu: il ribasso si esaurisce.","twin":null},{"id":"ident3crows_m","name":"Identical three crows","bull":false,"fam":"inv","trend":"u","c":[["b",62,64,89,93],["b",37,40,64,68],["b",12,15,39,43]],"n":3,"d":"Tre rosse in discesa in cui ognuna apre proprio alla chiusura della precedente. Variante più dura dei three black crows.","twin":null},{"id":"swallow_p","name":"Concealing baby swallow","bull":true,"fam":"inv","trend":"d","c":[["b",42,42,67,67],["b",21,21,45,45],["b",4,4,14,25],["b",2,2,27,27]],"n":4,"d":"Due marubozu rossi, una rossa in gap con lunga ombra superiore, poi una rossa che la avvolge. I venditori si arrendono.","twin":null},{"id":"deliberation_m","name":"Deliberation","bull":false,"fam":"inv","trend":"u","c":[["w",24,28,54,58],["w",46,50,77,81],["w",77,80,89,93]],"n":3,"d":"Due verdi lunghe e poi una verde piccola, spesso in gap. Il rialzo “ci pensa su” e perde slancio.","twin":null},{"id":"sandwich_p","name":"Stick sandwich","bull":true,"fam":"inv","trend":"d","c":[["b",12,12,45,52],["w",26,26,59,59],["b",11,11,66,70]],"n":3,"d":"Due candele rosse con la stessa chiusura e in mezzo una verde. La chiusura uguale segna un supporto.","twin":null},{"id":"advblock_m","name":"Advance block","bull":false,"fam":"inv","trend":"u","c":[["w",26,30,63,67],["w",55,59,71,84],["w",63,67,75,86]],"n":3,"d":"Tre verdi in salita, ma con corpi sempre più piccoli e ombre superiori sempre più lunghe. I compratori si stancano.","twin":null},{"id":"homing_p","name":"Homing pigeon","bull":true,"fam":"inv","trend":"d","c":[["b",24,29,54,60],["b",34,37,50,53]],"n":2,"d":"Come l’harami, ma sono rosse entrambe: un piccolo corpo rosso dentro un corpo rosso lungo. Il ribasso rallenta.","twin":null},{"id":"2crows_m","name":"Two crows","bull":false,"fam":"inv","trend":"u","c":[["w",28,33,64,68],["b",73,77,88,91],["b",45,50,82,85]],"n":3,"d":"Verde lunga, una rossa piccola in gap al rialzo, poi una rossa che chiude dentro il corpo della verde.","twin":null},{"id":"seplines_p","name":"Separating lines","bull":true,"fam":"cont","trend":"u","c":[["b",21,25,57,62],["w",52,57,89,93]],"n":2,"d":"In un rialzo: una rossa e poi una verde che apre allo stesso prezzo d’apertura della rossa. Il rialzo riparte.","twin":"seplines_m"},{"id":"seplines_m","name":"Separating lines","bull":false,"fam":"cont","trend":"d","c":[["w",32,36,67,72],["b",0,4,36,40]],"n":2,"d":"In un ribasso: una verde e poi una rossa che apre allo stesso prezzo d’apertura della verde. Il ribasso riparte.","twin":"seplines_p"},{"id":"rising3_p","name":"Rising three methods","bull":true,"fam":"cont","trend":"u","c":[["w",37,41,70,74],["b",60,64,72,76],["b",50,52,64,67],["b",42,44,55,58],["w",40,44,82,86]],"n":5,"d":"Verde lunga, tre piccole candele in calo che restano nel suo range, poi una verde lunga con nuovo massimo. Solo una pausa.","twin":"falling3_m"},{"id":"falling3_m","name":"Falling three methods","bull":false,"fam":"cont","trend":"d","c":[["b",18,25,52,57],["w",18,22,34,37],["b",26,30,39,43],["w",39,42,50,54],["b",14,17,47,49]],"n":5,"d":"Rossa lunga, tre piccole candele in risalita che restano nel suo range, poi una rossa lunga con nuovo minimo.","twin":"rising3_p"},{"id":"uptasuki_p","name":"Upside tasuki gap","bull":true,"fam":"cont","trend":"u","c":[["w",32,37,65,70],["w",75,79,98,103],["b",64,68,83,87]],"n":3,"d":"Due verdi separate da un gap al rialzo, poi una rossa che scende nel gap senza chiuderlo. Il rialzo continua.","twin":"dntasuki_m"},{"id":"dntasuki_m","name":"Downside tasuki gap","bull":false,"fam":"cont","trend":"d","c":[["b",36,40,67,72],["b",8,11,28,32],["w",13,17,31,35]],"n":3,"d":"Due rosse separate da un gap al ribasso, poi una verde che sale nel gap senza chiuderlo. Il ribasso continua.","twin":"uptasuki_p"},{"id":"sbswhite_p","name":"Side by side white lines","bull":true,"fam":"cont","trend":"u","c":[["w",28,31,61,67],["w",67,70,88,91],["w",67,70,88,92]],"n":3,"d":"In un rialzo, dopo un gap, due candele verdi affiancate, simili per apertura e dimensione. Il rialzo continua.","twin":"sbswhite_m"},{"id":"sbswhite_m","name":"Side by side white lines","bull":false,"fam":"cont","trend":"d","c":[["b",26,30,57,62],["w",-2,2,18,24],["w",-1,3,18,22]],"n":3,"d":"In un ribasso, dopo un gap, due candele verdi affiancate e simili: il rimbalzo è debole, il ribasso continua.","twin":"sbswhite_p"},{"id":"3strike_p","name":"Three line strike","bull":true,"fam":"cont","trend":"u","c":[["w",38,43,66,72],["w",48,54,76,82],["w",58,65,85,92],["b",26,30,88,92]],"n":4,"d":"Tre verdi in salita, poi una rossa lunga che cancella tutto e chiude sotto la prima. Prese di profitto, poi si riparte.","twin":"3strike_m"},{"id":"3strike_m","name":"Three line strike","bull":false,"fam":"cont","trend":"d","c":[["b",31,37,57,63],["b",21,27,47,53],["b",12,17,36,42],["w",9,13,64,67]],"n":4,"d":"Tre rosse in discesa, poi una verde lunga che apre sotto e chiude sopra la prima. Ricoperture, poi si riscende.","twin":"3strike_p"},{"id":"upgap3m_p","name":"Upside gap three methods","bull":true,"fam":"cont","trend":"u","c":[["w",27,32,54,60],["w",63,67,90,94],["b",41,46,74,78]],"n":3,"d":"Due verdi separate da un gap al rialzo, poi una rossa che chiude il gap. Il gap è riempito, il rialzo riprende.","twin":"dngap3m_m"},{"id":"dngap3m_m","name":"Downside gap three methods","bull":false,"fam":"cont","trend":"d","c":[["b",33,37,58,62],["b",1,5,25,29],["w",14,18,46,50]],"n":3,"d":"Due rosse separate da un gap al ribasso, poi una verde che chiude il gap. Il ribasso riprende.","twin":"upgap3m_p"},{"id":"onneck_p","name":"On neck line","bull":true,"fam":"cont","trend":"u","c":[["w",37,42,72,78],["b",78,78,88,93]],"n":2,"d":"In un rialzo: verde lunga, poi una rossa che apre più in alto e chiude proprio al massimo della verde.","twin":"onneck_m"},{"id":"onneck_m","name":"On neck line","bull":false,"fam":"cont","trend":"d","c":[["b",21,26,55,60],["w",7,11,21,21]],"n":2,"d":"In un ribasso: rossa lunga, poi una verde piccola che apre più in basso e chiude solo al minimo della rossa. Rimbalzo debole.","twin":"onneck_p"},{"id":"inneck_p","name":"In neck line","bull":true,"fam":"cont","trend":"u","c":[["w",43,50,85,92],["b",81,82,98,103]],"n":2,"d":"In un rialzo: verde lunga, poi una rossa che apre più in alto e chiude appena dentro il corpo verde.","twin":"inneck_m"},{"id":"inneck_m","name":"In neck line","bull":false,"fam":"cont","trend":"d","c":[["b",17,23,59,65],["w",2,8,25,25]],"n":2,"d":"Come la on neck, ma la verde chiude appena dentro il corpo rosso, poco sopra la sua chiusura. Rimbalzo debole.","twin":"inneck_p"}];
+const BYID = Object.fromEntries(P.map(p => [p.id, p]));
+const ROUND = 10;
+
+/* ---------- storage (best effort) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+// ogni utente ha la sua copia locale (chiave + ":" + id); senza account la chiave è quella semplice
+let space = "";
+const K = k => k + space;
+const PREFS0 = {tab:"f2n", fam:"all", ans:"btn", hl:true, sfilter:"all"};
+let stats = store.get(K("dojo-stats-v1"), {});
+let prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}));
+function savePrefs(){ store.set(K("dojo-prefs-v1"), prefs); cloud.schedule(); }
+function saveStats(){ store.set(K("dojo-stats-v1"), stats); cloud.schedule(); }
+if(!prefs.srsSeen){ prefs.mode = "srs"; prefs.srsSeen = true; }
+/* ---------- account: login con username e password su Supabase ----------
+   Supabase vuole un'email, quindi lo username diventa <username>@USER_DOMAIN.
+   I progressi stanno nella tabella progress, una riga per utente, protetta da
+   regole che fanno leggere e scrivere a ciascuno solo la propria (schema.sql).
+   Sul dispositivo resta una copia per ogni utente, più quella di chi usa il
+   Dojo senza account. */
+const CFG = window.DOJO_CONFIG || {};
+const USER_DOMAIN = "utenti.dojo-delle-candele.app";
+const cloud = (() => {
+  const ready = !!(window.supabase && CFG.supabaseUrl && CFG.supabaseAnonKey && !/INSERISCI/.test(CFG.supabaseUrl + CFG.supabaseAnonKey));
+  const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
+  let user = null, state = ready ? "guest" : "local", timer = 0, writing = false, dirty = false;
+  const uname = u => (u && u.user_metadata && u.user_metadata.username) || (u && u.email ? u.email.split("@")[0] : "");
+  const payload = () => ({v:1, srs, stats, daily, prefs});
+  function paint(s){
+    if(s) state = s;
+    const box = $("#acct"); if(!box) return;
+    const dot = {ok:"ok", saving:"busy", loading:"busy", error:"ko"}[state] || "";
+    const msg = {
+      local: "Progressi salvati solo su questo dispositivo",
+      guest: "Senza account: progressi salvati solo su questo dispositivo",
+      loading: "Carico i tuoi progressi…",
+      saving: "Salvataggio…",
+      ok: "Progressi salvati nel tuo account",
+      error: "Non riesco a salvare online: riprovo alla prossima risposta"
+    }[state];
+    box.innerHTML = `<span class="who noav"><span class="st ${dot}"></span><span class="txt">${user ? "<b></b> · " : ""}<span class="m"></span></span></span>` +
+      (ready ? (user ? `<button class="linkbtn" id="logoutBtn">Esci</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "");
+    if(user) box.querySelector("b").textContent = uname(user);
+    box.querySelector(".m").textContent = msg;
+    const lo = $("#logoutBtn"); if(lo) lo.onclick = logout;
+    const li = $("#loginBtn"); if(li) li.onclick = showAuth;
+  }
+  async function flush(){
+    clearTimeout(timer); timer = 0;
+    if(!user) return;
+    if(writing){ dirty = true; return; }
+    writing = true; dirty = false; paint("saving");
+    const {error} = await sb.from("progress").upsert({user_id: user.id, data: payload(), updated_at: new Date().toISOString()});
+    paint(error ? "error" : "ok");
+    writing = false;
+    if(dirty && user) flush();
+  }
+  function schedule(){ if(!user) return; clearTimeout(timer); timer = setTimeout(flush, 700); }
+  // unisce i progressi del server con quelli locali: per ogni figura vince quella più avanti
+  function merge(r){
+    let changed = false;
+    const rs = r.srs || {}, out = Object.assign({}, rs);
+    for(const [id, c] of Object.entries(srs)){
+      const o = rs[id];
+      if(!o || c.b > o.b || (c.b === o.b && c.due > o.due)){ out[id] = c; changed = true; }
+    }
+    const rst = r.stats || {}, st = Object.assign({}, rst);
+    for(const [id, c] of Object.entries(stats)){
+      const o = rst[id] || {r:0, w:0};
+      const m = {r: Math.max(o.r, c.r), w: Math.max(o.w, c.w)};
+      if(m.r !== o.r || m.w !== o.w) changed = true;
+      st[id] = m;
+    }
+    let d = r.daily || {day:0, newCount:0};
+    if(daily.day > d.day || (daily.day === d.day && daily.newCount > d.newCount)){ d = daily; changed = true; }
+    srs = out; stats = st; daily = d;
+    if(r.prefs) Object.assign(prefs, r.prefs);
+    saveLocal();
+    return changed;
+  }
+  async function enter(u){
+    if(user && user.id === u.id) return;
+    const guest = {srs, stats, daily};
+    user = u; setSpace(u.id); paint("loading");
+    const {data, error} = await sb.from("progress").select("data").eq("user_id", u.id).maybeSingle();
+    if(error){ paint("error"); }
+    else if(data){ if(merge(data.data || {})) flush(); else paint("ok"); }
+    else {
+      // primo accesso: porta nell'account quello che hai fatto senza account
+      merge(guest); flush();
+    }
+    goHome();
+  }
+  async function logout(){
+    if(timer) await flush();
+    await sb.auth.signOut();
+    user = null; setSpace(null); paint("guest"); goHome();
+  }
+  function toEmail(n){ return n + "@" + USER_DOMAIN; }
+  function errText(e){
+    const m = (e && e.message || "").toLowerCase();
+    if(m.includes("invalid login")) return "Username o password sbagliati.";
+    if(m.includes("already registered") || m.includes("already been registered")) return "Questo username è già preso: scegline un altro.";
+    if(m.includes("password")) return "La password deve avere almeno 6 caratteri.";
+    if(m.includes("confirm")) return "Account creato, ma Supabase chiede la conferma via email: disattivala nelle impostazioni (vedi LEGGIMI).";
+    return "Qualcosa non ha funzionato: " + (e && e.message || "riprova tra poco.");
+  }
+  async function signIn(n, pw){
+    const {data, error} = await sb.auth.signInWithPassword({email: toEmail(n), password: pw});
+    if(error) throw errText(error);
+    await enter(data.user);
+  }
+  async function signUp(n, pw){
+    const {data, error} = await sb.auth.signUp({email: toEmail(n), password: pw, options: {data: {username: n}}});
+    if(error) throw errText(error);
+    if(!data.session) throw errText({message: "confirm"});
+    await enter(data.user);
+  }
+  async function init(){
+    paint();
+    if(!ready) return;
+    const {data} = await sb.auth.getSession();
+    if(data.session) await enter(data.session.user);
+    else if(!store.get("dojo-guest", false)) showAuth();
+    sb.auth.onAuthStateChange((ev, s) => { if(ev === "SIGNED_OUT" && user){ user = null; setSpace(null); paint("guest"); goHome(); } });
+  }
+  window.addEventListener("pagehide", () => { if(timer) flush(); });
+  return {init, schedule, flush, signIn, signUp, get ready(){ return ready; }, get on(){ return !!user; }};
+})();
+
+
+/* ---------- ripasso a intervalli (Leitner) ---------- */
+const INT = [0, 1, 3, 7, 16, 35];          // giorni di attesa per ogni scatola
+const NEW_PER_DAY = 5, SRS_MAX = 20;
+let srs = store.get(K("dojo-srs-v1"), {});    // id -> {b: scatola 0..5, due: giorno}
+let daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
+function loadLocal(){
+  stats = store.get(K("dojo-stats-v1"), {});
+  prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}), {srsSeen:true});
+  srs = store.get(K("dojo-srs-v1"), {});
+  daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
+}
+function saveLocal(){ store.set(K("dojo-srs-v1"), srs); store.set(K("dojo-daily-v1"), daily); store.set(K("dojo-stats-v1"), stats); store.set(K("dojo-prefs-v1"), prefs); }
+function setSpace(id){ space = id ? ":" + id : ""; loadLocal(); }
+const today = () => { const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); };
+const sc = id => srs[id] || {b:0, due:0};
+function saveSrs(){ store.set(K("dojo-srs-v1"), srs); store.set(K("dojo-daily-v1"), daily); cloud.schedule(); }
+function newLeft(){ const t = today(); if(daily.day !== t) daily = {day:t, newCount:0}; return Math.max(0, NEW_PER_DAY - daily.newCount); }
+function grade(id, ok, relearn){
+  const c = Object.assign({b:0, due:0}, srs[id]);
+  c.b = ok ? (relearn ? 1 : Math.min(5, c.b + 1)) : 1;
+  c.due = today() + (ok ? INT[c.b] : 0);
+  srs[id] = c; saveSrs(); return c;
+}
+function srsQueue(){
+  const t = today(), list = P.filter(p => prefs.fam === "all" || p.fam === prefs.fam);
+  const due = list.filter(p => sc(p.id).b > 0 && sc(p.id).due <= t).sort((a, b) => sc(a.id).due - sc(b.id).due).slice(0, SRS_MAX);
+  const fresh = list.filter(p => sc(p.id).b === 0).slice(0, newLeft());
+  return {due, fresh};
+}
+function whenText(day){
+  const d = day - today();
+  if(d <= 0) return "oggi";
+  if(d === 1) return "domani";
+  if(d < 7) return `tra ${d} giorni`;
+  if(d < 14) return "tra una settimana circa";
+  if(d < 28) return `tra ${Math.round(d / 7)} settimane`;
+  return "tra un mese circa";
+}
+function nextDueDay(){
+  const ds = Object.values(srs).filter(c => c.b > 0).map(c => c.due);
+  return ds.length ? Math.min(...ds) : null;
+}
+function mastery(id){ const b = sc(id).b; return b >= 5 ? 3 : b >= 3 ? 2 : b >= 1 ? 1 : 0; }
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const dirWord = p => p.bull ? "rialzista" : "ribassista";
+const label = p => `${p.name} ${p.bull ? "+" : "–"}`;
+const chipDir = p => `<span class="chip ${p.bull?"bull":"bear"}">${p.bull?"▲ rialzo":"▼ ribasso"}</span>`;
+const chipN = p => `<span class="chip n">${p.n} candel${p.n===1?"a":"e"}</span>`;
+const famName = f => f === "inv" ? "Inversione" : "Continuazione";
+
+/* ---------- chart drawing ---------- */
+// candle: [kind, low, bodyBottom, bodyTop, high]
+function makeContext(p){
+  if(!p.trend) return [];
+  const m = 3, out = [];
+  const f = p.c[0];
+  const R = Math.max(...p.c.map(c => c[4])) - Math.min(...p.c.map(c => c[1]));
+  const k = Math.max(.8, Math.min(1.6, R / 40));
+  for(let i = m; i >= 1; i--){
+    const size = rnd(5, 9) * k, step = rnd(8, 11) * k;
+    let bot, top, kind;
+    if(p.trend === "d"){
+      bot = f[4] + rnd(2, 5) + (i - 1) * step; top = bot + size;
+      kind = Math.random() < .78 ? "b" : "w";
+    } else {
+      top = f[1] - rnd(2, 5) - (i - 1) * step; bot = top - size;
+      kind = Math.random() < .78 ? "w" : "b";
+    }
+    out.push([kind, bot - rnd(.8, 3.5), bot, top, top + rnd(.8, 3.5)]);
+  }
+  return out;
+}
+
+function chartSVG(p, o = {}){
+  const ctx = o.context || [];
+  const all = ctx.concat(p.c);
+  const n = all.length;
+  const arrow = o.arrow && p.trend;
+  const W = o.w || 320, H = o.h || 200, padX = 18, padY = 16;
+  const arrW = arrow ? 42 : 0;
+  let lo = Math.min(...all.map(c => c[1])), hi = Math.max(...all.map(c => c[4]));
+  if(arrow){ if(p.trend==="d") hi = Math.max(hi, p.c[0][4] + 30); else lo = Math.min(lo, p.c[0][1] - 30); }
+  const slot = Math.min(o.maxSlot || 36, (W - 2*padX - arrW) / Math.max(n, 1));
+  const groupW = arrW + slot * n;
+  const x0 = (W - groupW) / 2 + arrW + slot / 2;
+  const s = (H - 2*padY) / Math.max(hi - lo, 20);
+  const yOff = padY + ((H - 2*padY) - (hi - lo) * s) / 2;
+  const Y = v => H - yOff - (v - lo) * s;
+  const bw = Math.max(4, Math.min(o.maxBody || 16, slot * .58));
+  const sw = Math.max(1.2, Math.min(2, bw / 8));
+  let g = "";
+  // faint horizontal grid
+  for(let i=1;i<5;i++){ const y = (H*i/5).toFixed(1); g += `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4" opacity=".7"/>`; }
+  if(o.hl && ctx.length){
+    const xa = x0 + ctx.length*slot - slot/2 + 2, xb = x0 + (n-1)*slot + slot/2 - 2;
+    g += `<rect x="${xa.toFixed(1)}" y="3" width="${(xb-xa).toFixed(1)}" height="${H-6}" rx="7" fill="var(--hl)" stroke="var(--hl-line)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  }
+  if(arrow){
+    const f = p.c[0];
+    const a = p.trend === "d" ? [f[4] + 28, f[4] + 4] : [f[1] - 28, f[1] - 4];
+    const xs = x0 - arrW - slot*.15, xe = x0 - slot*.45;
+    const ys = Y(a[0]), ye = Y(a[1]);
+    const ang = Math.atan2(ye - ys, xe - xs), hd = 7;
+    g += `<line x1="${xs.toFixed(1)}" y1="${ys.toFixed(1)}" x2="${(xe-hd*.7*Math.cos(ang)).toFixed(1)}" y2="${(ye-hd*.7*Math.sin(ang)).toFixed(1)}" stroke="var(--muted)" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/>`;
+    g += `<polygon points="${xe},${ye} ${xe-hd*Math.cos(ang-.45)},${ye-hd*Math.sin(ang-.45)} ${xe-hd*Math.cos(ang+.45)},${ye-hd*Math.sin(ang+.45)}" fill="var(--muted)" fill-opacity=".55"/>`;
+  }
+  all.forEach((c, i) => {
+    const cx = x0 + i*slot, [k, l, b, t, h] = c;
+    if(k === "d"){
+      g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="var(--doji)" stroke-width="${sw}"/>`;
+      g += `<line x1="${cx-bw*.62}" x2="${cx+bw*.62}" y1="${Y(b)}" y2="${Y(b)}" stroke="var(--doji)" stroke-width="${sw*1.1}"/>`;
+      return;
+    }
+    const col = k === "w" ? "var(--bull)" : "var(--bear)";
+    g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="${col}" stroke-width="${sw}"/>`;
+    const yt = Y(t), hh = Math.max(1.6, (t - b) * s);
+    g += `<rect x="${(cx-bw/2).toFixed(1)}" y="${yt.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="1.5" fill="${col}"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria || "Grafico a candele")}">${g}</svg>`;
+}
+
+/* ---------- views & menu ---------- */
+let view = "home";
+const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura"};
+function setTab(t){
+  view = t; prefs.mode = t; savePrefs();
+  $("#view-home").hidden = true; $("#view-auth").hidden = true;
+  $("#bar").hidden = false;
+  $("#barTitle").textContent = MODE_TITLE[t];
+  const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
+  $("#barCfg").innerHTML = t === "studia" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
+    `<span class="chip n">${famTxt}</span>` + (t === "f2n" ? `<span class="chip n">${prefs.ans === "dd" ? "Menu a tendina" : "4 scelte"}</span>` : "") +
+    `<span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>`;
+  $("#view-studia").hidden = t !== "studia";
+  $("#view-quiz").hidden = t === "studia";
+  heroAnim.stop();
+  window.scrollTo({top:0});
+  if(t === "studia") renderStudy(); else newRound(t);
+}
+function curMode(){ return Q && Q.mode === "srs" ? Q.dirs[Q.i] : Q && Q.mode; }
+function goHome(){
+  view = "home";
+  $("#view-auth").hidden = true;
+  syncControls();
+  $("#view-home").hidden = false; $("#bar").hidden = true;
+  $("#view-studia").hidden = true; $("#view-quiz").hidden = true;
+  renderHome(); heroAnim.start();
+  window.scrollTo({top:0});
+}
+$("#backBtn").onclick = goHome;
+
+function selectMode(m, quiet){
+  prefs.mode = m; if(!quiet) savePrefs();
+  document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
+  $("#settings").hidden = m === "studia";
+  $("#ansField").hidden = m !== "f2n";
+  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : "Inizia il giro ";
+  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : "10 domande di allenamento libero.";
+}
+document.querySelectorAll(".mode").forEach(b => {
+  b.onclick = () => selectMode(b.dataset.mode);
+  b.ondblclick = () => setTab(b.dataset.mode);
+  b.onkeydown = e => {
+    const ms = ["srs","studia","f2n","n2f"], i = ms.indexOf(b.dataset.mode);
+    if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); selectMode(ms[(i+1)%4]); $("#mode-"+prefs.mode).focus(); }
+    if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); selectMode(ms[(i+3)%4]); $("#mode-"+prefs.mode).focus(); }
+  };
+});
+$("#startBtn").onclick = () => setTab(prefs.mode);
+
+function srsHint(){
+  const {due, fresh} = srsQueue();
+  if(!due.length && !fresh.length){ const nd = nextDueDay(); return "Per oggi hai finito." + (nd !== null ? ` Il prossimo ripasso è ${whenText(nd)}.` : ""); }
+  const parts = [];
+  if(due.length) parts.push(due.length === 1 ? "1 figura da ripassare" : `${due.length} figure da ripassare`);
+  if(fresh.length) parts.push(fresh.length === 1 ? "1 nuova" : `${fresh.length} nuove`);
+  return "Oggi ti aspettano " + parts.join(" e ") + ".";
+}
+function renderHome(){
+  const order = ["inv","cont"].flatMap(f => [true,false].flatMap(b => P.filter(p => p.fam === f && p.bull === b)));
+  $("#progDots").innerHTML = order.map(p => {
+    const b = sc(p.id).b;
+    const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || stats[p.id]) ? "l1" : "";
+    return `<i class="${cls}" title="${esc(label(p))}"></i>`;
+  }).join("");
+  const nd = nextDueDay();
+  $("#nextDue").textContent = nd === null ? "Comincia dal Ripasso del giorno: ogni giorno ti presenta 5 figure nuove." : `Prossime figure da ripassare: ${whenText(nd)}.`;
+  if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
+  $("#resetBox").innerHTML = `<button class="linkbtn" id="resetBtn">Azzera i progressi</button>`;
+  $("#resetBtn").onclick = () => {
+    $("#resetBox").innerHTML = `<span class="hint">${cloud.on ? "Cancello tutti i progressi, anche quelli salvati nel tuo account?" : "Cancello tutti i progressi su questo dispositivo?"}</span><button class="btn danger" id="resetYes">Sì, azzera</button><button class="btn ghost small" id="resetNo">Annulla</button>`;
+    $("#resetYes").onclick = () => { srs = {}; stats = {}; daily = {day:0, newCount:0}; saveSrs(); saveStats(); renderHome(); };
+    $("#resetNo").onclick = renderHome;
+  };
+}
+function renderIllustrations(){
+  const mini = (id, o) => chartSVG(BYID[id], Object.assign({arrow:true, w:90, h:80, maxSlot:16, maxBody:8}, o));
+  const boxes = ["oggi","1 g","3 g","1 sett.","2 sett.","1 mese"].slice(1);
+  $("#ill-srs").innerHTML = `<div style="display:flex;align-items:flex-end;gap:5px;padding:10px 10px 14px;width:100%;height:100%;position:relative">${boxes.map((t, i) => {
+    const n = 4 - Math.min(3, i);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">
+      <div style="display:flex;flex-direction:column-reverse;gap:2px;width:100%;align-items:center">${Array.from({length:n}, (_, j) => `<span style="display:block;width:70%;height:7px;border-radius:2px;background:${i >= 3 ? "var(--bull)" : i >= 1 ? "var(--hl-line)" : "var(--line)"};opacity:${.55 + j * .12}"></span>`).join("")}</div>
+      <span style="display:block;width:100%;height:14px;border:1.5px solid var(--line);border-top:0;border-radius:0 0 4px 4px;background:var(--card)"></span>
+</div>`;
+  }).join("")}<span style="position:absolute;left:10px;right:10px;bottom:3px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted)"><span>oggi</span><span>tra un mese</span></span></div>`;
+  $("#ill-studia").innerHTML = `<div style="display:flex;gap:6px;padding:8px;width:100%;height:100%">${["hammer_p","engulf_m","mstar_p"].map(id =>
+    `<div style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;padding:3px;min-width:0">${mini(id)}<span style="display:block;height:4px;width:70%;background:var(--line);border-radius:2px;margin:3px auto 2px"></span><span style="display:block;height:3px;width:45%;background:var(--line);border-radius:2px;margin:0 auto"></span></div>`).join("")}</div>`;
+  const es = BYID["estar_m"];
+  $("#ill-f2n").innerHTML = `<div style="position:relative;width:100%;height:100%">${chartSVG(es, {context: makeContext(es), hl:true, w:260, h:104, maxSlot:24, maxBody:12})}
+    <span style="position:absolute;right:10px;top:8px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--card);display:grid;place-items:center;font-family:var(--display);font-size:18px">?</span></div>`;
+  $("#ill-n2f").innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;width:100%;height:100%">
+    <span style="background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-weight:600;font-size:12px;white-space:nowrap">Hammer <span style="color:var(--bull)">▲</span></span>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;width:100%;max-width:200px;min-height:0;flex:1">${["hanging_m","hammer_p","shooting_m"].map((id,i) =>
+      `<div style="background:var(--card);border:1.5px solid ${i===1?"var(--bull)":"var(--line)"};border-radius:5px;min-width:0;display:flex">${mini(id,{w:70,h:56})}</div>`).join("")}</div></div>`;
+}
+
+/* hero: candles drifting slowly to the left */
+const heroAnim = (() => {
+  const cv = $("#heroCanvas"); const ctx = cv.getContext("2d");
+  let raf = 0, candles = [], off = 0, last = 50, W = 0, H = 0;
+  const CW = 22;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function nextCandle(){
+    const o = last, c = Math.max(12, Math.min(88, o + (Math.random() - .48) * 14));
+    const hi = Math.max(o, c) + Math.random() * 6, lo = Math.min(o, c) - Math.random() * 6;
+    last = c; return {o, c, hi, lo};
+  }
+  function size(){
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    while(candles.length < W / CW + 3) candles.push(nextCandle());
+  }
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    const bull = css("--bull"), bear = css("--bear");
+    const y = v => H * .92 - v / 100 * H * .84;
+    candles.forEach((k, i) => {
+      const x = i * CW - off + CW / 2;
+      const col = k.c >= k.o ? bull : bear;
+      ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(x, y(k.hi)); ctx.lineTo(x, y(k.lo)); ctx.stroke();
+      const t = y(Math.max(k.o, k.c)), b = y(Math.min(k.o, k.c));
+      ctx.fillRect(x - CW * .3, t, CW * .6, Math.max(2, b - t));
+    });
+  }
+  function tick(){
+    off += .25;
+    if(off >= CW){ off -= CW; candles.shift(); candles.push(nextCandle()); }
+    draw(); raf = requestAnimationFrame(tick);
+  }
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.addEventListener("resize", () => { size(); draw(); });
+  return {
+    start(){ size(); draw(); if(!still && !raf) raf = requestAnimationFrame(tick); },
+    stop(){ cancelAnimationFrame(raf); raf = 0; }
+  };
+})();
+
+function syncControls(){
+  [["#famSeg","fam"],["#ansSeg","ans"],["#studySeg","sfilter"]].forEach(([id, k]) =>
+    $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[k])));
+  $("#hlToggle").checked = prefs.hl;
+  selectMode(["srs","studia","f2n","n2f"].includes(prefs.mode) ? prefs.mode : "srs", true);
+}
+function bindSeg(id, key, cb){
+  const el = $(id);
+  const paint = () => el.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[key]));
+  el.querySelectorAll("button").forEach(b => b.onclick = () => { prefs[key] = b.dataset.v; savePrefs(); paint(); cb(); });
+  paint();
+}
+
+/* ---------- quiz ---------- */
+let Q = null;
+function pool(){ return P.filter(p => prefs.fam === "all" || p.fam === prefs.fam); }
+function weight(p){ const s = stats[p.id] || {r:0, w:0}; return Math.max(.35, 1 + 1.6*s.w - .45*s.r); }
+function pickQuestions(list, k){
+  const src = list.slice(), out = [];
+  while(out.length < k && src.length){
+    const tot = src.reduce((a, p) => a + weight(p), 0);
+    let r = Math.random() * tot, i = 0;
+    for(; i < src.length - 1; i++){ r -= weight(src[i]); if(r <= 0) break; }
+    out.push(src.splice(i, 1)[0]);
+  }
+  return out;
+}
+function distractors(t, list, k){
+  const others = list.filter(p => p.id !== t.id);
+  const chosen = [];
+  const add = p => { if(p && !chosen.includes(p) && p.id !== t.id) chosen.push(p); };
+  if(t.twin && Math.random() < .75) add(BYID[t.twin]);
+  shuffle(others.filter(p => p.n === t.n)).slice(0, 2).forEach(add);
+  shuffle(others.slice()).forEach(p => { if(chosen.length < k) add(p); });
+  return chosen.slice(0, k);
+}
+function newRound(mode, only){
+  if(mode === "srs" && !only){
+    const {due, fresh} = srsQueue();
+    if(!due.length && !fresh.length) return renderDone();
+    const qs = shuffle(due.slice()).concat(fresh);
+    Q = {mode, list: pool(), qs, dirs: qs.map(() => Math.random() < .5 ? "f2n" : "n2f"), intro: new Set(fresh.map(p => p.id)),
+         relearn: new Set(), requeued: {}, i:0, res:[], streak:0, best:0, answered:false};
+    return renderQuestion();
+  }
+  const list = pool();
+  const qs = only ? only.map(id => BYID[id]) : pickQuestions(list, Math.min(ROUND, list.length));
+  Q = {mode, list, qs, i:0, res:[], streak:0, best:0, answered:false};
+  renderQuestion();
+}
+function renderQuestion(){
+  const box = $("#quiz");
+  if(Q.i >= Q.qs.length) return renderSummary();
+  const t = Q.qs[Q.i];
+  if(!Q.cur || Q.cur.id !== t.id + Q.i){
+    Q.cur = {id: t.id + Q.i, ctx: makeContext(t), opts: shuffle([t, ...distractors(t, Q.list.length >= 5 ? Q.list : P, 3)]), ctxFor:{}};
+    Q.answered = false; Q.pick = null;
+  }
+  if(Q.mode === "srs" && Q.intro.has(t.id)) return renderIntro(t);
+  const mode = curMode();
+  const pips = Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("");
+  let body = "";
+  if(mode === "f2n"){
+    body += `<h2 class="prompt">Che figura è questa?<small>${prefs.hl ? "La figura è nella zona evidenziata. Le candele prima mostrano il trend." : "Le prime candele mostrano il trend, poi arriva la figura."}</small></h2>`;
+    body += `<div class="bigchart">${chartSVG(t, {context: Q.cur.ctx, hl: prefs.hl, w: 560, h: 260, maxSlot: 52, maxBody: 22, aria: "Grafico da riconoscere"})}</div>`;
+    if(prefs.ans === "dd"){
+      const opts = Q.list.slice().sort((a, b) => a.name.localeCompare(b.name) || (a.bull ? -1 : 1));
+      body += `<div class="ddrow"><select id="dd" aria-label="Scegli la figura" ${Q.answered?"disabled":""}><option value="">Scegli la figura…</option>${opts.map(p => `<option value="${p.id}" ${Q.pick===p.id?"selected":""}>${esc(p.name)} — ${dirWord(p)}</option>`).join("")}</select><button class="btn" id="ddGo" ${Q.answered?"disabled":""}>Conferma</button></div>`;
+    } else {
+      body += `<div class="opts">${Q.cur.opts.map((p, i) => `<button class="opt ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""}><span class="nm">${esc(p.name)}</span><span style="display:flex;gap:6px;align-items:center">${chipDir(p)}<span class="k">${i+1}</span></span></button>`).join("")}</div>`;
+    }
+  } else {
+    body += `<h2 class="prompt">Trova: ${esc(t.name)} ${chipDir(t)}<small>Scegli il grafico giusto. In ogni grafico la zona evidenziata è la figura.</small></h2>`;
+    body += `<div class="opts figs">${Q.cur.opts.map((p, i) => {
+      const ctx = Q.cur.ctxFor[p.id] || (Q.cur.ctxFor[p.id] = makeContext(p));
+      return `<button class="opt fig ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""} aria-label="Opzione ${i+1}"><span class="k">${i+1}</span>${chartSVG(p, {context: ctx, hl: prefs.hl, w: 300, h: 170, maxSlot: 34, maxBody: 15, aria: "Opzione " + (i+1)})}</button>`;
+    }).join("")}</div>`;
+  }
+  if(Q.answered) body += feedback(t);
+  box.innerHTML = `<div class="qhead"><div class="pips" aria-label="Avanzamento">${pips}</div><div class="streak">Di fila <b>${Q.streak}</b> · Record <b>${Q.best}</b></div></div><div class="panel qcard">${body}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(b.dataset.id));
+  const go = $("#ddGo"); if(go) go.onclick = () => { const v = $("#dd").value; if(v) answer(v); };
+  const nx = $("#next"); if(nx) { nx.onclick = next; nx.focus({preventScroll:true}); }
+}
+function optClass(p, t){
+  if(!Q.answered) return "";
+  if(p.id === t.id) return "right";
+  if(p.id === Q.pick) return "wrong";
+  return "";
+}
+function answer(id){
+  if(Q.answered) return;
+  const t = Q.qs[Q.i], ok = id === t.id;
+  Q.answered = true; Q.pick = id; Q.res.push(ok);
+  const s = stats[t.id] || (stats[t.id] = {r:0, w:0});
+  ok ? s.r++ : s.w++;
+  saveStats();
+  Q.lastGrade = null;
+  if(Q.mode === "srs"){
+    Q.lastGrade = grade(t.id, ok, Q.relearn.has(t.id));
+    if(!ok){
+      Q.relearn.add(t.id);
+      Q.requeued[t.id] = (Q.requeued[t.id] || 0) + 1;
+      if(Q.requeued[t.id] <= 3){
+        const pos = Math.min(Q.qs.length, Q.i + 3);
+        Q.qs.splice(pos, 0, t); Q.dirs.splice(pos, 0, Math.random() < .5 ? "f2n" : "n2f");
+      }
+    }
+  } else {
+    const c = srs[t.id];
+    if(c && c.b > 0){
+      if(!ok){ c.b = Math.max(1, c.b - 1); c.due = Math.min(c.due, today() + 1); saveSrs(); }
+      else if(c.due <= today()){ grade(t.id, true, false); }
+    }
+  }
+  Q.streak = ok ? Q.streak + 1 : 0; Q.best = Math.max(Q.best, Q.streak);
+  renderQuestion();
+}
+function feedback(t){
+  const ok = Q.pick === t.id, picked = BYID[Q.pick];
+  let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3><p>${esc(t.d)}</p>`;
+  if(Q.lastGrade){
+    h += `<span class="nextchip">${ok ? "La rivedrai " + whenText(Q.lastGrade.due) : (Q.requeued[t.id] <= 3 ? "Te la richiedo tra poco" : "La rivedrai oggi stesso")}</span>`;
+  }
+  if(!ok && picked){
+    h += `<div class="compare">
+      <figure>${chartSVG(t, {arrow:true, w:280, h:150, maxSlot:30, maxBody:14})}<figcaption>Era: <b>${esc(label(t))}</b></figcaption></figure>
+      <figure>${chartSVG(picked, {arrow:true, w:280, h:150, maxSlot:30, maxBody:14})}<figcaption>Hai scelto: <b>${esc(label(picked))}</b> — ${esc(picked.d)}</figcaption></figure></div>`;
+  }
+  h += `<div class="actions"><button class="btn" id="next">${Q.i + 1 >= Q.qs.length ? "Vedi il risultato" : "Avanti"}</button><span class="hint">oppure premi Invio</span></div></div>`;
+  return h;
+}
+function next(){ Q.i++; Q.cur = null; renderQuestion(); window.scrollTo({top: Math.min(window.scrollY, $("#quiz").offsetTop - 80), behavior:"smooth"}); }
+function renderIntro(t){
+  const twin = t.twin ? BYID[t.twin] : null;
+  $("#quiz").innerHTML = `<div class="qhead"><div class="pips">${Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("")}</div></div>
+  <div class="panel intro">
+    <div class="eyebrow">Figura nuova · guardala bene</div>
+    <h2>${esc(t.name)}</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${chipDir(t)}${chipN(t)}<span class="chip fam">${famName(t.fam)}</span></div>
+    <div class="big">${chartSVG(t, {arrow:true, w:520, h:240, maxSlot:56, maxBody:24, aria: label(t)})}</div>
+    <p style="margin:0;max-width:65ch;font-size:16px">${esc(t.d)}</p>
+    ${twin ? `<p class="hint" style="margin:0">La sua gemella è ${esc(label(twin))}: stessa idea, direzione opposta.</p>` : ""}
+    <div class="actions"><button class="btn" id="gotit">Ho capito, mettimi alla prova</button></div>
+  </div>`;
+  const b = $("#gotit");
+  b.onclick = () => { Q.intro.delete(t.id); newLeft(); daily.newCount++; srs[t.id] = srs[t.id] || {b:0, due:today()}; saveSrs(); renderQuestion(); };
+  b.focus({preventScroll:true});
+}
+function renderDone(){
+  const nd = nextDueDay();
+  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Ripasso del giorno</div><p class="score">Per oggi hai finito.</p>
+    <p style="margin:0;color:var(--muted);max-width:60ch">${nd !== null ? `Le prossime figure da ripassare arrivano ${whenText(nd)}. ` : ""}Le figure nuove sono finite per oggi: domani ne arrivano altre. Se vuoi, puoi allenarti liberamente.</p>
+    <div class="actions"><button class="btn" id="freeGo">Allenamento libero</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
+  $("#freeGo").onclick = () => setTab("f2n");
+  $("#homeGo").onclick = goHome;
+}
+function renderSrsSummary(){
+  const ids = [...new Set(Q.qs.map(p => p.id))];
+  const groups = {};
+  ids.forEach(id => { const w = whenText(sc(id).due); (groups[w] = groups[w] || []).push(BYID[id]); });
+  const order = ["oggi","domani"];
+  const keys = Object.keys(groups).sort((a, b) => {
+    const da = Math.min(...groups[a].map(p => sc(p.id).due)), db = Math.min(...groups[b].map(p => sc(p.id).due)); return da - db; });
+  const good = Q.res.filter(Boolean).length;
+  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Ripasso finito</div>
+    <p class="score">${good === Q.res.length ? "Tutto giusto, ottimo." : "Fatto. Le figure sbagliate le hai ripassate subito."}</p>
+    <div class="pips">${Q.res.map(r => `<span class="pip ${r ? "ok" : "ko"}"></span>`).join("")}</div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Quando le rivedrai</div>
+    <div class="sched">${keys.map(k => `<div><b>${k[0].toUpperCase() + k.slice(1)}</b><span>${groups[k].map(p => esc(label(p))).join(", ")}</span></div>`).join("")}</div></div>
+    <div class="actions"><button class="btn" id="homeGo">Torna al menu</button><button class="btn ghost" id="freeGo">Allenamento libero</button></div></div>`;
+  $("#homeGo").onclick = goHome;
+  $("#freeGo").onclick = () => setTab("f2n");
+}
+function renderSummary(){
+  if(Q.mode === "srs") return renderSrsSummary();
+  const good = Q.res.filter(Boolean).length, tot = Q.res.length;
+  const wrong = Q.qs.filter((_, i) => !Q.res[i]);
+  const msg = good === tot ? "Giro perfetto." : good >= tot * .7 ? "Ottimo lavoro." : good >= tot * .4 ? "Stai migliorando." : "Si impara sbagliando.";
+  const pips = Q.res.map(r => `<span class="pip ${r?"ok":"ko"}"></span>`).join("");
+  let h = `<div class="panel summary"><div class="eyebrow">Fine del giro</div><p class="score">${msg}</p>
+    <div class="pips">${pips}</div><p style="margin:0;color:var(--muted)">Giuste: ${good} su ${tot}. Record di risposte giuste di fila: ${Q.best}.</p>`;
+  if(wrong.length){
+    h += `<div><div class="eyebrow" style="margin-bottom:8px">Da ripassare</div><div class="grid">${wrong.map(cardHTML).join("")}</div></div>`;
+  }
+  h += `<div class="actions"><button class="btn" id="again">Nuovo giro</button>${wrong.length ? `<button class="btn ghost" id="retry">Rifai solo quelle sbagliate</button>` : ""}</div></div>`;
+  $("#quiz").innerHTML = h;
+  $("#again").onclick = () => newRound(Q.mode);
+  const r = $("#retry"); if(r) r.onclick = () => newRound(Q.mode, shuffle(wrong.map(p => p.id)));
+  bindTwinLinks($("#quiz"));
+}
+document.addEventListener("keydown", e => {
+  if(view === "home" || view === "studia" || view === "auth" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
+  if(Q.mode === "srs" && Q.intro && Q.qs[Q.i] && Q.intro.has(Q.qs[Q.i].id)) return;
+  if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || prefs.ans === "btn")){
+    const o = Q.cur && Q.cur.opts[+e.key - 1]; if(o) answer(o.id);
+  } else if(Q.answered && e.key === "Enter" && document.activeElement?.id !== "next"){ next(); }
+});
+
+/* ---------- study ---------- */
+function cardHTML(p){
+  const m = mastery(p.id);
+  const twin = p.twin ? BYID[p.twin] : null;
+  return `<article class="panel card" id="c-${p.id}">
+    <div class="well">${chartSVG(p, {arrow:true, w:240, h:150, maxSlot:30, maxBody:14, aria: label(p)})}</div>
+    <h3>${esc(p.name)}</h3>
+    <div class="chips">${chipDir(p)}${chipN(p)}<span class="chip fam">${famName(p.fam)}</span></div>
+    <p>${esc(p.d)}</p>
+    <div class="foot">${twin ? `<button data-go="${twin.id}">Gemella: ${esc(label(twin))}</button>` : "<span></span>"}<span class="meter" title="Quanto la conosci">${[0,1,2].map(i => `<i class="${i < m ? "on" : ""}"></i>`).join("")}</span></div>
+  </article>`;
+}
+function bindTwinLinks(root){
+  root.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
+    if(view !== "studia"){ $("#search").value = ""; setTab("studia"); }
+    const el = document.getElementById("c-" + b.dataset.go);
+    if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+  });
+}
+function renderStudy(){
+  const q = $("#search").value.trim().toLowerCase();
+  const f = prefs.sfilter;
+  const vis = P.filter(p => (f === "all" || (f === "bull") === p.bull) && (!q || p.name.toLowerCase().includes(q) || p.d.toLowerCase().includes(q)));
+  const groups = [["inv", true, "Inversione al rialzo"], ["inv", false, "Inversione al ribasso"], ["cont", true, "Continuazione al rialzo"], ["cont", false, "Continuazione al ribasso"]];
+  let h = "";
+  for(const [fam, bull, title] of groups){
+    const items = vis.filter(p => p.fam === fam && p.bull === bull);
+    if(!items.length) continue;
+    h += `<div class="sect"><h2>${title}</h2><span class="eyebrow">${items.length} figure</span></div><div class="grid">${items.map(cardHTML).join("")}</div>`;
+  }
+  $("#study").innerHTML = h || `<p class="empty">Nessuna figura trovata. Prova con un altro nome.</p>`;
+  bindTwinLinks($("#study"));
+}
+$("#search").addEventListener("input", renderStudy);
+
+/* ---------- schermata di accesso ---------- */
+let authMode = "in";
+function showAuth(){
+  view = "auth"; authMode = "in";
+  ["#view-home", "#view-quiz", "#view-studia", "#bar"].forEach(s => $(s).hidden = true);
+  $("#view-auth").hidden = false;
+  heroAnim.stop();
+  paintAuth();
+  $("#au-name").focus({preventScroll:true});
+}
+function paintAuth(){
+  const up = authMode === "up";
+  document.querySelectorAll("#authSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === authMode));
+  $("#au-title").textContent = up ? "Crea il tuo account" : "Bentornato nel dojo";
+  $("#au-pw2-row").hidden = !up;
+  $("#au-go").textContent = up ? "Crea account" : "Entra";
+  $("#au-pw").autocomplete = up ? "new-password" : "current-password";
+  $("#au-err").textContent = "";
+}
+document.querySelectorAll("#authSeg button").forEach(b => b.onclick = () => { authMode = b.dataset.v; paintAuth(); });
+$("#authForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const n = $("#au-name").value.trim().toLowerCase(), pw = $("#au-pw").value, err = $("#au-err");
+  if(!/^[a-z0-9_.-]{3,24}$/.test(n)) return err.textContent = "Lo username va da 3 a 24 caratteri: lettere, numeri, punto, trattino o trattino basso.";
+  if(pw.length < 6) return err.textContent = "La password deve avere almeno 6 caratteri.";
+  if(authMode === "up" && pw !== $("#au-pw2").value) return err.textContent = "Le due password non coincidono.";
+  const go = $("#au-go"); go.disabled = true; err.textContent = "";
+  try{
+    await (authMode === "up" ? cloud.signUp(n, pw) : cloud.signIn(n, pw));
+    $("#authForm").reset();
+  }catch(m){ err.textContent = typeof m === "string" ? m : "Connessione non riuscita: controlla la rete e riprova."; }
+  go.disabled = false;
+});
+$("#au-guest").onclick = () => { store.set("dojo-guest", true); goHome(); };
+
+/* ---------- boot ---------- */
+function start(data){
+  bindSeg("#famSeg", "fam", () => {});
+  bindSeg("#ansSeg", "ans", () => {});
+  bindSeg("#studySeg", "sfilter", renderStudy);
+  $("#hlToggle").checked = prefs.hl;
+  $("#hlToggle").onchange = e => { prefs.hl = e.target.checked; savePrefs(); };
+  selectMode(["srs","studia","f2n","n2f"].includes(prefs.mode) ? prefs.mode : "srs");
+  renderIllustrations();
+  if(data && data.view && data.view !== "home") setTab(data.view); else goHome();
+}
+start({});
+cloud.init();
+</script>
+</body>
+</html>
