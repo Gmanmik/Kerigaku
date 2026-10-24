@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="scenari.css">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}</style>
 <style>
 /* Versione A · Sumi. Carta washi e inchiostro: tanto bianco, filetti sottili al posto delle scatole,
@@ -334,6 +335,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
         <h3>Nome → Figura <span class="tick"></span></h3>
         <p>Leggi il nome e trovi il grafico giusto tra quattro.</p>
       </button>
+      <button class="mode scen-mode" role="radio" data-mode="scen" id="mode-scen">
+        <span class="ill" id="ill-scen"></span>
+        <span class="rec">Novità</span>
+        <h3>Scenari <span class="tick"></span></h3>
+        <p>Due o tre figure in fila su un grafico: riconoscile, poi leggi cosa dicono insieme.</p>
+      </button>
     </div>
 
     <div class="panel settings" id="settings">
@@ -403,6 +410,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 <script src="supabase.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script src="scenari.js"></script>
 <script src="theme.js"></script>
 <script src="cookie.js" defer></script>
 </body>

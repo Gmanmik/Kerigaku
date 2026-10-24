@@ -61,7 +61,7 @@ const cloud = (() => {
   const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
   let user = null, state = ready ? "guest" : "local", timer = 0, writing = false, dirty = false, lastErr = "";
   const uname = u => (u && u.user_metadata && u.user_metadata.username) || (u && u.email ? u.email.split("@")[0] : "");
-  const payload = () => ({v:1, srs, stats, daily, prefs});
+  const payload = () => Object.assign({v:1, srs, stats, daily, prefs}, window.Scenari ? Scenari.data() : {});
   function paint(s){
     if(s) state = s;
     const box = $("#acct"); if(!box) return;
@@ -124,6 +124,7 @@ const cloud = (() => {
     srs = out; stats = st; daily = d;
     if(r.prefs) for(const k of Object.keys(prefs)) if(k in r.prefs && typeof r.prefs[k] === typeof prefs[k]) prefs[k] = r.prefs[k];
     saveLocal();
+    if(window.Scenari && Scenari.merge(raw)) changed = true;
     return changed;
   }
   // il database ha rifiutato: l'accesso può essere scaduto, o la 2FA è stata attivata dopo questo accesso
@@ -239,6 +240,7 @@ function loadLocal(){
   prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}), {srsSeen:true});
   srs = store.get(K("dojo-srs-v1"), {});
   daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
+  if(window.Scenari) Scenari.load();
 }
 function saveLocal(){ store.set(K("dojo-srs-v1"), srs); store.set(K("dojo-daily-v1"), daily); store.set(K("dojo-stats-v1"), stats); store.set(K("dojo-prefs-v1"), prefs); }
 function setSpace(id){ space = id ? ":" + id : ""; loadLocal(); }
@@ -357,21 +359,21 @@ function chartSVG(p, o = {}){
 
 /* ---------- views & menu ---------- */
 let view = "home";
-const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura"};
+const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari"};
 function setTab(t){
   view = t; prefs.mode = t; savePrefs();
   $("#view-home").hidden = true; $("#view-auth").hidden = true; $("#view-account").hidden = true;
   $("#bar").hidden = false;
   $("#barTitle").textContent = MODE_TITLE[t];
   const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
-  $("#barCfg").innerHTML = t === "studia" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
+  $("#barCfg").innerHTML = t === "studia" || t === "scen" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
     `<span class="chip n">${famTxt}</span>` + (t === "f2n" ? `<span class="chip n">${prefs.ans === "dd" ? "Menu a tendina" : "4 scelte"}</span>` : "") +
     `<span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>`;
   $("#view-studia").hidden = t !== "studia";
   $("#view-quiz").hidden = t === "studia";
   heroAnim.stop();
   window.scrollTo({top:0});
-  if(t === "studia") renderStudy(); else newRound(t);
+  if(t === "studia") renderStudy(); else if(t === "scen") Scenari.round(); else newRound(t);
 }
 function curMode(){ return Q && Q.mode === "srs" ? Q.dirs[Q.i] : Q && Q.mode; }
 function goHome(){
@@ -388,18 +390,18 @@ $("#backBtn").onclick = goHome;
 function selectMode(m, quiet){
   prefs.mode = m; if(!quiet) savePrefs();
   document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
-  $("#settings").hidden = m === "studia";
+  $("#settings").hidden = m === "studia" || m === "scen";
   $("#ansField").hidden = m !== "f2n";
-  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : "Inizia il giro ";
-  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : "10 domande di allenamento libero.";
+  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : m === "scen" ? "Apri gli scenari " : "Inizia il giro ";
+  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : "10 domande di allenamento libero.";
 }
 document.querySelectorAll(".mode").forEach(b => {
   b.onclick = () => selectMode(b.dataset.mode);
   b.ondblclick = () => setTab(b.dataset.mode);
   b.onkeydown = e => {
-    const ms = ["srs","studia","f2n","n2f"], i = ms.indexOf(b.dataset.mode);
-    if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); selectMode(ms[(i+1)%4]); $("#mode-"+prefs.mode).focus(); }
-    if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); selectMode(ms[(i+3)%4]); $("#mode-"+prefs.mode).focus(); }
+    const ms = ["srs","studia","f2n","n2f","scen"], i = ms.indexOf(b.dataset.mode);
+    if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); selectMode(ms[(i+1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
+    if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); selectMode(ms[(i+ms.length-1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
   };
 });
 $("#startBtn").onclick = () => setTab(prefs.mode);
@@ -422,10 +424,11 @@ function renderHome(){
   const nd = nextDueDay();
   $("#nextDue").textContent = nd === null ? "Comincia dal Ripasso del giorno: ogni giorno ti presenta 5 figure nuove." : `Prossime figure da ripassare: ${whenText(nd)}.`;
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
+  if(prefs.mode === "scen" && window.Scenari) $("#startHint").textContent = Scenari.hint();
   $("#resetBox").innerHTML = `<button class="linkbtn" id="resetBtn">Azzera i progressi</button>`;
   $("#resetBtn").onclick = () => {
     $("#resetBox").innerHTML = `<span class="hint">${cloud.on ? "Cancello tutti i progressi, anche quelli salvati nel tuo account?" : "Cancello tutti i progressi su questo dispositivo?"}</span><button class="btn danger" id="resetYes">Sì, azzera</button><button class="btn ghost small" id="resetNo">Annulla</button>`;
-    $("#resetYes").onclick = () => { srs = {}; stats = {}; daily = {day:0, newCount:0}; saveSrs(); saveStats(); renderHome(); };
+    $("#resetYes").onclick = () => { srs = {}; stats = {}; daily = {day:0, newCount:0}; if(window.Scenari) Scenari.reset(); saveSrs(); saveStats(); renderHome(); };
     $("#resetNo").onclick = renderHome;
   };
 }
@@ -497,7 +500,7 @@ function syncControls(){
   [["#famSeg","fam"],["#ansSeg","ans"],["#studySeg","sfilter"]].forEach(([id, k]) =>
     $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[k])));
   $("#hlToggle").checked = prefs.hl;
-  selectMode(["srs","studia","f2n","n2f"].includes(prefs.mode) ? prefs.mode : "srs", true);
+  selectMode(["srs","studia","f2n","n2f","scen"].includes(prefs.mode) ? prefs.mode : "srs", true);
 }
 function bindSeg(id, key, cb){
   const el = $(id);
@@ -686,6 +689,7 @@ function renderSummary(){
 }
 document.addEventListener("keydown", e => {
   if(view === "home" || view === "studia" || view === "auth" || view === "account" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
+  if(Q.mode === "scen") return Scenari.key(e);
   if(Q.mode === "srs" && Q.intro && Q.qs[Q.i] && Q.intro.has(Q.qs[Q.i].id)) return;
   if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || prefs.ans === "btn")){
     const o = Q.cur && Q.cur.opts[+e.key - 1]; if(o) answer(o.id);
@@ -921,7 +925,7 @@ function start(data){
   bindSeg("#studySeg", "sfilter", renderStudy);
   $("#hlToggle").checked = prefs.hl;
   $("#hlToggle").onchange = e => { prefs.hl = e.target.checked; savePrefs(); };
-  selectMode(["srs","studia","f2n","n2f"].includes(prefs.mode) ? prefs.mode : "srs");
+  selectMode(["srs","studia","f2n","n2f","scen"].includes(prefs.mode) ? prefs.mode : "srs");
   renderIllustrations();
   if(data && data.view && data.view !== "home") setTab(data.view); else goHome();
 }

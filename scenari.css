@@ -1,0 +1,14 @@
+/* Dojo delle candele · modulo Scenari. Stessi colori e filetti del tema Sumi (variabili di index.html). */
+@media (min-width:901px){#view-home .modes{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:900px) and (min-width:641px){
+  #view-home .mode.scen-mode{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}
+}
+.scen-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:-6px}
+.scen-steps{display:inline-flex;gap:4px}
+.scen-steps span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);font-size:11.5px;font-weight:700;color:var(--muted);background:var(--card)}
+.scen-steps span.cur{border-color:var(--seal);background:var(--seal);color:var(--seal-ink)}
+.scen-steps span.ok{border-color:var(--bull);color:var(--bull);background:var(--bull-soft)}
+.scen-steps span.ko{border-color:var(--bear);color:var(--bear);background:var(--bear-soft)}
+.qcard.scen .bigchart svg{max-height:360px}
+.opts.verdicts{grid-template-columns:minmax(0,1fr)}
+@media (min-width:641px){.opts.verdicts{grid-template-columns:repeat(2,minmax(0,1fr))}}
