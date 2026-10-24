@@ -538,6 +538,7 @@ const cloud = (() => {
     const m = (e && e.message || "").toLowerCase();
     if(m.includes("captcha")) return "Il controllo anti-robot non è passato: riprova tra qualche secondo.";
     if(m.includes("invalid login")) return "Username, email o password sbagliati.";
+    if(m.includes("banned")) return "Questo account è sospeso. Per informazioni scrivi ad admin@dojodellecandele.com.";
     if(m.includes("troppi tentativi")) return "Troppi tentativi sbagliati con questo username: riprova tra 15 minuti o entra con l'email.";
     if(m.includes("already registered") || m.includes("already been registered")) return "Questa email ha già un account: prova ad accedere.";
     if(m.includes("database error saving new user")) return "Questo username è già preso: scegline un altro.";

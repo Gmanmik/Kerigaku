@@ -99,6 +99,8 @@ input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1.5
 .msg.ko{color:var(--bear)}
 .empty{color:var(--muted);text-align:center;padding:24px 0}
 .chip.ok{background:var(--bull-soft);color:var(--bull)}
+.chip.ko{background:var(--bear-soft);color:var(--bear)}
+.user.off{opacity:.75}
 .mail{font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
 .exportbox{display:grid;gap:6px}
 .exportbox textarea{font-family:var(--mono);font-size:12.5px;width:100%;padding:10px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);resize:vertical}
@@ -275,9 +277,9 @@ function render(){
 }
 function row(u, s){
   const self = me && u.id === me.id, tot = s.r + s.w;
-  return `<article class="panel user" id="u-${u.id}">
+  return `<article class="panel user${u.banned ? " off" : ""}" id="u-${u.id}">
     <div class="uhead">
-      <div class="uname"><span class="n"></span>${u.is_admin ? `<span class="chip">admin</span>` : ""}${u.mfa ? `<span class="chip ok">2FA</span>` : ""}${u.marketing ? `<span class="chip ok">newsletter</span>` : ""}${self ? `<span class="chip me">sei tu</span>` : ""}</div>
+      <div class="uname"><span class="n"></span>${u.is_admin ? `<span class="chip">admin</span>` : ""}${u.mfa ? `<span class="chip ok">2FA</span>` : ""}${u.marketing ? `<span class="chip ok">newsletter</span>` : ""}${self ? `<span class="chip me">sei tu</span>` : ""}${u.banned ? `<span class="chip ko">sospeso</span>` : ""}${u.locked ? `<span class="chip ko">accesso bloccato</span>` : ""}</div>
       <div class="meta">Registrato il ${fmtDate(u.created_at)} · ultimo accesso ${ago(u.last_sign_in_at)} · ultimo allenamento ${ago(u.progress_updated_at)}</div>
     </div>
     <div class="mail"></div>
@@ -289,6 +291,9 @@ function row(u, s){
     <div class="acts">
       <button class="btn ghost" data-a="pw" type="button">Nuova password</button>
       <button class="btn ghost" data-a="reset" type="button" ${u.progress ? "" : "disabled"}>Azzera progressi</button>
+      ${u.mfa && !self ? `<button class="btn ghost" data-a="mfa" type="button">Togli 2FA</button>` : ""}
+      ${u.locked ? `<button class="btn ghost" data-a="unlock" type="button">Sblocca accesso</button>` : ""}
+      ${self ? "" : `<button class="btn ghost" data-a="ban" type="button">${u.banned ? "Riattiva account" : "Sospendi account"}</button>`}
       ${self ? "" : `<button class="btn ghost" data-a="admin" type="button">${u.is_admin ? "Togli admin" : "Rendi admin"}</button>
       <button class="btn ghost" data-a="del" type="button">Elimina account</button>`}
     </div>
@@ -307,6 +312,9 @@ function ask(u, a, el){
     pw: [`Nuova password per ${u.username}: comunicagliela tu.`, "Imposta password", "btn", true],
     reset: [`Cancello tutti i progressi di ${u.username}? Ripartirà da zero.`, "Sì, azzera", "btn danger", false],
     admin: [u.is_admin ? `Tolgo a ${u.username} l'accesso a questo pannello?` : `Do a ${u.username} l'accesso a questo pannello, con gli stessi poteri tuoi?`, u.is_admin ? "Sì, togli" : "Sì, rendi admin", "btn", false],
+    mfa: [`Tolgo la verifica in due passaggi a ${u.username}? Potrà entrare con la sola password e riattivarla dalla pagina Account. Fallo solo se sei sicuro che sia davvero lui a chiederlo.`, "Sì, togli 2FA", "btn danger", false],
+    unlock: [`Sblocco l'accesso di ${u.username}? Potrà riprovare subito la password.`, "Sì, sblocca", "btn", false],
+    ban: [u.banned ? `Riattivo l'account di ${u.username}? Potrà di nuovo entrare.` : `Sospendo l'account di ${u.username}? Non potrà più entrare e verrà disconnesso entro un'ora; progressi e dati restano. Puoi riattivarlo quando vuoi.`, u.banned ? "Sì, riattiva" : "Sì, sospendi", u.banned ? "btn" : "btn danger", false],
     del: [`Elimino l'account di ${u.username} e tutti i suoi progressi? Non si può annullare.`, "Sì, elimina", "btn danger", false]
   }[a];
   slot.innerHTML = `<div class="confirm"><p></p>${t[3] ? `<input type="text" autocomplete="off" placeholder="Almeno 8 caratteri, lettere e numeri" aria-label="Nuova password">` : ""}<button class="${t[2]}" type="button" data-ok>${t[1]}</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
@@ -320,6 +328,9 @@ function ask(u, a, el){
     if(a === "reset") call = sb.rpc("admin_reset_progress", {target: u.id});
     if(a === "admin") call = sb.rpc("admin_set_admin", {target: u.id, make: !u.is_admin});
     if(a === "del") call = sb.rpc("admin_delete_user", {target: u.id});
+    if(a === "mfa") call = sb.rpc("admin_remove_mfa", {target: u.id});
+    if(a === "unlock") call = sb.rpc("admin_unlock", {u: u.username});
+    if(a === "ban") call = sb.rpc("admin_set_banned", {target: u.id, ban: !u.banned});
     e.target.disabled = true;
     const {error} = await call;
     if(error){ e.target.disabled = false; msg.className = "msg ko"; msg.textContent = "Non riuscito: " + error.message; return; }
@@ -358,7 +369,7 @@ $("#loginForm").addEventListener("submit", async e => {
   }
   const {data, error} = await sb.auth.signInWithPassword({email, password: pw, options: {captchaToken}});
   $("#lg-go").disabled = false;
-  if(error) return err.textContent = /invalid login/i.test(error.message) ? "Username o password sbagliati." : "Accesso non riuscito: " + error.message;
+  if(error) return err.textContent = /invalid login/i.test(error.message) ? "Username o password sbagliati." : /banned/i.test(error.message) ? "Questo account è sospeso." : "Accesso non riuscito: " + error.message;
   me = data.user; $("#loginForm").reset();
   await enter();
 });
