@@ -4,8 +4,9 @@
 //
 // Azioni (POST, corpo JSON):
 //   {action:"sync"}            l'utente entrato: lo aggiunge alla lista se ha il consenso, altrimenti lo toglie
+//   {action:"delete_self"}     l'utente entrato: cancella il proprio contatto da Brevo (eliminazione account)
 //   {action:"delete", id, email} solo admin con 2FA: cancella il contatto di un account che sta per essere eliminato
-//   {action:"reconcile"}       solo admin con 2FA: confronta lista e profili e sistema le differenze
+//   {action:"reconcile"}       solo admin con 2FA (o la chiamata settimanale automatica con x-cron-token): confronta lista e profili e sistema le differenze
 //   {action:"stats", days}     solo admin con 2FA: iscritti, email mandate e ultime campagne, per la pagina admin
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -70,9 +71,23 @@ Deno.serve(async (req) => {
       return json({ ok: true, iscritto: !!(prof?.marketing && user.email_confirmed_at) });
     }
 
-    // da qui in poi solo admin con 2FA
-    const { data: isAdmin } = await asUser.rpc("is_admin");
-    if (isAdmin !== true) return json({ error: "solo admin" }, 403);
+    // la persona che sta eliminando il proprio account: la tolgo e cancello il suo contatto da Brevo
+    if (body.action === "delete_self") {
+      const { data: { user } } = await asUser.auth.getUser();
+      if (!user) return json({ error: "serve l'accesso" }, 401);
+      await remove(user.id, user.email ?? undefined);
+      return json({ ok: true });
+    }
+
+    // l'allineamento settimanale parte da solo (pg_cron su Supabase) e si riconosce dal segreto NEWSLETTER_CRON_TOKEN
+    const cronToken = Deno.env.get("NEWSLETTER_CRON_TOKEN") ?? "";
+    const viaCron = body.action === "reconcile" && cronToken.length >= 24 && req.headers.get("x-cron-token") === cronToken;
+
+    // da qui in poi solo admin con 2FA (tranne l'allineamento automatico)
+    if (!viaCron) {
+      const { data: isAdmin } = await asUser.rpc("is_admin");
+      if (isAdmin !== true) return json({ error: "solo admin" }, 403);
+    }
 
     if (body.action === "delete" && typeof body.id === "string") {
       // l'account di solito è già stato eliminato: l'email la passa la pagina admin (contatti importati a mano hanno solo quella)

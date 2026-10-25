@@ -183,6 +183,15 @@ const cloud = (() => {
     await sb.auth.signOut();
     user = null; setSpace(null); paint("guest"); goHome();
   }
+  async function deleteAccount(){
+    clearTimeout(timer); timer = 0; dirty = false;
+    await sb.functions.invoke("newsletter", {body: {action: "delete_self"}}).catch(() => {});   // toglie il contatto da Brevo prima che l'account sparisca
+    const {error} = await sb.rpc("delete_my_account");
+    if(error){ await sb.functions.invoke("newsletter", {body: {action: "sync"}}).catch(() => {}); throw error; }   // non è stato eliminato: rimetto il contatto com'era
+    try{ const sfx = ":" + user.id; Object.keys(localStorage).filter(k => k.endsWith(sfx)).forEach(k => localStorage.removeItem(k)); }catch(e){}   // via anche la copia locale dei progressi
+    await sb.auth.signOut().catch(() => {});
+    user = null; setSpace(null); paint("guest"); goHome();
+  }
   function errText(e){
     const m = (e && e.message || "").toLowerCase();
     if(m.includes("captcha")) return "Il controllo anti-robot non è passato: riprova tra qualche secondo.";
@@ -210,7 +219,7 @@ const cloud = (() => {
     return data;
   }
   return {
-    get ready(){ return ready; }, get on(){ return !!user; }, get user(){ return user; }, sb, schedule, flush, logout, errText,
+    get ready(){ return ready; }, get on(){ return !!user; }, get user(){ return user; }, sb, schedule, flush, logout, deleteAccount, errText,
     async signIn(id, pw){
       const email = await toLogin(id, pw);
       const {data, error} = await sb.auth.signInWithPassword({email, password: pw, options: {captchaToken: await captcha.take()}});
@@ -534,17 +543,17 @@ function renderHome(){
   };
 }
 // conferma a prova di distrazione: il tasto si accende solo scrivendo CANCELLA
-const DANGER_WORD = "CANCELLA";
-function dangerHTML(id, text){
+const DANGER_WORD = "CANCELLA", DELETE_WORD = "ELIMINA";
+function dangerHTML(id, text, label = "Azzera i progressi", word = DANGER_WORD){
   return `<div class="danger-box"><p>${esc(text)} <b>Non si può annullare.</b></p>
-    <label for="${id}-w">Per confermare scrivi <b>${DANGER_WORD}</b></label>
-    <div class="row"><input id="${id}-w" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="${id}-m"><button class="btn danger" type="button" id="${id}-go" disabled>Azzera i progressi</button></div>
+    <label for="${id}-w">Per confermare scrivi <b>${word}</b></label>
+    <div class="row"><input id="${id}-w" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="${id}-m"><button class="btn danger" type="button" id="${id}-go" disabled>${label}</button></div>
     <p class="hint" id="${id}-m" role="status"></p></div>`;
 }
-function bindDanger(id, onYes){
+function bindDanger(id, onYes, word = DANGER_WORD){
   const w = $("#" + id + "-w"), go = $("#" + id + "-go");
-  w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== DANGER_WORD; };
-  go.onclick = () => { if(w.value.trim().toUpperCase() !== DANGER_WORD) return; go.disabled = true; w.value = ""; onYes(); };
+  w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== word; };
+  go.onclick = () => { if(w.value.trim().toUpperCase() !== word) return; go.disabled = true; w.value = ""; onYes(); };
 }
 function renderIllustrations(){
   const mini = (id, o) => chartSVG(BYID[id], Object.assign({arrow:true, w:90, h:80, maxSlot:16, maxBody:8}, o));
@@ -1056,12 +1065,20 @@ async function showAccount(){
       <h3>Azzera i progressi</h3>
       ${dangerHTML("dz", "Cancello tutti i tuoi progressi, sul tuo account e su tutti i tuoi dispositivi: figure imparate, ripasso, statistiche, scenari, livello e record della Prova. L'account, l'email e la newsletter restano come sono.")}
     </section>
+    <section class="panel acard danger-zone" id="deleteZone"><div class="eyebrow">Danger zone</div>
+      <h3>Elimina l'account</h3>
+      ${dangerHTML("da", "Elimino per sempre il tuo account: username, email, progressi e iscrizione alla newsletter, su tutti i dispositivi.", "Elimina il mio account", DELETE_WORD)}
+    </section>
     <div class="actions"><button class="btn ghost" type="button" id="ac-out">Esci dall'account</button></div>`;
   if(window.DojoSuoni) DojoSuoni.paint();
   box.querySelector(".u-name").textContent = (prof && prof.username) || (u.user_metadata && u.user_metadata.username) || "";
   box.querySelector(".u-mail").textContent = legacy ? "Nessuna: aggiungila per recuperare la password e ricevere le email" : u.email;
   const say = (id, m, ok) => { const el = $(id); el.textContent = m; el.className = ok ? "au-ok" : "au-err"; };
   bindDanger("dz", async () => { wipeProgress(Date.now()); await cloud.flush(); $("#dz-m").textContent = "Fatto: i progressi sono azzerati. Si riparte dal livello 1."; });
+  bindDanger("da", async () => {
+    try{ await cloud.deleteAccount(); }
+    catch(e){ $("#da-m").textContent = /admin/i.test((e && e.message) || "") ? "Questo è un account admin: prima va tolto il ruolo admin." : cloud.errText(e); $("#da-w").value = ""; }
+  }, DELETE_WORD);
   let newMail = "";
   $("#f-mail").onsubmit = async e => {
     e.preventDefault(); newMail = $("#ac-mail").value.trim().toLowerCase();
