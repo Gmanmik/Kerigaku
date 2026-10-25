@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="tasti-hover.css">
 <style>
 /* Layout: one reading column on the dojo's chart-paper; two chapters, About and Crediti. */
 :root{
@@ -61,6 +62,10 @@ a{color:var(--accent)}
 .boxes span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:var(--well);font-variant-numeric:tabular-nums}
 .boxes span:nth-child(n+4){border-color:var(--bull);color:var(--bull)}
 .note{border-left:3px solid var(--hl-line);padding:4px 0 4px 14px;color:var(--muted);font-size:14.5px}
+.compare-fig{margin:0;display:grid;gap:8px}
+.compare-fig svg{width:100%;height:auto;max-width:560px;background:var(--well);border:1px solid var(--line);border-radius:6px}
+.compare-fig figcaption{font-size:13.5px;color:var(--muted);max-width:62ch}
+.plain{margin:0;padding-left:20px;display:grid;gap:8px}
 .credits{display:grid;gap:0;margin:0}
 .credits div{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
 .credits div:first-child{border-top:0;padding-top:0}
@@ -166,6 +171,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
   </div>
 
   <header>
+    <img src="logo.svg" alt="" height="64" style="display:block;margin-bottom:10px;width:auto">
     <div class="eyebrow">Dojo delle candele · 道場</div>
     <h1>Un dojo per allenare <em>l'occhio</em></h1>
   </header>
@@ -194,6 +200,41 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
     <p><a class="support" href="https://paypal.me/Gmanmik" target="_blank" rel="noopener noreferrer"><span class="cha" aria-hidden="true">茶</span>Sostieni il Dojo</a></p>
   </section>
 
+  <section class="chapter" id="storia">
+    <div class="eyebrow">Storia</div>
+    <h2>Da dove arrivano le candele</h2>
+    <p class="lead">Le candele giapponesi sono nate prima dei computer, prima della borsa come la conosciamo e perfino prima di Wall Street: nascono dal riso.</p>
+
+    <h3>Il mercato del riso di Osaka</h3>
+    <p>Nel Giappone del Settecento il riso era il vero denaro: con il riso si pagavano le tasse e gli stipendi dei samurai. Il centro di tutto era Dojima, a Osaka, dove i mercanti compravano e vendevano riso <b>non ancora raccolto</b>, con contratti che somigliano molto ai nostri future. Nel 1730 lo shogunato riconobbe ufficialmente il mercato di Dojima, che a quel punto era già uno dei più organizzati del mondo.</p>
+
+    <h3>Munehisa Homma</h3>
+    <p>Il nome che si lega alle candele è quello di <b>Munehisa Homma</b> (1724–1803), figlio di una ricca famiglia di mercanti di riso di Sakata. La leggenda racconta che a Osaka abbia fatto una fortuna enorme, perfino con una lunga serie di operazioni quasi senza errori, e che per questo lo shogunato lo abbia fatto samurai e consigliere. Su quante di queste storie siano vere gli storici sono prudenti. È più sicuro dire che a Homma si attribuisce un'idea nuova per l'epoca: <b>il prezzo non dipende solo dal raccolto, ma anche dalle emozioni di chi compra e vende</b>. Speranza, paura e avidità muovono il mercato quanto i numeri.</p>
+    <p>Le candele, nella forma che usiamo oggi, si sono definite dopo di lui, nell'Ottocento e nel Novecento, nelle mani di analisti giapponesi. Ma partono da quell'idea: ogni candela racconta una piccola battaglia fra compratori e venditori.</p>
+
+    <h3>Come arrivano in Occidente</h3>
+    <p>Per secoli rimasero un segreto dei mercati giapponesi. Alla fine degli anni Ottanta <b>Steve Nison</b>, analista americano, le scopre mentre lavora a Wall Street. Nel 1991 pubblica <i>Japanese Candlestick Charting Techniques</i>, il libro che le porta a trader e investitori di tutto il mondo. I nomi poetici (<i>hammer, shooting star, evening star</i>) vengono da lì: sono traduzioni inglesi, ormai standard, di nomi giapponesi.</p>
+
+    <h3>Candele contro barre</h3>
+    <p>In Europa e in America, per quasi tutto il Novecento, il grafico più usato è stato quello <b>a barre</b> (OHLC, dalle iniziali di open, high, low, close: apertura, massimo, minimo, chiusura). Le candele raccontano gli stessi quattro numeri, ma in un altro modo.</p>
+    <figure class="compare-fig">
+      <svg viewBox="0 0 520 230" role="img" aria-label="Lo stesso movimento di prezzo disegnato come barra OHLC e come candela">
+        <g stroke="var(--line)" stroke-dasharray="2 5"><line x1="10" x2="510" y1="50" y2="50"/><line x1="10" x2="510" y1="110" y2="110"/><line x1="10" x2="510" y1="170" y2="170"/></g>
+        <g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"><path d="M150 40v140"/><path d="M128 140h22"/><path d="M150 76h22"/></g>
+        <g font-size="17" fill="var(--muted)" font-family="var(--body)"><text x="122" y="146" text-anchor="end">apertura</text><text x="178" y="82">chiusura</text><text x="150" y="26" text-anchor="middle">massimo</text><text x="150" y="200" text-anchor="middle">minimo</text><text x="150" y="224" text-anchor="middle" font-weight="700" fill="var(--ink)">Barra</text></g>
+        <g><path d="M390 40v140" stroke="var(--bull)" stroke-width="4" stroke-linecap="round"/><rect x="364" y="76" width="52" height="64" rx="2" fill="var(--bull)"/></g>
+        <g font-size="17" fill="var(--muted)" font-family="var(--body)"><text x="356" y="146" text-anchor="end">apertura</text><text x="424" y="86">chiusura</text><text x="390" y="26" text-anchor="middle">ombra alta</text><text x="390" y="200" text-anchor="middle">ombra bassa</text><text x="390" y="224" text-anchor="middle" font-weight="700" fill="var(--ink)">Candela</text></g>
+      </svg>
+      <figcaption>Stesso prezzo, due disegni. Nella barra l'apertura è il trattino a sinistra e la chiusura quello a destra. Nella candela il tratto fra i due diventa un <b>corpo</b> pieno, e le linee sopra e sotto sono le <b>ombre</b>.</figcaption>
+    </figure>
+    <ul class="plain">
+      <li><b>Si legge a colpo d'occhio.</b> Il corpo pieno e il colore dicono subito chi ha vinto la seduta, mentre nella barra bisogna confrontare due trattini minuscoli.</li>
+      <li><b>Le forme diventano figure.</b> Un corpo piccolo con un'ombra lunga, o un corpo che ne avvolge un altro, sono immagini che si imparano e si riconoscono: è su questo che si allena il Dojo.</li>
+      <li><b>Le informazioni sono le stesse.</b> Una barra e una candela contengono gli stessi quattro prezzi: cambia solo come li vedi. Non è che l'una sia più «giusta» dell'altra.</li>
+    </ul>
+    <p class="note">Questa è storia e divulgazione, non un consiglio di investimento: nessuna figura garantisce come si muoverà il prezzo.</p>
+  </section>
+
   <section class="chapter" id="crediti">
     <div class="eyebrow">Crediti</div>
     <h2>Chi ha costruito il Dojo</h2>
@@ -202,8 +243,10 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
       <div><dt>Progetto e codice</dt><dd>Scritto insieme a <b>Claude</b>, l'assistente di Anthropic</dd></div>
       <div><dt>Le figure</dt><dd>La tradizione delle candele giapponesi nasce nel Settecento con <b>Munehisa Homma</b>, mercante di riso a Osaka, ed è arrivata in Occidente con i libri di <b>Steve Nison</b>. Nomi e descrizioni seguono la terminologia inglese ormai standard.</dd></div>
       <div><dt>Caratteri</dt><dd><b>Shippori Mincho</b> di FONTDASU e <b>Zen Kaku Gothic New</b> di Yoshimichi Ohira, entrambi con licenza SIL Open Font License, ospitati direttamente sul sito</dd></div>
+      <div><dt>Foto</dt><dd>La Borsa del riso di Dojima a Osaka (1914), dalla Prefettura di Osaka, in pubblico dominio (<a href="https://commons.wikimedia.org/wiki/File:OsakaRiceMarket.jpg" rel="noopener noreferrer" target="_blank">Wikimedia Commons</a>)</dd></div>
+      <div><dt>Bandiere dei paesi</dt><dd><b>Twemoji</b> (grafica CC-BY 4.0, codice MIT), ospitate sul sito</dd></div>
       <div><dt>Account e database</dt><dd><b>Supabase</b>, con la libreria supabase-js (licenza MIT)</dd></div>
-      <div><dt>Hosting</dt><dd><b>GitHub Pages</b></dd></div>
+      <div><dt>Hosting</dt><dd><b>Cloudflare</b> (Workers), con il codice del sito conservato su <b>GitHub</b></dd></div>
     </dl>
   </section>
 

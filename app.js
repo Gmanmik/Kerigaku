@@ -1,6 +1,20 @@
-const P = [{"id":"hammer_p","name":"Hammer","bull":true,"fam":"inv","trend":"d","c":[["b",24,41,52,52]],"n":1,"d":"Dopo un ribasso: corpo piccolo in alto e ombra inferiore lunga almeno il doppio del corpo. I venditori spingono giù, ma i compratori recuperano tutto.","twin":"hanging_m"},{"id":"hanging_m","name":"Hanging man","bull":false,"fam":"inv","trend":"u","c":[["b",46,64,74,74]],"n":1,"d":"Stessa forma del martello, ma arriva dopo un rialzo. Avverte che la pressione di vendita sta crescendo: aspetta la conferma il giorno dopo.","twin":"hammer_p"},{"id":"invhammer_p","name":"Inverted hammer","bull":true,"fam":"inv","trend":"d","c":[["b",18,23,50,55],["b",8,8,18,38]],"n":1,"d":"Dopo un ribasso: corpo piccolo in basso e lunga ombra superiore. È il primo tentativo dei compratori, da confermare con una seduta rialzista.","twin":"shooting_m"},{"id":"shooting_m","name":"Shooting star","bull":false,"fam":"inv","trend":"u","c":[["w",19,28,61,71],["b",64,64,74,95]],"n":1,"d":"Dopo un rialzo: apre in gap, sale molto ma ricade. Corpo piccolo in basso e lunga ombra superiore: i prezzi alti sono stati respinti.","twin":"invhammer_p"},{"id":"belthold_p","name":"Belt hold","bull":true,"fam":"inv","trend":"d","c":[["w",18,18,43,52]],"n":1,"d":"Candela verde lunga che apre esattamente sul minimo (niente ombra inferiore) e sale per tutta la seduta. Più è lunga, più conta.","twin":"belthold_m"},{"id":"belthold_m","name":"Belt hold","bull":false,"fam":"inv","trend":"u","c":[["b",49,58,84,84]],"n":1,"d":"Candela rossa lunga che apre esattamente sul massimo (niente ombra superiore) e scende per tutta la seduta.","twin":"belthold_p"},{"id":"engulf_p","name":"Engulfing","bull":true,"fam":"inv","trend":"d","c":[["b",27,34,50,54],["w",20,24,59,64]],"n":2,"d":"Il corpo verde “ingoia” completamente il corpo rosso del giorno prima. Uno dei segnali d’inversione al rialzo più affidabili.","twin":"engulf_m"},{"id":"engulf_m","name":"Engulfing","bull":false,"fam":"inv","trend":"u","c":[["w",53,58,76,80],["b",49,53,83,87]],"n":2,"d":"Il corpo rosso ingoia completamente il corpo verde del giorno prima. I venditori prendono il controllo.","twin":"engulf_p"},{"id":"harami_p","name":"Harami","bull":true,"fam":"inv","trend":"d","c":[["b",14,21,51,57],["w",22,29,44,50]],"n":2,"d":"Dopo una lunga candela rossa, un piccolo corpo verde tutto dentro il corpo precedente (harami = “incinta”). Il ribasso perde forza.","twin":"harami_m"},{"id":"harami_m","name":"Harami","bull":false,"fam":"inv","trend":"u","c":[["w",35,40,70,75],["b",43,47,66,70]],"n":2,"d":"Dopo una lunga candela verde, un piccolo corpo rosso tutto dentro il corpo precedente. Il rialzo rallenta.","twin":"harami_p"},{"id":"haramix_p","name":"Harami cross","bull":true,"fam":"inv","trend":"d","c":[["b",13,20,55,62],["d",26,37,37,47]],"n":2,"d":"Come l’harami, ma la seconda candela è un doji. L’indecisione è totale: segnale più forte dell’harami normale.","twin":"haramix_m"},{"id":"haramix_m","name":"Harami cross","bull":false,"fam":"inv","trend":"u","c":[["w",43,49,80,86],["d",52,65,65,76]],"n":2,"d":"Un doji tutto dentro il corpo di una lunga candela verde. Il rialzo si blocca nell’indecisione.","twin":"haramix_p"},{"id":"piercing_p","name":"Piercing line","bull":true,"fam":"inv","trend":"d","c":[["b",16,20,49,54],["w",3,8,37,42]],"n":2,"d":"Dopo una candela rossa, la verde apre sotto il minimo e chiude oltre la metà del corpo rosso. Più “perfora”, più è forte.","twin":"darkcloud_m"},{"id":"darkcloud_m","name":"Dark cloud cover","bull":false,"fam":"inv","trend":"u","c":[["w",40,44,73,78],["b",49,54,83,88]],"n":2,"d":"Dopo una candela verde, la rossa apre sopra il massimo e chiude sotto la metà del corpo verde. Una nuvola scura sul rialzo.","twin":"piercing_p"},{"id":"dojistar_p","name":"Doji star","bull":true,"fam":"inv","trend":"d","c":[["b",21,26,55,60],["d",3,16,16,25]],"n":2,"d":"Dopo una lunga candela rossa, un doji che apre in gap al ribasso. Il mercato esita: possibile svolta, da confermare.","twin":"dojistar_m"},{"id":"dojistar_m","name":"Doji star","bull":false,"fam":"inv","trend":"u","c":[["w",34,39,67,72],["d",67,80,80,89]],"n":2,"d":"Dopo una lunga candela verde, un doji in gap al rialzo. Il mercato esita sui massimi.","twin":"dojistar_p"},{"id":"meeting_p","name":"Meeting line","bull":true,"fam":"inv","trend":"d","c":[["b",25,30,58,63],["w",-3,1,30,34]],"n":2,"d":"Candela rossa lunga, poi una verde che apre molto più in basso ma risale fino a chiudere allo stesso prezzo del giorno prima.","twin":"meeting_m"},{"id":"meeting_m","name":"Meeting line","bull":false,"fam":"inv","trend":"u","c":[["w",26,30,59,63],["b",54,59,88,93]],"n":2,"d":"Candela verde lunga, poi una rossa che apre molto più in alto ma ricade fino a chiudere allo stesso prezzo del giorno prima.","twin":"meeting_p"},{"id":"3soldiers_p","name":"Three white soldiers","bull":true,"fam":"inv","trend":"d","c":[["w",20,24,52,57],["w",34,38,67,72],["w",49,53,82,86]],"n":3,"d":"Tre candele verdi lunghe, con chiusure sempre più alte. Ognuna apre dentro il corpo della precedente. Ripresa decisa.","twin":"3crows_m"},{"id":"3crows_m","name":"Three black crows","bull":false,"fam":"inv","trend":"u","c":[["b",48,52,83,87],["b",32,36,67,71],["b",17,21,51,55]],"n":3,"d":"Tre candele rosse lunghe, con chiusure sempre più basse. Ognuna apre dentro il corpo della precedente.","twin":"3soldiers_p"},{"id":"mstar_p","name":"Morning star","bull":true,"fam":"inv","trend":"d","c":[["b",23,28,56,60],["w",4,9,18,23],["w",17,22,43,47]],"n":3,"d":"Candela rossa lunga, poi un piccolo corpo in gap al ribasso (la “stella”), poi una verde che chiude ben dentro il primo corpo.","twin":"estar_m"},{"id":"estar_m","name":"Evening star","bull":false,"fam":"inv","trend":"u","c":[["w",36,40,68,73],["b",71,75,85,90],["b",45,49,70,75]],"n":3,"d":"Candela verde lunga, poi un piccolo corpo in gap al rialzo, poi una rossa che chiude ben dentro il primo corpo.","twin":"mstar_p"},{"id":"mdoji_p","name":"Morning doji star","bull":true,"fam":"inv","trend":"d","c":[["b",20,24,52,57],["d",7,14,14,22],["w",14,18,40,44]],"n":3,"d":"Come la morning star, ma la stella centrale è un doji. Segnale ancora più forte.","twin":"edoji_m"},{"id":"edoji_m","name":"Evening doji star","bull":false,"fam":"inv","trend":"u","c":[["w",37,41,68,73],["d",74,80,80,87],["b",45,49,73,78]],"n":3,"d":"Come la evening star, ma la stella centrale è un doji. Segnale ancora più forte.","twin":"mdoji_p"},{"id":"abandoned_p","name":"Abandoned baby","bull":true,"fam":"inv","trend":"d","c":[["b",20,24,52,57],["d",7,14,14,21],["w",13,17,39,43]],"n":3,"d":"Il doji centrale è isolato da due gap: le sue ombre non toccano quelle delle candele vicine. Raro ma molto potente.","twin":"abandoned_m"},{"id":"abandoned_m","name":"Abandoned baby","bull":false,"fam":"inv","trend":"u","c":[["w",36,40,67,72],["d",81,86,86,92],["b",46,50,73,77]],"n":3,"d":"Doji isolato in alto da due gap, tra una candela verde e una rossa. Raro ma molto potente.","twin":"abandoned_p"},{"id":"tristar_p","name":"Tri-star","bull":true,"fam":"inv","trend":"d","c":[["d",37,43,43,50],["d",26,32,32,39],["d",33,39,39,46]],"n":3,"d":"Tre doji di fila, con quello centrale più in basso degli altri due. Rarissimo: indecisione estrema dopo il ribasso.","twin":"tristar_m"},{"id":"tristar_m","name":"Tri-star","bull":false,"fam":"inv","trend":"u","c":[["d",50,57,57,63],["d",61,68,68,74],["d",56,62,62,69]],"n":3,"d":"Tre doji di fila, con quello centrale più in alto degli altri due, dopo un rialzo.","twin":"tristar_p"},{"id":"breakaway_p","name":"Breakaway","bull":true,"fam":"inv","trend":"d","c":[["b",38,42,63,67],["b",20,23,33,36],["b",14,18,30,33],["b",11,15,24,28],["w",17,20,41,45]],"n":5,"d":"Rossa lunga, gap al ribasso, tre candele che scendono sempre più piano. La quinta, verde, risale e chiude dentro il gap.","twin":"breakaway_m"},{"id":"breakaway_m","name":"Breakaway","bull":false,"fam":"inv","trend":"u","c":[["w",36,39,60,65],["w",70,72,83,86],["b",71,74,85,89],["w",75,77,87,90],["b",57,61,82,84]],"n":5,"d":"Verde lunga, gap al rialzo, tre candele che salgono sempre più piano. La quinta, rossa, ricade e chiude dentro il gap.","twin":"breakaway_p"},{"id":"3inside_p","name":"Three inside up","bull":true,"fam":"inv","trend":"d","c":[["b",12,17,43,48],["w",19,23,36,40],["w",26,30,50,55]],"n":3,"d":"Un harami rialzista seguito da una terza candela verde che chiude sopra la prima. È l’harami confermato.","twin":"3inside_m"},{"id":"3inside_m","name":"Three inside down","bull":false,"fam":"inv","trend":"u","c":[["w",44,49,76,81],["b",51,56,69,73],["b",36,40,62,66]],"n":3,"d":"Un harami ribassista seguito da una terza candela rossa che chiude sotto la prima. È l’harami confermato.","twin":"3inside_p"},{"id":"3outside_p","name":"Three outside up","bull":true,"fam":"inv","trend":"d","c":[["b",13,18,33,37],["w",7,11,40,45],["w",21,26,51,55]],"n":3,"d":"Un engulfing rialzista seguito da una terza candela verde con chiusura più alta. È l’engulfing confermato.","twin":"3outside_m"},{"id":"3outside_m","name":"Three outside down","bull":false,"fam":"inv","trend":"u","c":[["w",46,50,64,69],["b",35,40,69,74],["b",27,32,57,61]],"n":3,"d":"Un engulfing ribassista seguito da una terza candela rossa con chiusura più bassa. È l’engulfing confermato.","twin":"3outside_p"},{"id":"kicking_p","name":"Kicking","bull":true,"fam":"inv","trend":null,"c":[["b",2,2,37,37],["w",48,48,86,86]],"n":2,"d":"Marubozu rosso (senza ombre) e poi marubozu verde in gap al rialzo. Cambio d’umore netto, conta poco il trend precedente.","twin":"kicking_m"},{"id":"kicking_m","name":"Kicking","bull":false,"fam":"inv","trend":null,"c":[["w",47,47,85,85],["b",1,1,36,36]],"n":2,"d":"Marubozu verde (senza ombre) e poi marubozu rosso in gap al ribasso. Cambio d’umore netto.","twin":"kicking_p"},{"id":"matchlow_p","name":"Matching low","bull":true,"fam":"inv","trend":"d","c":[["b",15,15,47,52],["b",14,14,35,43]],"n":2,"d":"Due candele rosse che chiudono esattamente allo stesso prezzo. Quel livello fa da supporto: il prezzo non scende oltre.","twin":"matchhigh_m"},{"id":"matchhigh_m","name":"Matching high","bull":false,"fam":"inv","trend":"u","c":[["w",41,48,80,80],["w",51,60,80,80]],"n":2,"d":"Due candele verdi che chiudono esattamente allo stesso prezzo. Quel livello fa da resistenza.","twin":"matchlow_p"},{"id":"ladderbot_p","name":"Ladder bottom","bull":true,"fam":"inv","trend":"d","c":[["b",43,43,67,67],["b",32,32,57,57],["b",22,22,47,47],["b",13,13,26,43],["w",28,28,62,62]],"n":5,"d":"Tre rosse in discesa, una quarta rossa con ombra superiore lunga, poi una verde che apre in gap al rialzo.","twin":"laddertop_m"},{"id":"laddertop_m","name":"Ladder top","bull":false,"fam":"inv","trend":"u","c":[["w",39,39,64,64],["w",50,50,75,75],["w",60,60,86,86],["w",64,80,92,92],["b",42,42,75,75]],"n":5,"d":"Tre verdi in salita, una quarta verde con ombra inferiore lunga, poi una rossa che apre in gap al ribasso.","twin":"ladderbot_p"},{"id":"u3river_p","name":"Unique three river bottom","bull":true,"fam":"inv","trend":"d","c":[["b",25,30,56,60],["b",13,44,52,53],["w",26,26,37,46]],"n":3,"d":"Rossa lunga, poi una rossa piccola con lunga ombra inferiore (nuovo minimo, subito respinto), infine una verde piccola.","twin":null},{"id":"upgap2crows_m","name":"Upside gap two crows","bull":false,"fam":"inv","trend":"u","c":[["w",29,33,63,67],["b",70,73,82,85],["b",64,68,84,88]],"n":3,"d":"Verde lunga, una rossa piccola in gap al rialzo, poi una rossa più grande che la avvolge ma resta sopra la verde.","twin":null},{"id":"3stars_p","name":"Three stars in the south","bull":true,"fam":"inv","trend":"d","c":[["b",8,36,68,68],["b",15,28,39,41],["b",22,22,30,30]],"n":3,"d":"Tre candele rosse sempre più piccole, con minimi sempre più alti. L’ultima è un piccolo marubozu: il ribasso si esaurisce.","twin":null},{"id":"ident3crows_m","name":"Identical three crows","bull":false,"fam":"inv","trend":"u","c":[["b",62,64,89,93],["b",37,40,64,68],["b",12,15,39,43]],"n":3,"d":"Tre rosse in discesa in cui ognuna apre proprio alla chiusura della precedente. Variante più dura dei three black crows.","twin":null},{"id":"swallow_p","name":"Concealing baby swallow","bull":true,"fam":"inv","trend":"d","c":[["b",42,42,67,67],["b",21,21,45,45],["b",4,4,14,25],["b",2,2,27,27]],"n":4,"d":"Due marubozu rossi, una rossa in gap con lunga ombra superiore, poi una rossa che la avvolge. I venditori si arrendono.","twin":null},{"id":"deliberation_m","name":"Deliberation","bull":false,"fam":"inv","trend":"u","c":[["w",24,28,54,58],["w",46,50,77,81],["w",77,80,89,93]],"n":3,"d":"Due verdi lunghe e poi una verde piccola, spesso in gap. Il rialzo “ci pensa su” e perde slancio.","twin":null},{"id":"sandwich_p","name":"Stick sandwich","bull":true,"fam":"inv","trend":"d","c":[["b",12,12,45,52],["w",26,26,59,59],["b",11,11,66,70]],"n":3,"d":"Due candele rosse con la stessa chiusura e in mezzo una verde. La chiusura uguale segna un supporto.","twin":null},{"id":"advblock_m","name":"Advance block","bull":false,"fam":"inv","trend":"u","c":[["w",26,30,63,67],["w",55,59,71,84],["w",63,67,75,86]],"n":3,"d":"Tre verdi in salita, ma con corpi sempre più piccoli e ombre superiori sempre più lunghe. I compratori si stancano.","twin":null},{"id":"homing_p","name":"Homing pigeon","bull":true,"fam":"inv","trend":"d","c":[["b",24,29,54,60],["b",34,37,50,53]],"n":2,"d":"Come l’harami, ma sono rosse entrambe: un piccolo corpo rosso dentro un corpo rosso lungo. Il ribasso rallenta.","twin":null},{"id":"2crows_m","name":"Two crows","bull":false,"fam":"inv","trend":"u","c":[["w",28,33,64,68],["b",73,77,88,91],["b",45,50,82,85]],"n":3,"d":"Verde lunga, una rossa piccola in gap al rialzo, poi una rossa che chiude dentro il corpo della verde.","twin":null},{"id":"seplines_p","name":"Separating lines","bull":true,"fam":"cont","trend":"u","c":[["b",21,25,57,62],["w",52,57,89,93]],"n":2,"d":"In un rialzo: una rossa e poi una verde che apre allo stesso prezzo d’apertura della rossa. Il rialzo riparte.","twin":"seplines_m"},{"id":"seplines_m","name":"Separating lines","bull":false,"fam":"cont","trend":"d","c":[["w",32,36,67,72],["b",0,4,36,40]],"n":2,"d":"In un ribasso: una verde e poi una rossa che apre allo stesso prezzo d’apertura della verde. Il ribasso riparte.","twin":"seplines_p"},{"id":"rising3_p","name":"Rising three methods","bull":true,"fam":"cont","trend":"u","c":[["w",37,41,70,74],["b",60,64,72,76],["b",50,52,64,67],["b",42,44,55,58],["w",40,44,82,86]],"n":5,"d":"Verde lunga, tre piccole candele in calo che restano nel suo range, poi una verde lunga con nuovo massimo. Solo una pausa.","twin":"falling3_m"},{"id":"falling3_m","name":"Falling three methods","bull":false,"fam":"cont","trend":"d","c":[["b",18,25,52,57],["w",18,22,34,37],["b",26,30,39,43],["w",39,42,50,54],["b",14,17,47,49]],"n":5,"d":"Rossa lunga, tre piccole candele in risalita che restano nel suo range, poi una rossa lunga con nuovo minimo.","twin":"rising3_p"},{"id":"uptasuki_p","name":"Upside tasuki gap","bull":true,"fam":"cont","trend":"u","c":[["w",32,37,65,70],["w",75,79,98,103],["b",64,68,83,87]],"n":3,"d":"Due verdi separate da un gap al rialzo, poi una rossa che scende nel gap senza chiuderlo. Il rialzo continua.","twin":"dntasuki_m"},{"id":"dntasuki_m","name":"Downside tasuki gap","bull":false,"fam":"cont","trend":"d","c":[["b",36,40,67,72],["b",8,11,28,32],["w",13,17,31,35]],"n":3,"d":"Due rosse separate da un gap al ribasso, poi una verde che sale nel gap senza chiuderlo. Il ribasso continua.","twin":"uptasuki_p"},{"id":"sbswhite_p","name":"Side by side white lines","bull":true,"fam":"cont","trend":"u","c":[["w",28,31,61,67],["w",67,70,88,91],["w",67,70,88,92]],"n":3,"d":"In un rialzo, dopo un gap, due candele verdi affiancate, simili per apertura e dimensione. Il rialzo continua.","twin":"sbswhite_m"},{"id":"sbswhite_m","name":"Side by side white lines","bull":false,"fam":"cont","trend":"d","c":[["b",26,30,57,62],["w",-2,2,18,24],["w",-1,3,18,22]],"n":3,"d":"In un ribasso, dopo un gap, due candele verdi affiancate e simili: il rimbalzo è debole, il ribasso continua.","twin":"sbswhite_p"},{"id":"3strike_p","name":"Three line strike","bull":true,"fam":"cont","trend":"u","c":[["w",38,43,66,72],["w",48,54,76,82],["w",58,65,85,92],["b",26,30,88,92]],"n":4,"d":"Tre verdi in salita, poi una rossa lunga che cancella tutto e chiude sotto la prima. Prese di profitto, poi si riparte.","twin":"3strike_m"},{"id":"3strike_m","name":"Three line strike","bull":false,"fam":"cont","trend":"d","c":[["b",31,37,57,63],["b",21,27,47,53],["b",12,17,36,42],["w",9,13,64,67]],"n":4,"d":"Tre rosse in discesa, poi una verde lunga che apre sotto e chiude sopra la prima. Ricoperture, poi si riscende.","twin":"3strike_p"},{"id":"upgap3m_p","name":"Upside gap three methods","bull":true,"fam":"cont","trend":"u","c":[["w",27,32,54,60],["w",63,67,90,94],["b",41,46,74,78]],"n":3,"d":"Due verdi separate da un gap al rialzo, poi una rossa che chiude il gap. Il gap è riempito, il rialzo riprende.","twin":"dngap3m_m"},{"id":"dngap3m_m","name":"Downside gap three methods","bull":false,"fam":"cont","trend":"d","c":[["b",33,37,58,62],["b",1,5,25,29],["w",14,18,46,50]],"n":3,"d":"Due rosse separate da un gap al ribasso, poi una verde che chiude il gap. Il ribasso riprende.","twin":"upgap3m_p"},{"id":"onneck_p","name":"On neck line","bull":true,"fam":"cont","trend":"u","c":[["w",37,42,72,78],["b",78,78,88,93]],"n":2,"d":"In un rialzo: verde lunga, poi una rossa che apre più in alto e chiude proprio al massimo della verde.","twin":"onneck_m"},{"id":"onneck_m","name":"On neck line","bull":false,"fam":"cont","trend":"d","c":[["b",21,26,55,60],["w",7,11,21,21]],"n":2,"d":"In un ribasso: rossa lunga, poi una verde piccola che apre più in basso e chiude solo al minimo della rossa. Rimbalzo debole.","twin":"onneck_p"},{"id":"inneck_p","name":"In neck line","bull":true,"fam":"cont","trend":"u","c":[["w",43,50,85,92],["b",81,82,98,103]],"n":2,"d":"In un rialzo: verde lunga, poi una rossa che apre più in alto e chiude appena dentro il corpo verde.","twin":"inneck_m"},{"id":"inneck_m","name":"In neck line","bull":false,"fam":"cont","trend":"d","c":[["b",17,23,59,65],["w",2,8,25,25]],"n":2,"d":"Come la on neck, ma la verde chiude appena dentro il corpo rosso, poco sopra la sua chiusura. Rimbalzo debole.","twin":"inneck_p"}];
 const BYID = Object.fromEntries(P.map(p => [p.id, p]));
 const ROUND = 10;
+
+/* ---------- livelli e figure aperte: al livello 1 sono aperte le 20 figure più note, il livello 2 ne apre altre 24 e il 3 le ultime 22.
+   I livelli salgono con le risposte giuste (vedi LEVELS); le figure già studiate restano sempre aperte. La Prova del Dojo si apre dal livello 2. */
+const FIG_GROUPS = [
+  ["hammer_p","hanging_m","invhammer_p","shooting_m","engulf_p","engulf_m","harami_p","harami_m","haramix_p","haramix_m",  "piercing_p","darkcloud_m","dojistar_p","dojistar_m","mstar_p","estar_m","mdoji_p","edoji_m","3soldiers_p","3crows_m"],
+  ["belthold_p","belthold_m","seplines_p","seplines_m","rising3_p","falling3_m","matchlow_p","matchhigh_m",
+    "3inside_p","3inside_m","3outside_p","3outside_m","abandoned_p","abandoned_m","uptasuki_p","dntasuki_m",
+    "onneck_p","onneck_m","inneck_p","inneck_m","meeting_p","meeting_m","kicking_p","kicking_m"],
+  ["tristar_p","tristar_m","breakaway_p","breakaway_m","3strike_p","3strike_m","upgap3m_p","dngap3m_m",
+    "ladderbot_p","laddertop_m","sbswhite_p","sbswhite_m","homing_p","deliberation_m","advblock_m","sandwich_p",
+    "u3river_p","upgap2crows_m","3stars_p","ident3crows_m","swallow_p","2crows_m"]
+];
+const LEVEL_GROUP = [0, 1, 2, 2], PROVA_LEVEL = 1;      // quale gruppo apre ogni livello
+const GROUP_OF = {}; FIG_GROUPS.forEach((g, i) => g.forEach(id => GROUP_OF[id] = i));
+const LEVEL_FOR_GROUP = LEVEL_GROUP.map((g, i) => i).filter((i, k) => k === 0 || LEVEL_GROUP[k] > LEVEL_GROUP[k - 1]);   // primo livello che apre ogni gruppo
 
 /* ---------- storage (best effort) ---------- */
 const store = {
@@ -10,7 +24,7 @@ const store = {
 // ogni utente ha la sua copia locale (chiave + ":" + id); senza account la chiave è quella semplice
 let space = "";
 const K = k => k + space;
-const PREFS0 = {tab:"f2n", fam:"all", ans:"btn", hl:true, sfilter:"all"};
+const PREFS0 = {tab:"f2n", fam:"all", ans:"btn", hl:true, sfilter:"all", provaBest:0};
 let stats = store.get(K("dojo-stats-v1"), {});
 let prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}));
 function savePrefs(){ store.set(K("dojo-prefs-v1"), prefs); cloud.schedule(); }
@@ -61,7 +75,7 @@ const cloud = (() => {
   const sb = ready ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
   let user = null, state = ready ? "guest" : "local", timer = 0, writing = false, dirty = false, lastErr = "";
   const uname = u => (u && u.user_metadata && u.user_metadata.username) || (u && u.email ? u.email.split("@")[0] : "");
-  const payload = () => Object.assign({v:1, srs, stats, daily, prefs}, window.Scenari ? Scenari.data() : {});
+  const payload = () => Object.assign({v:1, srs, stats, daily, prefs, resetAt: resetSeen}, window.Scenari ? Scenari.data() : {});
   function paint(s){
     if(s) state = s;
     const box = $("#acct"); if(!box) return;
@@ -102,11 +116,14 @@ const cloud = (() => {
     for(const [id, c] of Object.entries(r.srs || {})) if(ids.has(id) && c) srs[id] = {b: num(c.b), due: num(c.due)};
     for(const [id, c] of Object.entries(r.stats || {})) if(ids.has(id) && c) stats[id] = {r: num(c.r), w: num(c.w)};
     const d = r.daily || {};
-    return {srs, stats, daily: {day: num(d.day), newCount: num(d.newCount)}, prefs: r.prefs && typeof r.prefs === "object" ? r.prefs : null};
+    return {srs, stats, daily: {day: num(d.day), newCount: num(d.newCount)}, prefs: r.prefs && typeof r.prefs === "object" ? r.prefs : null, resetAt: num(r.resetAt)};
   }
   function merge(raw){
     let changed = false;
     const r = clean(raw);
+    // azzerato su un altro dispositivo: prima cancello qui; azzerato qui ma non ancora salvato: ignoro i vecchi dati del server
+    if(r.resetAt > resetSeen){ wipeProgress(r.resetAt); }
+    else if(r.resetAt < resetSeen){ r.srs = {}; r.stats = {}; r.daily = {day:0, newCount:0}; r.prefs = null; raw = {}; changed = true; }
     const rs = r.srs, out = Object.assign({}, rs);
     for(const [id, c] of Object.entries(srs)){
       const o = rs[id];
@@ -145,6 +162,7 @@ const cloud = (() => {
     if(user && user.id === u.id){ goHome(); schedule(); return; }
     const guest = {srs, stats, daily};
     user = u; setSpace(u.id); paint("loading");
+    nlSync(u);
     const {data, error} = await sb.from("progress").select("data").eq("user_id", u.id).maybeSingle();
     if(error){ if(await recover(error, true)) return; paint("error"); }
     else if(data){ if(merge(data.data || {})) flush(); else paint("ok"); }
@@ -152,6 +170,9 @@ const cloud = (() => {
       // primo accesso: porta nell'account quello che hai fatto senza account
       merge(guest); flush();
     }
+    // figure imposte dall'admin (la tabella può non esserci ancora: in quel caso non succede nulla)
+    const fz = await sb.from("progress_forced").select("item, box, t").eq("user_id", u.id);
+    if(!fz.error && applyForced(fz.data)) flush();
     goHome();
   }
   async function logout(){
@@ -227,7 +248,7 @@ const cloud = (() => {
       if(!ready) return;
       const {data} = await sb.auth.getSession();
       if(data.session) await enter(data.session.user);
-      else if(!store.get("dojo-guest", false)) showAuth("in");
+      else if(!store.get("dojo-guest", false)) showLanding();
       sb.auth.onAuthStateChange((ev, s) => {
         if(ev === "SIGNED_OUT" && user){ user = null; setSpace(null); paint("guest"); goHome(); }
         if(ev === "USER_UPDATED" && s && user){ user = s.user; paint(); }
@@ -241,14 +262,38 @@ const INT = [0, 1, 3, 7, 16, 35];          // giorni di attesa per ogni scatola
 const NEW_PER_DAY = 5, SRS_MAX = 20;
 let srs = store.get(K("dojo-srs-v1"), {});    // id -> {b: scatola 0..5, due: giorno}
 let daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
+// azzeramenti e figure imposte dall'admin: ricordo l'ultimo visto, così un altro dispositivo non riporta indietro i vecchi progressi
+let resetSeen = store.get(K("dojo-reset-v1"), 0), forcedSeen = store.get(K("dojo-forced-v1"), {});
 function loadLocal(){
   stats = store.get(K("dojo-stats-v1"), {});
   prefs = Object.assign({}, PREFS0, store.get(K("dojo-prefs-v1"), {}), {srsSeen:true});
   srs = store.get(K("dojo-srs-v1"), {});
   daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
+  resetSeen = store.get(K("dojo-reset-v1"), 0); forcedSeen = store.get(K("dojo-forced-v1"), {});
   if(window.Scenari) Scenari.load();
 }
 function saveLocal(){ store.set(K("dojo-srs-v1"), srs); store.set(K("dojo-daily-v1"), daily); store.set(K("dojo-stats-v1"), stats); store.set(K("dojo-prefs-v1"), prefs); }
+// azzera tutti i progressi (ripasso, statistiche, scenari, livello); "at" è il momento dell'azzeramento
+function wipeProgress(at){
+  srs = {}; stats = {}; daily = {day:0, newCount:0}; forcedSeen = {};
+  prefs.provaBest = 0;
+  resetSeen = at; store.set(K("dojo-reset-v1"), at); store.set(K("dojo-forced-v1"), forcedSeen);
+  if(window.Scenari) Scenari.reset();
+  saveLocal();
+}
+// figure fatte imparare (box 5) o dimenticare (box 0) dall'admin, dalla tabella progress_forced
+function applyForced(rows){
+  let changed = false;
+  for(const r of rows || []){
+    const t = Date.parse(r.t) || 0, id = r.item;
+    if(!BYID[id] || t <= (forcedSeen[id] || 0) || t <= resetSeen) continue;
+    const b = Math.max(0, Math.min(5, +r.box || 0));
+    if(b > 0) srs[id] = {b, due: today() + INT[b]}; else delete srs[id];
+    forcedSeen[id] = t; changed = true;
+  }
+  if(changed){ store.set(K("dojo-forced-v1"), forcedSeen); saveLocal(); }
+  return changed;
+}
 function setSpace(id){ space = id ? ":" + id : ""; loadLocal(); }
 const today = () => { const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); };
 const sc = id => srs[id] || {b:0, due:0};
@@ -261,7 +306,7 @@ function grade(id, ok, relearn){
   srs[id] = c; saveSrs(); return c;
 }
 function srsQueue(){
-  const t = today(), list = P.filter(p => prefs.fam === "all" || p.fam === prefs.fam);
+  const t = today(), list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam);
   const due = list.filter(p => sc(p.id).b > 0 && sc(p.id).due <= t).sort((a, b) => sc(a.id).due - sc(b.id).due).slice(0, SRS_MAX);
   const fresh = list.filter(p => sc(p.id).b === 0).slice(0, newLeft());
   return {due, fresh};
@@ -280,6 +325,13 @@ function nextDueDay(){
   return ds.length ? Math.min(...ds) : null;
 }
 function mastery(id){ const b = sc(id).b; return b >= 5 ? 3 : b >= 3 ? 2 : b >= 1 ? 1 : 0; }
+const learnedFig = id => sc(id).b >= 2;
+// gruppo di figure aperto dal livello raggiunto
+function groupNow(){ return LEVEL_GROUP[levelInfo().i]; }
+// aperta: compresa nel gruppo del livello raggiunto, oppure già studiata
+const isOpen = (p, gi = groupNow()) => GROUP_OF[p.id] <= gi || sc(p.id).b > 0;
+function openP(){ const gi = groupNow(); return P.filter(p => isOpen(p, gi)); }
+const provaOpen = () => levelInfo().i >= PROVA_LEVEL;
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -351,11 +403,11 @@ function chartSVG(p, o = {}){
   all.forEach((c, i) => {
     const cx = x0 + i*slot, [k, l, b, t, h] = c;
     if(k === "d"){
-      g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="var(--doji)" stroke-width="${sw}"/>`;
-      g += `<line x1="${cx-bw*.62}" x2="${cx+bw*.62}" y1="${Y(b)}" y2="${Y(b)}" stroke="var(--doji)" stroke-width="${sw*1.1}"/>`;
+      g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="${o.mono ? "var(--line2)" : "var(--doji)"}" stroke-width="${sw}"/>`;
+      g += `<line x1="${cx-bw*.62}" x2="${cx+bw*.62}" y1="${Y(b)}" y2="${Y(b)}" stroke="${o.mono ? "var(--line2)" : "var(--doji)"}" stroke-width="${sw*1.1}"/>`;
       return;
     }
-    const col = k === "w" ? "var(--bull)" : "var(--bear)";
+    const col = o.mono ? "var(--line2)" : k === "w" ? "var(--bull)" : "var(--bear)";   // mono: figura chiusa, nessun indizio dal colore
     g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="${col}" stroke-width="${sw}"/>`;
     const yt = Y(t), hh = Math.max(1.6, (t - b) * s);
     g += `<rect x="${(cx-bw/2).toFixed(1)}" y="${yt.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="1.5" fill="${col}"/>`;
@@ -365,24 +417,26 @@ function chartSVG(p, o = {}){
 
 /* ---------- views & menu ---------- */
 let view = "home";
-const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari"};
+const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari", prova:"La Prova del Dojo"};
 function setTab(t){
+  leaveLanding();
   view = t; prefs.mode = t; savePrefs();
   $("#view-home").hidden = true; $("#view-auth").hidden = true; $("#view-account").hidden = true;
   $("#bar").hidden = false;
   $("#barTitle").textContent = MODE_TITLE[t];
   const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
-  $("#barCfg").innerHTML = t === "studia" || t === "scen" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
+  $("#barCfg").innerHTML = t === "studia" || t === "scen" || t === "prova" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
     `<span class="chip n">${famTxt}</span>` +
     `<span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>`;
   $("#view-studia").hidden = t !== "studia";
   $("#view-quiz").hidden = t === "studia";
   heroAnim.stop();
   window.scrollTo({top:0});
-  if(t === "studia") renderStudy(); else if(t === "scen") Scenari.round(); else newRound(t);
+  if(t === "studia") renderStudy(); else if(t === "scen") Scenari.round(); else if(t === "prova") Prova.start(); else newRound(t);
 }
 function curMode(){ return Q && Q.mode === "srs" ? Q.dirs[Q.i] : Q && Q.mode; }
 function goHome(){
+  leaveLanding();
   view = "home";
   $("#view-auth").hidden = true; $("#view-account").hidden = true;
   syncControls();
@@ -396,15 +450,15 @@ $("#backBtn").onclick = goHome;
 function selectMode(m, quiet){
   prefs.mode = m; if(!quiet) savePrefs();
   document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
-  $("#settings").hidden = m === "studia" || m === "scen";
-  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : m === "scen" ? "Apri gli scenari " : "Inizia il giro ";
-  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : "10 domande di allenamento libero.";
+  $("#settings").hidden = m === "studia" || m === "scen" || m === "prova";
+  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : m === "scen" ? "Apri gli scenari " : m === "prova" ? (window.Prova && Prova.unlocked() ? "Inizia la prova " : "Scopri la prova ") : "Inizia il giro ";
+  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : m === "prova" ? (window.Prova ? Prova.hint() : "") : "10 domande di allenamento libero.";
 }
 document.querySelectorAll(".mode").forEach(b => {
   b.onclick = () => selectMode(b.dataset.mode);
   b.ondblclick = () => setTab(b.dataset.mode);
   b.onkeydown = e => {
-    const ms = ["srs","studia","f2n","n2f","scen"], i = ms.indexOf(b.dataset.mode);
+    const ms = ["srs","studia","f2n","n2f","scen","prova"], i = ms.indexOf(b.dataset.mode);
     if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); selectMode(ms[(i+1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
     if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); selectMode(ms[(i+ms.length-1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
   };
@@ -433,13 +487,29 @@ function renderLevel(){
     pct = Math.min(100, Math.round((L.right - L.cur.r) / (L.next.r - L.cur.r) * 100));
     const miss = Math.max(0, L.next.r - L.right);
     txt = `Prossimo livello: ${esc(L.next.n)}. ` + (miss ? (miss === 1 ? "Ti manca 1 risposta giusta" : `Ti mancano ${miss} risposte giuste`) : "Risposte giuste raggiunte") +
-      (L.next.all && L.learned < P.length ? `${miss ? " e" : ", ora"} ${P.length - L.learned} figure da imparare.` : ".");
+      (L.next.all && L.learned < P.length ? `${miss ? " e" : ", ora"} ${P.length - L.learned} figure da imparare.` : ".") + opensNext(L.i);
   }
-  box.innerHTML = `<div class="lv-name">${esc(L.cur.n)}<small>Livello ${L.i + 1} di ${LEVELS.length}</small></div><div class="lv-bar"><i style="width:${pct}%"></i></div><div class="lv-next">${txt}</div>`;
+  box.innerHTML = `<span class="lv-ico l${L.i + 1}" role="img" aria-label="${esc(L.cur.n)}"></span><div class="lv-main"><div class="lv-name">${esc(L.cur.n)}<small>Livello ${L.i + 1} di ${LEVELS.length} · ${openP().length} figure aperte su ${P.length}</small></div><div class="lv-bar"><i style="width:${pct}%"></i></div><div class="lv-next">${txt}</div></div>`;
+}
+// messaggio quando un livello apre figure nuove o La Prova del Dojo
+function opensHTML(from, to){
+  const g0 = LEVEL_GROUP[from], g1 = LEVEL_GROUP[to], n = P.filter(p => GROUP_OF[p.id] > g0 && GROUP_OF[p.id] <= g1).length;
+  const bits = [n ? `${n} figure nuove` : "", from < PROVA_LEVEL && to >= PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
+  return bits.length ? `<p class="levelup">Si aprono ${bits.join(" e ")}.</p>` : "";
+}
+// cosa apre il prossimo livello, per il riquadro dei progressi
+function opensNext(i){
+  const g = LEVEL_GROUP[i + 1] - LEVEL_GROUP[i], n = g > 0 ? P.filter(p => GROUP_OF[p.id] > LEVEL_GROUP[i] && GROUP_OF[p.id] <= LEVEL_GROUP[i + 1]).length : 0;
+  const bits = [n ? `${n} figure nuove` : "", i + 1 === PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
+  return bits.length ? ` Si aprono ${bits.join(" e ")}.` : "";
 }
 function renderHome(){
   const order = ["inv","cont"].flatMap(f => [true,false].flatMap(b => P.filter(p => p.fam === f && p.bull === b)));
+  const bi = groupNow();
+  // le figure chiuse vanno in fondo, in ordine di gruppo, così la posizione del pallino non dice nulla
+  order.sort((a, b) => (isOpen(a, bi) ? -1 : GROUP_OF[a.id]) - (isOpen(b, bi) ? -1 : GROUP_OF[b.id]) || (isOpen(a, bi) || a.id === b.id ? 0 : a.id < b.id ? -1 : 1));
   $("#progDots").innerHTML = order.map(p => {
+    if(!isOpen(p, bi)) return `<i class="lk" title="Figura chiusa: si apre salendo di livello"></i>`;
     const b = sc(p.id).b;
     const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || stats[p.id]) ? "l1" : "";
     return `<i class="${cls}" title="${esc(label(p))}"></i>`;
@@ -449,12 +519,28 @@ function renderHome(){
   $("#nextDue").textContent = nd === null ? "Comincia dal Ripasso del giorno: ogni giorno ti presenta 5 figure nuove." : `Prossime figure da ripassare: ${whenText(nd)}.`;
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
   if(prefs.mode === "scen" && window.Scenari) $("#startHint").textContent = Scenari.hint();
+  const pl = $("#provaLock"); if(pl) pl.hidden = !!(window.Prova && Prova.unlocked());
   $("#resetBox").innerHTML = `<button class="linkbtn" id="resetBtn">Azzera i progressi</button>`;
   $("#resetBtn").onclick = () => {
-    $("#resetBox").innerHTML = `<span class="hint">${cloud.on ? "Cancello tutti i progressi, anche quelli salvati nel tuo account?" : "Cancello tutti i progressi su questo dispositivo?"}</span><button class="btn danger" id="resetYes">Sì, azzera</button><button class="btn ghost small" id="resetNo">Annulla</button>`;
-    $("#resetYes").onclick = () => { srs = {}; stats = {}; daily = {day:0, newCount:0}; if(window.Scenari) Scenari.reset(); saveSrs(); saveStats(); renderHome(); };
+    // con l'account l'azzeramento sta nella Danger zone della pagina Account
+    if(cloud.on) return showAccount().then(() => { const d = $("#dangerZone"); if(d) d.scrollIntoView({behavior:"smooth", block:"center"}); });
+    $("#resetBox").innerHTML = dangerHTML("rz", "Cancello tutti i progressi su questo dispositivo: figure imparate, ripasso, scenari e livello.") + `<button class="btn ghost small" id="resetNo">Annulla</button>`;
+    bindDanger("rz", () => { wipeProgress(Date.now()); renderHome(); });
     $("#resetNo").onclick = renderHome;
   };
+}
+// conferma a prova di distrazione: il tasto si accende solo scrivendo CANCELLA
+const DANGER_WORD = "CANCELLA";
+function dangerHTML(id, text){
+  return `<div class="danger-box"><p>${esc(text)} <b>Non si può annullare.</b></p>
+    <label for="${id}-w">Per confermare scrivi <b>${DANGER_WORD}</b></label>
+    <div class="row"><input id="${id}-w" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="${id}-m"><button class="btn danger" type="button" id="${id}-go" disabled>Azzera i progressi</button></div>
+    <p class="hint" id="${id}-m" role="status"></p></div>`;
+}
+function bindDanger(id, onYes){
+  const w = $("#" + id + "-w"), go = $("#" + id + "-go");
+  w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== DANGER_WORD; };
+  go.onclick = () => { if(w.value.trim().toUpperCase() !== DANGER_WORD) return; go.disabled = true; w.value = ""; onYes(); };
 }
 function renderIllustrations(){
   const mini = (id, o) => chartSVG(BYID[id], Object.assign({arrow:true, w:90, h:80, maxSlot:16, maxBody:8}, o));
@@ -524,7 +610,7 @@ function syncControls(){
   [["#famSeg","fam"],["#studySeg","sfilter"]].forEach(([id, k]) =>
     $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[k])));
   $("#hlToggle").checked = prefs.hl;
-  selectMode(["srs","studia","f2n","n2f","scen"].includes(prefs.mode) ? prefs.mode : "srs", true);
+  selectMode(["srs","studia","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs", true);
 }
 function bindSeg(id, key, cb){
   const el = $(id);
@@ -535,7 +621,7 @@ function bindSeg(id, key, cb){
 
 /* ---------- quiz ---------- */
 let Q = null;
-function pool(){ return P.filter(p => prefs.fam === "all" || p.fam === prefs.fam); }
+function pool(){ return openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam); }
 function weight(p){ const s = stats[p.id] || {r:0, w:0}; return Math.max(.35, 1 + 1.6*s.w - .45*s.r); }
 function pickQuestions(list, k){
   const src = list.slice(), out = [];
@@ -551,7 +637,7 @@ function distractors(t, list, k){
   const others = list.filter(p => p.id !== t.id);
   const chosen = [];
   const add = p => { if(p && !chosen.includes(p) && p.id !== t.id) chosen.push(p); };
-  if(t.twin && Math.random() < .75) add(BYID[t.twin]);
+  if(t.twin && Math.random() < .75 && isOpen(BYID[t.twin])) add(BYID[t.twin]);
   shuffle(others.filter(p => p.n === t.n)).slice(0, 2).forEach(add);
   shuffle(others.slice()).forEach(p => { if(chosen.length < k) add(p); });
   return chosen.slice(0, k);
@@ -575,8 +661,8 @@ function renderQuestion(){
   if(Q.i >= Q.qs.length) return renderSummary();
   const t = Q.qs[Q.i];
   if(!Q.cur || Q.cur.id !== t.id + Q.i){
-    Q.cur = {id: t.id + Q.i, ctx: makeContext(t), opts: shuffle([t, ...distractors(t, Q.list.length >= 5 ? Q.list : P, 3)]), ctxFor:{}};
-    Q.answered = false; Q.pick = null; Q.levelUp = null;
+    Q.cur = {id: t.id + Q.i, ctx: makeContext(t), opts: shuffle([t, ...distractors(t, Q.list.length >= 5 ? Q.list : openP(), 3)]), ctxFor:{}};
+    Q.answered = false; Q.pick = null; Q.levelUp = null; Q.opens = "";
   }
   if(Q.mode === "srs" && Q.intro.has(t.id)) return renderIntro(t);
   const mode = curMode();
@@ -631,6 +717,8 @@ function answer(id){
   }
   Q.streak = ok ? Q.streak + 1 : 0; Q.best = Math.max(Q.best, Q.streak);
   const lvAfter = levelInfo().i; if(lvAfter > lvBefore) Q.levelUp = LEVELS[lvAfter].n;
+  if(lvAfter > lvBefore) Q.opens = opensHTML(lvBefore, lvAfter);
+  if(window.DojoSuoni) DojoSuoni.play(lvAfter > lvBefore ? "livello" : ok ? "giusto" : "sbagliato");
   renderQuestion();
   if(ok) memePop();
 }
@@ -659,7 +747,7 @@ function supportToday(){
 }
 function feedback(t){
   const ok = Q.pick === t.id, picked = BYID[Q.pick];
-  let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3>${Q.levelUp ? `<p class="levelup">Sei salito di livello: <b>${esc(Q.levelUp)}</b></p>` : ""}<p>${esc(t.d)}</p>`;
+  let h = `<div class="fb ${ok?"ok":"ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(t.name)} ${chipDir(t)} ${chipN(t)}</h3>${Q.levelUp ? `<p class="levelup"><span class="lv-ico big l${levelInfo().i + 1}" aria-hidden="true"></span>Sei salito di livello: <b>${esc(Q.levelUp)}</b></p>` : ""}${Q.levelUp ? Q.opens || "" : ""}<p>${esc(t.d)}</p>`;
   if(Q.lastGrade){
     h += `<span class="nextchip">${ok ? "La rivedrai " + whenText(Q.lastGrade.due) : (Q.requeued[t.id] <= 3 ? "Te la richiedo tra poco" : "La rivedrai oggi stesso")}</span>`;
   }
@@ -681,7 +769,7 @@ function renderIntro(t){
     <div style="display:flex;gap:6px;flex-wrap:wrap">${chipDir(t)}${chipN(t)}<span class="chip fam">${famName(t.fam)}</span></div>
     <div class="big">${chartSVG(t, {arrow:true, w:520, h:240, maxSlot:56, maxBody:24, aria: label(t)})}</div>
     <p style="margin:0;max-width:65ch;font-size:16px">${esc(t.d)}</p>
-    ${twin ? `<p class="hint" style="margin:0">La sua gemella è ${esc(label(twin))}: stessa idea, direzione opposta.</p>` : ""}
+    ${twin && isOpen(twin) ? `<p class="hint" style="margin:0">La sua gemella è ${esc(label(twin))}: stessa idea, direzione opposta.</p>` : ""}
     <div class="actions"><button class="btn" id="gotit">Ho capito, mettimi alla prova</button></div>
   </div>`;
   const b = $("#gotit");
@@ -732,7 +820,7 @@ function renderSummary(){
   bindTwinLinks($("#quiz"));
 }
 document.addEventListener("keydown", e => {
-  if(view === "home" || view === "studia" || view === "auth" || view === "account" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
+  if(view === "home" || view === "studia" || view === "prova" || view === "auth" || view === "account" || !Q || e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
   if(Q.mode === "scen") return Scenari.key(e);
   if(Q.mode === "srs" && Q.intro && Q.qs[Q.i] && Q.intro.has(Q.qs[Q.i].id)) return;
   if(!Q.answered && /^[1-4]$/.test(e.key) && (curMode() === "n2f" || curMode() === "f2n")){
@@ -741,9 +829,18 @@ document.addEventListener("keydown", e => {
 });
 
 /* ---------- study ---------- */
+function lockedCardHTML(p){
+  const N = LEVEL_FOR_GROUP[GROUP_OF[p.id]] + 1, tk = "<i></i>".repeat(N);
+  return `<article class="panel card locked" aria-label="Figura chiusa">
+    <div class="well wrap" role="img" aria-label="Figura chiusa"><span class="band"></span><span class="seal">?</span><span class="tk">${tk}</span></div>
+    <div class="ghostname">? ? ?</div>
+    <div class="unl"><span class="tk2">${tk}</span>Si apre al livello ${N}: ${esc(LEVELS[N - 1].n)}</div>
+    <div class="ghostline"></div><div class="ghostline" style="width:80%"></div>
+  </article>`;
+}
 function cardHTML(p){
   const m = mastery(p.id);
-  const twin = p.twin ? BYID[p.twin] : null;
+  const twin = p.twin && isOpen(BYID[p.twin]) ? BYID[p.twin] : null;
   return `<article class="panel card" id="c-${p.id}">
     <div class="well">${chartSVG(p, {arrow:true, w:240, h:150, maxSlot:30, maxBody:14, aria: label(p)})}</div>
     <h3>${esc(p.name)}</h3>
@@ -762,14 +859,20 @@ function bindTwinLinks(root){
 function renderStudy(){
   const q = $("#search").value.trim().toLowerCase();
   const f = prefs.sfilter;
-  const vis = P.filter(p => (f === "all" || (f === "bull") === p.bull) && (!q || p.name.toLowerCase().includes(q) || p.d.toLowerCase().includes(q)));
+  const bi = groupNow();
+  // le figure chiuse compaiono come sagome in fondo a ogni gruppo, ma non nella ricerca
+  const vis = P.filter(p => isOpen(p, bi) && (f === "all" || (f === "bull") === p.bull) && (!q || p.name.toLowerCase().includes(q) || p.d.toLowerCase().includes(q)));
   const groups = [["inv", true, "Inversione al rialzo"], ["inv", false, "Inversione al ribasso"], ["cont", true, "Continuazione al rialzo"], ["cont", false, "Continuazione al ribasso"]];
   let h = "";
   for(const [fam, bull, title] of groups){
     const items = vis.filter(p => p.fam === fam && p.bull === bull);
     if(!items.length) continue;
-    h += `<div class="sect"><h2>${title}</h2><span class="eyebrow">${items.length} figure</span></div><div class="grid">${items.map(cardHTML).join("")}</div>`;
+    const op = items.filter(p => isOpen(p, bi));
+    if(op.length) h += `<div class="sect"><h2>${title}</h2><span class="eyebrow">${op.length} figure</span></div><div class="grid">${op.map(cardHTML).join("")}</div>`;
   }
+  // le figure chiuse stanno tutte insieme in fondo, in ordine di livello: né la sezione né il filtro dicono se salgono o scendono
+  const lk = q ? [] : P.filter(p => !isOpen(p, bi)).sort((a, b) => GROUP_OF[a.id] - GROUP_OF[b.id] || (a.id < b.id ? -1 : 1));
+  if(lk.length) h += `<div class="sect"><h2>Figure chiuse</h2><span class="eyebrow">${lk.length} figure · si aprono salendo di livello</span></div><div class="grid">${lk.map(lockedCardHTML).join("")}</div>`;
   $("#study").innerHTML = h || `<p class="empty">Nessuna figura trovata. Prova con un altro nome.</p>`;
   bindTwinLinks($("#study"));
 }
@@ -779,7 +882,19 @@ $("#search").addEventListener("input", renderStudy);
 const AUTH = {step: "in", email: ""};
 const weakPw = p => p.length < 8 || !/[a-z]/i.test(p) || !/\d/.test(p);
 const fieldHTML = (id, label, attrs) => `<label for="${id}">${label}</label><input id="${id}" ${attrs}>`;
+/* pagina d'ingresso per chi non è iscritto: nasconde l'app finché non si sceglie Accedi o Iscriviti */
+function showLanding(){
+  view = "landing";
+  document.body.classList.add("is-landing"); $("#landing").hidden = false;
+  heroAnim.stop();
+  const fig = (id, ctx) => { const p = BYID[id]; return chartSVG(p, {context: ctx ? makeContext(p) : [], w: 320, h: 200, maxSlot: 30, maxBody: 14, aria: p.name}); };
+  $("#lp-1").innerHTML = fig("hammer_p", true); $("#lp-2").innerHTML = fig("mstar_p", true);
+  window.scrollTo({top:0});
+}
+function leaveLanding(){ document.body.classList.remove("is-landing"); $("#landing").hidden = true; }
+document.addEventListener("click", e => { const b = e.target.closest("#landing [data-go]"); if(b) showAuth(b.dataset.go); });
 function showAuth(step){
+  leaveLanding();
   view = "auth";
   ["#view-home", "#view-quiz", "#view-studia", "#view-account", "#bar"].forEach(s => $(s).hidden = true);
   $("#view-auth").hidden = false;
@@ -866,6 +981,18 @@ async function submitAuth(e){
   if(document.body.contains(go)) go.disabled = false;
 }
 
+/* ---------- newsletter: la funzione "newsletter" su Supabase allinea la lista Brevo con il consenso ----------
+   Si chiama quando cambi il consenso o l'email, e una volta per dispositivo all'accesso. A Brevo vanno solo email e username. */
+function nlSync(u, force){
+  try{
+    // sul dispositivo resta solo un'impronta dell'email, per accorgersi se cambia
+    const k = "dojo-nl-v1:" + u.id, tag = String([...(u.email || "")].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7));
+    if(!force && localStorage.getItem(k) === tag) return;
+    cloud.sb.functions.invoke("newsletter", {body: {action: "sync"}})
+      .then(r => { if(!r.error) try{ localStorage.setItem(k, tag); }catch(e){} }).catch(() => {});
+  }catch(e){}
+}
+
 /* ---------- pagina account ---------- */
 async function showAccount(){
   view = "account";
@@ -906,10 +1033,15 @@ async function showAccount(){
       </form>
       <p class="au-err" id="m-pw" role="status"></p>
     </section>
+    <section class="panel acard danger-zone" id="dangerZone"><div class="eyebrow">Danger zone</div>
+      <h3>Azzera i progressi</h3>
+      ${dangerHTML("dz", "Cancello tutti i tuoi progressi, sul tuo account e su tutti i tuoi dispositivi: figure imparate, ripasso, statistiche, scenari, livello e record della Prova. L'account, l'email e la newsletter restano come sono.")}
+    </section>
     <div class="actions"><button class="btn ghost" type="button" id="ac-out">Esci dall'account</button></div>`;
   box.querySelector(".u-name").textContent = (prof && prof.username) || (u.user_metadata && u.user_metadata.username) || "";
   box.querySelector(".u-mail").textContent = legacy ? "Nessuna: aggiungila per recuperare la password e ricevere le email" : u.email;
   const say = (id, m, ok) => { const el = $(id); el.textContent = m; el.className = ok ? "au-ok" : "au-err"; };
+  bindDanger("dz", async () => { wipeProgress(Date.now()); await cloud.flush(); $("#dz-m").textContent = "Fatto: i progressi sono azzerati. Si riparte dal livello 1."; });
   let newMail = "";
   $("#f-mail").onsubmit = async e => {
     e.preventDefault(); newMail = $("#ac-mail").value.trim().toLowerCase();
@@ -922,13 +1054,15 @@ async function showAccount(){
     e.preventDefault();
     const {error} = await sb.auth.verifyOtp({email: newMail, token: $("#ac-mailcode").value.trim(), type: "email_change"});
     if(error) return say("#m-mail", cloud.errText(error));
-    await sb.auth.refreshSession(); showAccount();
+    const {data: ref} = await sb.auth.refreshSession(); if(ref && ref.user) nlSync(ref.user, true);
+    showAccount();
   };
   $("#ac-mkt").onchange = async e => {
     const on = e.target.checked;
     const {error} = await sb.from("profiles").update({marketing: on, marketing_at: new Date().toISOString()}).eq("id", u.id);
     if(error){ e.target.checked = !on; return say("#m-mkt", "Non riuscito: " + error.message); }
     say("#m-mkt", on ? "Iscritto alla newsletter." : "Non riceverai più la newsletter.", true);
+    nlSync(u, true);
   };
   $("#ac-mfa").onclick = async () => {
     if(totp){
@@ -967,7 +1101,7 @@ function start(data){
   bindSeg("#studySeg", "sfilter", renderStudy);
   $("#hlToggle").checked = prefs.hl;
   $("#hlToggle").onchange = e => { prefs.hl = e.target.checked; savePrefs(); };
-  selectMode(["srs","studia","f2n","n2f","scen"].includes(prefs.mode) ? prefs.mode : "srs");
+  selectMode(["srs","studia","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs");
   renderIllustrations();
   if(data && data.view && data.view !== "home") setTab(data.view); else goHome();
 }

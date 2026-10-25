@@ -1,0 +1,47 @@
+/* Pagina d'ingresso per chi non è iscritto (variante A «Insegna», scelta da Michele il 25/10).
+   Tutto sotto #landing; i colori sono i token Sumi del sito. Quando è visibile nasconde il resto dell'app. */
+#landing{display:none}
+body.is-landing #landing{display:block}
+body.is-landing .wrap{display:none}
+#landing .eyebrow{font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+#landing h2{font-family:var(--display);font-weight:800;line-height:1.1;margin:0 0 14px;text-wrap:balance;font-size:clamp(28px,5.5vw,44px)}
+#landing .muted{color:var(--muted);font-size:14px}
+#landing .lead{font-size:17px;max-width:56ch}
+#landing .btn{font:inherit;font-weight:700;font-size:15px;padding:11px 20px;border-radius:2px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;letter-spacing:.03em;text-decoration:none;display:inline-block}
+#landing .btn.small{font-size:13px;padding:8px 14px}
+#landing .btn.big{font-size:clamp(20px,5vw,30px);letter-spacing:.08em;padding:20px clamp(36px,10vw,84px);background:var(--seal);color:#fff}
+#landing .btn:focus-visible,#landing .linkbtn:focus-visible,#landing a:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
+#landing .linkbtn{font:inherit;border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+#landing .top{position:fixed;inset:0 0 auto 0;display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));z-index:5}
+#landing .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 16px 72px;overflow:hidden}
+#landing .hanko{display:block;height:min(42svh,80vw);width:auto;filter:drop-shadow(0 2px 0 rgba(0,0,0,.08))}
+#landing .giu{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+#landing .riga{display:block;width:100%;max-width:760px;margin-top:-6px;height:clamp(50px,10svh,90px);opacity:.9}
+#landing .arco{width:min(98vw,760px);height:auto;margin-top:-6px;overflow:visible}
+#landing .arco text{font-family:var(--display);font-weight:800;font-size:55px;fill:var(--ink);letter-spacing:.04em}
+#landing .frase{margin:clamp(22px,5svh,44px) 0 clamp(24px,5svh,40px);font-family:var(--display);font-weight:700;font-size:clamp(17px,4.4vw,22px);text-align:center;max-width:28ch;line-height:1.3}
+#landing .iscr2{background:var(--seal);color:#fff;font-size:17px;letter-spacing:.08em;padding:14px 44px}
+#landing .s{max-width:880px;margin:0 auto;padding:72px max(18px,env(safe-area-inset-left)) 40px}
+#landing .fotorow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
+#landing .foto{margin:0}
+#landing .foto img,#landing .foto svg{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;background:var(--card);border:1px solid var(--line2);border-radius:var(--r,4px)}
+#landing .foto figcaption{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
+#landing .passi{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:12px}
+#landing .passi li{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-family:var(--display);font-weight:700;font-size:clamp(20px,4vw,26px)}
+#landing .passi .lv{font-style:normal;color:var(--seal)}
+#landing .passi .lv i{font-style:normal;font-weight:800;font-size:2em;line-height:0;-webkit-text-stroke:1px currentColor;margin-left:.08em;display:inline-block;transform:rotate(8deg) translateY(.05em)}
+#landing .passi b{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--seal);color:var(--seal);display:grid;place-items:center;font-size:20px;flex:none}
+#landing .fine{text-align:center;padding-block:56px 40px}
+#landing .fine .muted{margin-top:18px}
+#landing footer{text-align:center;padding:24px 16px 48px;color:var(--muted);font-size:13px}
+@media (hover:hover){#landing .btn:hover{transform:scale(1.04);filter:var(--hover-tint)}}
+#landing .btn{transition:transform .15s,filter .15s}
+@media (prefers-reduced-motion:reduce){#landing .btn{transition:none}#landing .btn:hover{transform:none!important}}
+/* schermi bassi (portatili): hero più compatto così Iscriviti resta nella prima schermata */
+@media (max-height:900px){
+  #landing .hero{padding:52px 16px 56px}
+  #landing .hanko{height:min(30svh,70vw)}
+  #landing .arco{width:min(98vw,540px)}
+  #landing .riga{height:clamp(36px,7svh,64px)}
+  #landing .frase{margin:clamp(12px,3svh,26px) 0 clamp(14px,3svh,26px)}
+}

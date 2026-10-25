@@ -1,0 +1,105 @@
+/* Dojo delle candele · La Prova del Dojo (gioco di supporti e resistenze) e cinture.
+   Stessi colori del tema Sumi (variabili di index.html). Tutto sotto .pd per non toccare il resto del sito. */
+.pd{--band:rgba(46,106,78,.18);display:flex;flex-direction:column;gap:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pd{--band:rgba(134,194,156,.2)}}
+:root[data-theme="dark"] .pd{--band:rgba(134,194,156,.2)}
+.pd [hidden]{display:none!important}
+.pd-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+.pd-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,4vw,1.7rem);margin:0;line-height:1.2}
+.pd .stato{display:flex;gap:14px;font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.pd .stato b{color:var(--ink)}
+.pd-dots{display:flex;gap:6px;align-items:center}
+.pd-dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line2);display:block}
+.pd-dots i.ok{background:var(--bull);border-color:var(--bull)}
+.pd-dots i.mid{background:var(--hl-line);border-color:var(--hl-line)}
+.pd-dots i.ko{background:var(--bear);border-color:var(--bear)}
+.pd-dots i.now{border-color:var(--ink)}
+.pd .gioco{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+@media (min-width:900px){.pd .gioco{grid-template-columns:minmax(0,1fr) 320px;align-items:start}}
+.pd .carta{background:var(--card);border:1px solid var(--line);border-radius:6px}
+.pd .grafico{padding:8px;position:relative}
+.pd .pd-chart{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.pd .pd-chart.locked{touch-action:auto}
+.pd .pd-chart text{font-family:var(--body)}
+.pd .c-bull{fill:var(--bull);stroke:var(--bull)} .pd .c-bear{fill:var(--bear);stroke:var(--bear)} .pd .c-doji{fill:var(--doji);stroke:var(--doji)}
+.pd .pd-gl{stroke:var(--line);stroke-width:1} .pd .pd-glt{fill:var(--muted);font-size:13px}
+.pd .hl{fill:var(--hl);stroke:var(--hl-line);stroke-width:1}
+.pd .fut{fill:var(--well);stroke:var(--line2);stroke-dasharray:4 5}
+.pd .futt{fill:var(--muted);font-size:15px}
+.pd .uline{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.pd .handle{fill:var(--card);stroke:var(--ink);stroke-width:2;cursor:ns-resize}
+.pd .utag{fill:var(--ink);font-size:16px;font-weight:700}
+.pd .band{fill:var(--band)} .pd .bandl{stroke:var(--bull);stroke-width:1.5;stroke-dasharray:6 4}
+.pd .band.res{fill:var(--bear-soft);opacity:.9} .pd .bandl.res{stroke:var(--bear)}
+.pd .pann{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.pd .passo{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.pd .dom{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.35;margin:0;text-wrap:balance}
+.pd .aiuto{font-size:.9rem;color:var(--muted);margin:0}
+.pd .btns{display:flex;flex-wrap:wrap;gap:8px}
+.pd .btns button{font:700 1rem var(--body);border-radius:6px;border:1.5px solid var(--line2);background:var(--well);color:var(--ink);padding:12px 16px;min-height:48px;cursor:pointer;flex:1 1 120px}
+.pd .btns button:hover{border-color:var(--ink)}
+.pd .btns button:focus-visible{outline:3px solid var(--hl-line);outline-offset:2px}
+.pd .btns button.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pd .btns button.indietro{background:none;border-color:transparent;color:var(--muted);font-weight:500;font-size:.95rem;min-height:44px}
+.pd .btns button.indietro:hover{color:var(--ink);border-color:var(--line2)}
+.pd .btns button.mini{flex:0 0 56px;font-size:1.3rem;padding:8px}
+.pd .legenda{display:flex;flex-direction:column;gap:4px;font-size:.88rem;background:var(--well);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.pd .legenda b{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pd .legenda em{font-style:normal;font-weight:700}
+.pd .esito{display:flex;flex-direction:column;gap:10px}
+.pd .timbro{align-self:flex-start;font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--seal);border:2.5px solid var(--seal);border-radius:4px;padding:2px 12px;transform:rotate(-3deg)}
+.pd .timbro.ok{color:var(--bull);border-color:var(--bull)}
+.pd .nome{font-family:var(--display);font-weight:800;font-size:1.25rem;margin:0}
+.pd .nome span{font-family:var(--body);font-weight:700;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:6px}
+.pd .esito p{margin:0;font-size:.95rem}
+.pd .punti{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:.92rem;font-variant-numeric:tabular-nums;border-top:1px solid var(--line);padding-top:8px}
+.pd .punti b{text-align:right}
+.pd .punti .tot{font-weight:700;border-top:1px solid var(--line);padding-top:4px}
+.pd .riass{padding:20px;display:flex;flex-direction:column;gap:14px}
+.pd .riass h2{font-family:var(--display);font-weight:800;margin:0;font-size:1.6rem}
+.pd .grande{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;font-variant-numeric:tabular-nums}
+.pd .grande small{font-size:1rem;color:var(--muted)}
+.pd .tab{overflow-x:auto}
+.pd table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+.pd td,.pd th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}
+.pd th{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pd td.num,.pd th.num{text-align:right}
+.pd .nota{font-size:.8rem;color:var(--muted);margin:0}
+/* telefono: il grafico (600 unità di larghezza) si stringe a circa 340 px, quindi le scritte vanno ingrandite */
+.pd.narrow .pd-glt{font-size:22px}
+.pd.narrow .utag{font-size:26px}
+.pd.narrow .futt{font-size:24px}
+.pd.narrow .uline{stroke-width:4}
+.pd.narrow .handle{stroke-width:3}
+.pd-locked{padding:24px;display:grid;gap:12px;justify-items:start}
+.pd-locked h2{font-family:var(--display);font-weight:800;margin:0}
+.pd-locked p{margin:0;color:var(--muted);max-width:60ch}
+
+/* figure chiuse e griglia home */
+.progress .dots i.lk{border-style:dashed;opacity:.6}
+.card.locked .ghostname{font-family:var(--display);font-weight:800;font-size:16.5px;letter-spacing:.2em;color:var(--muted)}
+.card.locked .ghostline{height:8px;background:var(--line);border-radius:2px;opacity:.7}
+.card.locked .unl{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--seal);letter-spacing:.04em}
+.mode.prova-mode .lockchip{justify-self:start;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center}
+@media (max-width:900px){#view-home .mode:nth-child(5){border-left:0}#view-home .mode.scen-mode{grid-column:auto;border-top:1px solid var(--line)}}
+@media (max-width:900px) and (min-width:641px){#view-home .mode.scen-mode{border-left:1px solid var(--line)}}
+@media (min-width:901px){#view-home .modes{grid-template-columns:repeat(3,minmax(0,1fr))}#view-home .mode:nth-child(4){border-left:0}#view-home .mode:nth-child(n+4){border-top:1px solid var(--line)}}
+@media (prefers-reduced-motion:reduce){.pd *{transition:none!important;animation:none!important}}
+
+/* A · Busta: la figura è incartata nella carta washi, legata con una fascia d'inchiostro.
+   Niente cinture: sulla fascia ci sono tante tacche vermiglie quanto il livello che apre la figura (le stesse tacche delle icone dei livelli). */
+.card.locked .well.wrap{width:100%;aspect-ratio:240/150;position:relative;overflow:hidden;
+  background:
+    linear-gradient(135deg,transparent 49.6%,var(--line) 49.6% 50.4%,transparent 50.4%),
+    linear-gradient(45deg,transparent 49.6%,var(--line) 49.6% 50.4%,transparent 50.4%),
+    repeating-linear-gradient(100deg,transparent 0 6px,rgba(128,110,80,.05) 6px 7px),
+    var(--card)}
+.card.locked .well.wrap .band{position:absolute;left:0;right:0;top:50%;height:22%;transform:translateY(-50%);
+  background:linear-gradient(var(--ink),var(--ink));opacity:.88;box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 0 0 1px var(--line2)}
+.card.locked .well.wrap .seal{position:absolute;left:50%;top:50%;width:38px;height:38px;transform:translate(-50%,-50%) rotate(-5deg);
+  display:grid;place-items:center;background:var(--seal);color:var(--seal-ink);border-radius:4px;
+  font-family:var(--display);font-weight:800;font-size:22px;line-height:1;box-shadow:0 0 0 3px var(--card)}
+.card.locked .well.wrap .tk{position:absolute;left:0;right:0;bottom:9%;display:flex;gap:6px;justify-content:center}
+.card.locked .well.wrap .tk i{width:11px;height:11px;border-radius:2px;background:var(--seal);border:1.5px solid var(--ink)}
+.card.locked .unl .tk2{display:inline-flex;gap:3px}.card.locked .unl .tk2 i{width:8px;height:8px;border-radius:1.5px;background:var(--seal);border:1px solid var(--ink)}
+

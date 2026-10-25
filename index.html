@@ -12,6 +12,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="scenari.css">
+<link rel="stylesheet" href="prova-dojo.css">
+<link rel="stylesheet" href="landing.css">
+<link rel="stylesheet" href="icone-livelli.css">
+<link rel="stylesheet" href="tasti-hover.css">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}</style>
 <style>
 /* Versione A · Sumi. Carta washi e inchiostro: tanto bianco, filetti sottili al posto delle scatole,
@@ -57,6 +61,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .hero h1{font-size:clamp(44px,9vw,86px);line-height:1;max-width:8ch;font-weight:800}
 .hero h1 em{font-style:normal;color:var(--seal)}
 .hero .lead{max-width:38ch;color:var(--muted);font-size:clamp(15.5px,2.2vw,18px);margin:18px 0 0}
+.hero .logo{grid-column:2;grid-row:1 / span 3;align-self:center;height:104px;width:auto}
 .hero .kanji{grid-column:2;grid-row:1 / span 3;align-self:center;font-family:var(--display);font-weight:800;writing-mode:vertical-rl;
   font-size:clamp(30px,5.4vw,50px);line-height:1;letter-spacing:.08em;color:var(--seal-ink);background:var(--seal);padding:14px 10px;border-radius:6px;
   box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px color-mix(in srgb,var(--seal-ink) 55%,transparent);transform:rotate(2deg)}
@@ -112,7 +117,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .back:hover{color:var(--ink)}
 .bar .t{font-family:var(--display);font-weight:800;font-size:24px}
 .bar .cfg{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-@media (max-width:640px){.modes{grid-template-columns:minmax(0,1fr)!important}.mode{border-left:0!important;border-top:1px solid var(--line)}.mode:first-child{border-top:0}.mode{grid-template-columns:120px minmax(0,1fr);align-items:center}.mode .ill{height:80px;grid-row:span 3}.bar .cfg{margin-left:0}.hero .kanji{font-size:30px}}
+@media (max-width:640px){.modes{grid-template-columns:minmax(0,1fr)!important}.mode{border-left:0!important;border-top:1px solid var(--line)}.mode:first-child{border-top:0}.mode{grid-template-columns:120px minmax(0,1fr);align-items:center}.mode .ill{height:80px;grid-row:span 3}.bar .cfg{margin-left:0}.hero .logo{height:84px;width:auto}}
 
 .controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:18px 0 14px}
 .field{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
@@ -167,7 +172,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .fb.ko{background:var(--bear-soft);border-color:var(--bear)}
 .fb h3{margin:0;font-family:var(--display);font-size:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fb p{margin:0;max-width:65ch}
-.level{display:grid;gap:6px;margin:10px 0 14px}
+.level{display:flex;gap:14px;align-items:center;margin:10px 0 14px}.level .lv-main{display:grid;gap:6px;flex:1;min-width:0}
 .level .lv-name{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.2}
 .level .lv-name small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
 .level .lv-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
@@ -232,6 +237,17 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 .acard .stack{display:grid;gap:8px;max-width:360px}
 .acard input:not([type=checkbox]){font:inherit;font-size:16px;padding:10px 2px;border-radius:0;border:0;border-bottom:1.5px solid var(--line2);background:transparent;color:var(--ink);min-width:0;flex:1 1 200px}
 .acard .au-err:empty{display:none}
+.danger-zone{border-color:var(--bear);border-top:3px solid var(--bear)}
+.danger-zone .eyebrow{color:var(--bear)}
+.danger-zone h3{margin:0;font-family:var(--display);font-size:18px}
+.danger-box{display:grid;gap:8px;max-width:520px}
+.danger-box p{margin:0}
+.danger-box label{font-size:13px;color:var(--muted)}
+.danger-box .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.danger-box input,.acard .danger-box input:not([type=checkbox]){font:inherit;font-size:16px;padding:8px 2px;border:0;border-bottom:1.5px solid var(--bear);background:transparent;color:var(--ink);min-width:0;flex:1 1 160px;letter-spacing:.08em}
+.danger-box .btn.danger:disabled{opacity:.45;cursor:not-allowed}
+.danger-box .hint:empty{display:none}
+.reset .danger-box{margin-bottom:8px}
 .mfasteps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
 .secret{font-family:var(--body);font-size:12.5px;background:var(--well);border:1px solid var(--line);border-radius:2px;padding:1px 6px;overflow-wrap:anywhere}
 .qr{width:180px;height:180px;background:#fff;border-radius:2px;padding:8px}
@@ -297,7 +313,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
   .topbar{margin-bottom:4px}
   .hero{padding:22px 0 22px;margin-top:0;grid-template-columns:minmax(0,1fr) auto}
   .hero canvas{display:none}
-  .hero .kanji{font-size:22px;padding:9px 6px;align-self:start}
+  .hero .logo{height:76px;width:auto;align-self:start}
   .hero h1{font-size:40px;max-width:none}
   .hero .lead{font-size:14.5px;margin-top:10px}
   .menu-h{font-size:19px;margin:24px 0 8px}
@@ -345,6 +361,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 </style>
 </head>
 <body>
+<div id="landing" class="A" hidden><header class="top"><button class="btn small acc" type="button" data-go="in">Accedi</button></header>
+<main><section class="hero"><img class="hanko" src="logo.svg" alt="Dojo delle candele" height="256">
+<svg class="arco" viewBox="0 -10 600 160" role="img" aria-label="Dojo delle candele"><defs><path id="arc" d="M15 135 Q300 -35 585 135"/></defs><text><textPath href="#arc" startOffset="50%" text-anchor="middle">Dojo delle candele</textPath></text></svg>
+<svg class="riga" id="riga" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true"></svg>
+<p class="frase">Acchiappale tutte, una formazione al giorno!</p><button class="btn iscr2" type="button" data-go="up">Iscriviti</button>
+<a class="giu" href="#chi" aria-label="Scorri">scorri ↓</a></section><section class="s chi"><p class="eyebrow">Che cos’è</p><h2>Allenarsi a leggere le candele</h2><p class="lead">Il Dojo allena l’occhio. Ogni giorno una manciata di grafici a candele, una formazione da riconoscere, una risposta, una spiegazione. Niente promesse di guadagno: solo pratica, a ripetizione, finché il nome della formazione ti viene prima del pensiero.</p><div class="fotorow"><figure class="foto"><img src="storia-borsa-riso.jpg" alt="La Borsa del riso di Dojima a Osaka, fotografia del 1914" loading="lazy" width="320" height="200"><figcaption>La Borsa del riso di Dojima, Osaka: qui nascono le candele (1914)</figcaption></figure><figure class="foto"><div id="lp-1" role="img" aria-label="Grafico a candele: un martello dopo una discesa"></div><figcaption>Il martello dopo una discesa</figcaption></figure><figure class="foto"><div id="lp-2" role="img" aria-label="Grafico a candele: la stella del mattino"></div><figcaption>La stella del mattino</figcaption></figure></div></section><section class="s come"><p class="eyebrow">Come funziona</p><ol class="passi"><li><b>1</b><span>Guardi il grafico</span></li><li><b>2</b><span>Dai il nome alla formazione</span></li><li><b>3</b><span>Leggi la spiegazione e <em class="lv">sali di livello<i>!</i></em></span></li></ol><p class="muted">Quattro livelli, dal “Fuffaguru mancato” al “Figlio di Buffett”. Gratis, con la possibilità di sostenere il Dojo.</p></section><section class="s fine"><button class="btn big iscr" type="button" data-go="up">Iscriviti</button><p class="muted">Ci metti un minuto. Hai già un account? <button class="linkbtn" type="button" data-go="in">Accedi</button></p></section><footer><a href="about.html">Chi siamo</a> · <a href="privacy.html">Privacy</a></footer></main></div>
 <div class="wrap">
   <div class="topbar">
     <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
@@ -358,7 +380,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
       <div class="eyebrow">Allenamento · 66 figure giapponesi</div>
       <h1 style="margin-top:10px">Dojo delle <em>candele</em></h1>
       <p class="lead">Impara a riconoscere le formazioni candlestick: prima le studi, poi le alleni su grafici sempre diversi.</p>
-      <div class="kanji" aria-hidden="true">道場</div>
+      <img class="logo" src="logo.svg" alt="Dojo delle candele, timbro 道場" height="104">
     </div>
 
     <h2 class="menu-h">Scegli come allenarti</h2>
@@ -390,6 +412,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
         <h3>Scenari <span class="tick"></span></h3>
         <p>Due o tre figure in fila su un grafico: riconoscile, poi leggi cosa dicono insieme.</p>
       </button>
+      <button class="mode prova-mode" role="radio" data-mode="prova" id="mode-prova">
+        <span class="ill" id="ill-prova"></span>
+        <span class="lockchip" id="provaLock">Dal livello 2</span>
+        <h3>La Prova del Dojo <span class="tick"></span></h3>
+        <p>Tracci tu il supporto o la resistenza che la figura difende, poi scopri il futuro candela per candela.</p>
+      </button>
     </div>
 
     <div class="panel settings" id="settings">
@@ -415,6 +443,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
         <span><i style="background:var(--hl-line);opacity:.6"></i>in apprendimento</span>
         <span><i style="background:var(--bull);opacity:.6"></i>la stai fissando</span>
         <span><i style="background:var(--bull)"></i>la conosci</span>
+        <span><i style="border:1.5px dashed var(--line2);background:transparent"></i>chiusa</span>
       </div>
       <p class="hint" id="nextDue" style="margin:10px 0 0"></p>
       <div class="reset" id="resetBox"><button class="linkbtn" id="resetBtn">Azzera i progressi</button></div>
@@ -454,8 +483,12 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 
 <script src="supabase.js"></script>
 <script src="config.js"></script>
+<script src="suoni.js"></script>
+<script src="landing.js" defer></script>
+<script src="figure.js"></script>
 <script src="app.js"></script>
 <script src="scenari.js"></script>
+<script src="prova-dojo.js"></script>
 <script src="theme.js"></script>
 <script src="cookie.js" defer></script>
 </body>

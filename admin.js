@@ -79,6 +79,7 @@ async function load(){
   if(error){ $("#list").innerHTML = `<p class="empty">Non riesco a caricare gli allievi: ${esc(error.message)}</p>`; return; }
   users = data || [];
   render();
+  loadIps();
 }
 function render(){
   const week = Date.now() - 7 * 86400000;
@@ -113,6 +114,8 @@ function row(u, s){
     <div class="acts">
       <button class="btn ghost" data-a="pw" type="button">Nuova password</button>
       <button class="btn ghost" data-a="reset" type="button" ${u.progress ? "" : "disabled"}>Azzera progressi</button>
+      <button class="btn ghost" data-a="fig" type="button">Impara o dimentica una figura</button>
+      ${self ? "" : `<button class="btn ghost" data-a="ip" type="button">Blocca IP</button>`}
       ${u.mfa && !self ? `<button class="btn ghost" data-a="mfa" type="button">Togli 2FA</button>` : ""}
       ${u.locked ? `<button class="btn ghost" data-a="unlock" type="button">Sblocca accesso</button>` : ""}
       ${self ? "" : `<button class="btn ghost" data-a="ban" type="button">${u.banned ? "Riattiva account" : "Sospendi account"}</button>`}
@@ -128,8 +131,56 @@ function bindRow(u){
   el.querySelector(".mail").textContent = u.email || "Nessuna email (account creato con il solo username)";
   el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => ask(u, b.dataset.a, el));
 }
+// fa imparare (scatola 5, "la conosci") o dimenticare (torna nuova) una figura; l'allievo lo vede al prossimo accesso
+function askFigure(u, slot){
+  const opts = P.map(p => `<option value="${p.id}">${esc(p.name)} ${p.bull ? "▲" : "▼"}</option>`).join("");
+  slot.innerHTML = `<div class="confirm"><p></p><select aria-label="Figura">${opts}</select>
+    <button class="btn" type="button" data-learn>Segna come imparata</button><button class="btn danger" type="button" data-forget>Fai dimenticare</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
+  slot.querySelector("p").textContent = `Scegli una figura per ${u.username}. La modifica arriva sul suo Dojo la prossima volta che lo apre.`;
+  const sel = slot.querySelector("select"), msg = slot.querySelector(".msg");
+  slot.querySelector("[data-no]").onclick = () => slot.innerHTML = "";
+  const go = async learn => {
+    const p = P.find(x => x.id === sel.value);
+    const {error} = await sb.rpc("admin_force_item", {target: u.id, item: p.id, learn});
+    msg.className = error ? "msg ko" : "msg";
+    msg.textContent = error ? "Non riuscito: " + (/admin_force_item/.test(error.message) ? "manca la funzione su Supabase (file SQL «figure-forzate»)" : error.message)
+      : `${p.name} ${p.bull ? "▲" : "▼"}: ${learn ? "segnata come imparata" : "dimenticata, tornerà come figura nuova"} per ${u.username}.`;
+  };
+  slot.querySelector("[data-learn]").onclick = () => go(true);
+  slot.querySelector("[data-forget]").onclick = () => go(false);
+}
+// blocco IP: mostra gli ultimi indirizzi usati dall'allievo, l'admin sceglie quale bloccare e per quanti giorni
+async function askIp(u, slot){
+  slot.innerHTML = `<p class="msg" role="status">Cerco gli indirizzi usati da ${esc(u.username)}…</p>`;
+  const {data, error} = await sb.rpc("admin_user_ips", {target: u.id});
+  const msg = slot.querySelector(".msg");
+  if(error){ msg.className = "msg ko"; msg.textContent = "Non riesco a leggere gli indirizzi: " + error.message; return; }
+  if(!data || !data.length){ msg.textContent = "Nessun indirizzo registrato per questo allievo."; return; }
+  slot.innerHTML = `<div class="confirm"><p>Blocco un indirizzo IP e sospendo gli account che lo hanno usato. Da quell'indirizzo non si potranno più creare account. Attenzione: più persone possono condividere lo stesso IP (scuola, rete mobile).</p>
+    <select aria-label="Indirizzo IP">${data.map(r => `<option value="${esc(r.ip)}">${esc(r.ip)} · visto ${ago(r.last_seen)}${r.blocked ? " · già bloccato" : ""}</option>`).join("")}</select>
+    <select aria-label="Giorni">${[[7, "7 giorni"], [30, "30 giorni"], [90, "90 giorni"]].map(([d, t]) => `<option value="${d}"${d === 30 ? " selected" : ""}>${t}</option>`).join("")}</select>
+    <button class="btn danger" type="button" data-ok>Sì, blocca</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
+  const [selIp, selDays] = slot.querySelectorAll("select");
+  slot.querySelector("[data-no]").onclick = () => slot.innerHTML = "";
+  slot.querySelector("[data-ok]").onclick = async e => {
+    e.target.disabled = true;
+    const {data: n, error: er} = await sb.rpc("admin_ban_ip", {addr: selIp.value, days: Number(selDays.value), note: "da " + u.username});
+    const m = slot.querySelector(".msg");
+    if(er){ e.target.disabled = false; m.className = "msg ko"; m.textContent = "Non riuscito: " + er.message; return; }
+    await loadIps(); await load();
+  };
+}
+async function loadIps(){
+  const box = $("#ipBox"), {data} = await sb.rpc("admin_list_banned_ips");
+  if(!data || !data.length){ box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
+  box.innerHTML = `<strong>Indirizzi IP bloccati</strong><ul style="margin:6px 0 0;padding:0;list-style:none">${data.map(r => `<li style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:4px 0"><code>${esc(r.ip)}</code><span class="meta">fino al ${fmtDate(r.until)}${r.note ? " · " + esc(r.note) : ""}</span><button class="btn ghost" type="button" data-ip="${esc(r.ip)}">Sblocca</button></li>`).join("")}</ul>`;
+  box.querySelectorAll("[data-ip]").forEach(b => b.onclick = async () => { b.disabled = true; await sb.rpc("admin_unban_ip", {addr: b.dataset.ip}); loadIps(); });
+}
 function ask(u, a, el){
   const slot = el.querySelector(".slot");
+  if(a === "fig") return askFigure(u, slot);
+  if(a === "ip") return askIp(u, slot);
   const t = {
     pw: [`Nuova password per ${u.username}: comunicagliela tu.`, "Imposta password", "btn", true],
     reset: [`Cancello tutti i progressi di ${u.username}? Ripartirà da zero.`, "Sì, azzera", "btn danger", false],
@@ -156,11 +207,24 @@ function ask(u, a, el){
     e.target.disabled = true;
     const {error} = await call;
     if(error){ e.target.disabled = false; msg.className = "msg ko"; msg.textContent = "Non riuscito: " + error.message; return; }
+    // account eliminato: cancella anche il suo contatto su Brevo (se Brevo non risponde, "Allinea" lo toglie almeno dalla lista)
+    if(a === "del") await sb.functions.invoke("newsletter", {body: {action: "delete", id: u.id, email: u.email}}).catch(() => {});
     if(a === "pw"){ slot.innerHTML = `<p class="msg" role="status"></p>`; slot.querySelector(".msg").textContent = `Password di ${u.username} aggiornata.`; return; }
     await load();
   };
 }
 
+// paese: Cloudflare manda il codice ISO (US, IT…); mostro bandierina e nome in italiano.
+// La bandierina è un'emoji disegnata dal font Twemoji Country Flags, ospitato sul sito, così si vede anche su Windows.
+const regionName = (() => { try{ return new Intl.DisplayNames(["it"], {type: "region"}); }catch(e){ return null; } })();
+function countryHTML(r){
+  const c = String(r.nome || "").toUpperCase();
+  if(c === "XX" || c === "T1") return esc(c === "T1" ? "Rete Tor" : "Sconosciuto");
+  if(!/^[A-Z]{2}$/.test(c)) return esc(r.nome);
+  const flag = String.fromCodePoint(...[...c].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65));
+  let name = c; try{ name = (regionName && regionName.of(c)) || c; }catch(e){}
+  return `<span class="flag" aria-hidden="true">${flag}</span>${esc(name)} <span class="cc">${c}</span>`;
+}
 $("#q").addEventListener("input", render);
 $("#reload").onclick = load;
 // CSV da importare in Brevo (Contatti → Importa): solo chi ha dato il consenso
@@ -171,6 +235,24 @@ $("#mktcopy").onclick = async () => {
   let copied = false;
   try{ await navigator.clipboard.writeText(csv); copied = true; }catch(e){ $("#exportTxt").select(); }
   $("#exportMsg").textContent = `${list.length} iscritt${list.length === 1 ? "o" : "i"} alla newsletter. ` + (copied ? "Elenco copiato: incollalo in Brevo, Contatti → Importa contatti." : "Copia l'elenco qui sotto e incollalo in Brevo, Contatti → Importa contatti.");
+};
+// confronta la lista Brevo con i consensi: iscrive chi manca, toglie chi ha spento il consenso o non ha più l'account,
+// e spegne il consenso di chi si è disiscritto da Brevo
+$("#nlsync").onclick = async e => {
+  const msg = $("#nlMsg"); e.target.disabled = true; msg.className = "meta"; msg.textContent = "Confronto la lista Brevo con gli iscritti…";
+  const {data, error} = await sb.functions.invoke("newsletter", {body: {action: "reconcile"}});
+  e.target.disabled = false;
+  if(error){
+    let why = "";
+    if(error.context && typeof error.context.json === "function"){
+      try{ const b = await error.context.clone().json(); why = (b.error || "") + (b.dettagli && b.dettagli.length ? ": " + b.dettagli.join("; ") : ""); }catch(_){}
+      if(error.context.status === 404) why = "la funzione \"newsletter\" non esiste su Supabase";
+    }
+    msg.className = "meta ko"; msg.textContent = "Non riuscito: " + (why || error.message); return;
+  }
+  const n = (k, one, many) => `${data[k]} ${data[k] === 1 ? one : many}`;
+  msg.textContent = `Fatto. ${n("aggiunti", "iscritto aggiunto", "iscritti aggiunti")}, ${n("tolti", "tolto dalla lista", "tolti dalla lista")}, ${n("senzaAccount", "contatto senza account tolto dalla lista", "contatti senza account tolti dalla lista")}, ${n("disiscritti", "disiscritto da Brevo", "disiscritti da Brevo")}.`;
+  if(data.disiscritti) await load();
 };
 $("#loginForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -211,13 +293,55 @@ $("#mfaForm").addEventListener("submit", async e => {
 boot();
 
 // visite al sito: la funzione Supabase "statistiche" chiede i numeri a Cloudflare Web Analytics (il token resta sul server)
+let statsTab = "sito", statsDays = 7;
+// motivo preciso di un errore delle funzioni Supabase (404 funzione mancante, 403 non admin, 502 servizio esterno)
+async function fnError(error, data, name){
+  let why = data && data.error ? data.error + (data.dettagli && data.dettagli.length ? ": " + data.dettagli.join("; ") : "") : "";
+  if(error && error.context && typeof error.context.json === "function"){
+    try{ const b = await error.context.clone().json(); why = (b.error || b.message || "") + (b.dettagli && b.dettagli.length ? ": " + b.dettagli.join("; ") : ""); }catch(e){}
+    if(error.context.status === 404) why = `la funzione "${name}" non esiste su Supabase`;
+    why = why || "errore " + error.context.status;
+  }
+  return why;
+}
+async function loadBrevo(days){
+  const box = $("#statsBody");
+  box.innerHTML = `<p class="empty">Carico le statistiche della newsletter…</p>`;
+  const {data, error} = await sb.functions.invoke("newsletter", {body: {action: "stats", days}});
+  if(statsTab !== "brevo") return;
+  if(error || !data || data.error){
+    const why = await fnError(error, data, "newsletter");
+    box.innerHTML = `<p class="empty">Statistiche Brevo non disponibili${why ? ` (${esc(why)})` : ""}. Servono la funzione "newsletter" e i segreti BREVO_API_KEY e BREVO_LIST_ID.</p>`;
+    return;
+  }
+  const n = v => Math.max(0, Math.round(Number(v) || 0)), t = data.transazionali || {};
+  const tile = (v, l) => `<div class="panel tile"><span class="v">${n(v)}</span><span class="l">${l}</span></div>`;
+  const day = s => { const d = new Date(s); return isNaN(d) ? "" : d.toLocaleDateString("it-IT", {day: "numeric", month: "short", year: "numeric"}); };
+  const camps = (data.campagne || []).map(c => `<tr><td>${esc(c.oggetto || c.nome || "")}<br><span class="meta">${esc(day(c.data))}</span></td><td class="num">${n(c.consegnate)}</td><td class="num">${n(c.rimbalzi)}</td><td class="num">${n(c.disiscritti)}</td></tr>`).join("");
+  box.innerHTML = `<div style="display:grid;gap:14px;grid-template-columns:minmax(0,1fr)">
+    <div class="tiles four">${tile(data.iscritti, "iscritti alla newsletter")}${tile(t.consegnate, "email dei codici consegnate")}${tile(t.rimbalzi + t.bloccate, "rimbalzate o bloccate")}${tile(t.disiscritti, "disiscritti nel periodo")}</div>
+    ${data.piano ? `<p class="meta">Piano Brevo: ${esc(String(data.piano.tipo || ""))}${data.piano.tipoCrediti === "sendLimit" ? ` · ${n(data.piano.crediti)} email al giorno` : data.piano.crediti != null ? ` · crediti ${n(data.piano.crediti)}` : ""}. Segnalazioni di spam nel periodo: ${n(t.spam)}.</p>` : ""}
+    <div><h3 style="margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase">Ultime newsletter mandate</h3>
+    ${camps ? `<div class="tabwrap"><table><thead><tr><th>Newsletter</th><th class="num">Consegnate</th><th class="num">Rimbalzi</th><th class="num">Disiscritti</th></tr></thead><tbody>${camps}</tbody></table></div>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora nessuna newsletter mandata.</p>`}</div>
+    <p class="meta">Aperture e clic non li contiamo: il tracciamento in Brevo è spento per scelta.</p></div>`;
+}
 async function loadStats(days){
+  statsDays = days;
   document.querySelectorAll("#statsSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === days)));
+  if(statsTab === "brevo") return loadBrevo(days);
   const box = $("#statsBody");
   box.innerHTML = `<p class="empty">Carico le statistiche…</p>`;
   const {data, error} = await sb.functions.invoke("statistiche", {body: {days}});
+  if(statsTab !== "sito") return;
   if(error || !data || data.error){
-    box.innerHTML = `<p class="empty">Statistiche non disponibili. Se non hai ancora collegato Cloudflare, segui i passi in LEGGIMI (funzione "statistiche").</p>`;
+    // motivo preciso, per capire cosa sistemare: funzione mancante (404), non admin (403) o risposta di Cloudflare (502)
+    let why = data && data.error ? data.error + (data.dettagli && data.dettagli.length ? ": " + data.dettagli.join("; ") : "") : "";
+    if(error && error.context && typeof error.context.json === "function"){
+      try{ const b = await error.context.clone().json(); why = (b.error || b.message || "") + (b.dettagli && b.dettagli.length ? ": " + b.dettagli.join("; ") : ""); }catch(e){}
+      if(error.context.status === 404) why = "la funzione \"statistiche\" non esiste su Supabase";
+      why = why || "errore " + error.context.status;
+    }
+    box.innerHTML = `<p class="empty">Statistiche non disponibili${why ? ` (${esc(why)})` : ""}. Se non hai ancora collegato Cloudflare, segui i passi in LEGGIMI (funzione "statistiche").</p>`;
     return;
   }
   const n = v => Math.max(0, Math.round(Number(v) || 0));
@@ -225,10 +349,15 @@ async function loadStats(days){
   const max = Math.max(1, ...days_.map(d => d.v)), W = 600, H = 120, bw = days_.length ? W / days_.length : W;
   const bars = days_.map((d, i) => { const h = Math.round((H - 4) * d.v / max); return `<rect x="${(i * bw + 1).toFixed(1)}" y="${H - h}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h}"><title>${esc(d.data)}: ${d.v}</title></rect>`; }).join("");
   const lab = days_.length ? `<div class="chart-dates"><span>${esc(days_[0].data)}</span><span>${esc(days_[days_.length - 1].data)}</span></div>` : "";
-  const list = (t, rows) => `<div><h3>${t}</h3>${(rows || []).length ? `<ol>${rows.map(r => `<li><span>${esc(r.nome)}</span><span>${n(r.visualizzazioni)}</span></li>`).join("")}</ol>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora niente.</p>`}</div>`;
-  box.innerHTML = `<div style="display:grid;gap:14px">
+  const list = (t, rows, fmt = r => esc(r.nome)) => `<div><h3>${t}</h3>${(rows || []).length ? `<ol>${rows.map(r => `<li><span>${fmt(r)}</span><span>${n(r.visualizzazioni)}</span></li>`).join("")}</ol>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora niente.</p>`}</div>`;
+  box.innerHTML = `<div style="display:grid;gap:14px;grid-template-columns:minmax(0,1fr)">
     <div class="tiles"><div class="panel tile"><span class="v">${n(data.visite)}</span><span class="l">visite</span></div><div class="panel tile"><span class="v">${n(data.visualizzazioni)}</span><span class="l">pagine viste</span></div></div>
     ${days_.length > 1 ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pagine viste per giorno">${bars}</svg>${lab}` : ""}
-    <div class="lists">${list("Pagine più viste", data.pagine)}${list("Da dove arrivano", data.provenienza)}${list("Paesi", data.paesi)}${list("Dispositivi", data.dispositivi)}</div></div>`;
+    <div class="lists">${list("Pagine più viste", data.pagine)}${list("Da dove arrivano", data.provenienza)}${list("Paesi", data.paesi, countryHTML)}${list("Dispositivi", data.dispositivi)}</div></div>`;
 }
 document.querySelectorAll("#statsSeg button").forEach(b => b.onclick = () => loadStats(+b.dataset.d));
+document.querySelectorAll("#statsTab button").forEach(b => b.onclick = () => {
+  statsTab = b.dataset.t;
+  document.querySelectorAll("#statsTab button").forEach(x => { x.setAttribute("aria-pressed", String(x === b)); x.setAttribute("aria-selected", String(x === b)); });
+  loadStats(statsDays);
+});

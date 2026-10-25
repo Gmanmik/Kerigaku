@@ -1,0 +1,14 @@
+/* Tasti al passaggio del mouse (richiesta di Michele, 25/10): si ingrandiscono leggermente e la tinta
+   diventa più scura di giorno e più chiara di notte. Solo con mouse vero (hover:hover), non sul tablet al tocco.
+   Va in fondo allo stile di index, about, privacy e admin, dopo le regole :hover che ci sono già. */
+:root{--hover-tint:brightness(.9)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--hover-tint:brightness(1.22)}}
+:root[data-theme="dark"]{--hover-tint:brightness(1.22)}
+.btn,.opt,.mode,.support,.linkbtn,.back,.seg button,.fig{transition:transform .15s ease,filter .15s ease,background-color .15s,color .15s}
+@media (hover:hover){
+  .btn:hover:not(:disabled),.opt:hover:not(:disabled),.support:hover,.seg button:hover,.linkbtn:hover,.fig:hover{transform:scale(1.04);filter:var(--hover-tint)}
+  .mode:hover{transform:scale(1.015);filter:var(--hover-tint)}
+}
+.btn:active:not(:disabled),.opt:active:not(:disabled){transform:scale(.98)}
+@media (prefers-reduced-motion: reduce){.btn,.opt,.mode,.support,.linkbtn,.back,.seg button,.fig{transition:none}
+  .btn:hover,.opt:hover,.mode:hover,.support:hover,.seg button:hover,.linkbtn:hover,.fig:hover{transform:none!important}}

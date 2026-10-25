@@ -83,15 +83,17 @@ function load(){ scen = store.get(K("dojo-scen-v1"), {}); scenDaily = store.get(
 function saveScen(){ store.set(K("dojo-scen-v1"), scen); store.set(K("dojo-scen-daily-v1"), scenDaily); cloud.schedule(); }
 const ss = id => scen[id] || {b:0, due:0};
 function scenNewLeft(){ const t = today(); if(scenDaily.day !== t) scenDaily = {day:t, newCount:0}; return Math.max(0, SCEN_NEW - scenDaily.newCount); }
+// uno scenario è disponibile quando tutte le sue figure sono aperte con il livello (o è già stato fatto)
+function scenAvail(){ const gi = groupNow(); return SCEN.filter(s => ss(s.id).b > 0 || s.seq.every(t => t[0] === "+" || isOpen(BYID[t], gi))); }
 function scenQueue(){
-  const t = today();
-  const due = SCEN.filter(s => ss(s.id).b > 0 && ss(s.id).due <= t).sort((a, b) => ss(a.id).due - ss(b.id).due).slice(0, SCEN_MAX);
-  const fresh = SCEN.filter(s => ss(s.id).b === 0).slice(0, scenNewLeft());
+  const t = today(), list = scenAvail();
+  const due = list.filter(s => ss(s.id).b > 0 && ss(s.id).due <= t).sort((a, b) => ss(a.id).due - ss(b.id).due).slice(0, SCEN_MAX);
+  const fresh = list.filter(s => ss(s.id).b === 0).slice(0, scenNewLeft());
   return {due, fresh};
 }
 function scenHint(){
-  const {due, fresh} = scenQueue(), known = SCEN.filter(s => ss(s.id).b >= 3).length;
-  const tail = ` Ne conosci ${known} su ${SCEN.length}.`;
+  const {due, fresh} = scenQueue(), avail = scenAvail(), known = avail.filter(s => ss(s.id).b >= 3).length;
+  const tail = ` Ne conosci ${known} su ${avail.length}` + (avail.length < SCEN.length ? ": gli altri si aprono salendo di livello." : ".");
   if(!due.length && !fresh.length) return "Per oggi gli scenari sono finiti: puoi rifarne qualcuno a caso." + tail;
   const parts = [];
   if(due.length) parts.push(due.length === 1 ? "1 scenario da ripassare" : `${due.length} scenari da ripassare`);
@@ -182,7 +184,7 @@ function scenRound(only){
 function scenStart(){
   const s = Q.qs[Q.i];
   Q.cur = {s, B: buildScen(s), step: 0, picks: [], answered: false,
-    opts: s.seq.filter(t => t[0] !== "+").map(id => shuffle([BYID[id], ...distractors(BYID[id], P, 3)]))};
+    opts: s.seq.filter(t => t[0] !== "+").map(id => shuffle([BYID[id], ...distractors(BYID[id], openP(), 3)]))};
 }
 function renderScen(){
   if(Q.i >= Q.qs.length) return renderScenSummary();
@@ -224,6 +226,7 @@ function scenAnswer(id){
     c.picks[nz] = id === c.s.v; if(c.picks[nz]) pop();
     const all = c.picks.every(Boolean), s = c.s;
     Q.res.push(all);
+    if(window.DojoSuoni) DojoSuoni.play(all ? "giusto" : "sbagliato");
     Q.streak = all ? Q.streak + 1 : 0; Q.best = Math.max(Q.best, Q.streak);
     if(!Q.free){
       if(Q.fresh.has(s.id) && !ss(s.id).b){ scenNewLeft(); scenDaily.newCount++; }
@@ -256,7 +259,7 @@ function renderScenDone(){
   $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Scenari</div><p class="score">Per oggi hai finito.</p>
     <p style="margin:0;color:var(--muted);max-width:60ch">${nd.length ? `I prossimi scenari da ripassare arrivano ${whenText(Math.min(...nd))}. ` : ""}Domani ne arrivano ${SCEN_NEW} nuovi. Intanto puoi rifarne 5 a caso, senza che contino per il ripasso.</p>
     <div class="actions"><button class="btn" id="freeGo">5 scenari a caso</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
-  $("#freeGo").onclick = () => scenRound(shuffle(SCEN.map(s => s.id)).slice(0, 5));
+  $("#freeGo").onclick = () => scenRound(shuffle(scenAvail().map(s => s.id)).slice(0, 5));
   $("#homeGo").onclick = goHome;
 }
 function renderScenSummary(){
@@ -269,7 +272,7 @@ function renderScenSummary(){
     ${wrong.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Da rivedere</div><div class="sched">${wrong.map(t => `<div><span>${esc(t)}</span></div>`).join("")}</div></div>` : ""}
     <div class="actions"><button class="btn" id="homeGo">Torna al menu</button><button class="btn ghost" id="freeGo">5 scenari a caso</button></div></div>`;
   $("#homeGo").onclick = goHome;
-  $("#freeGo").onclick = () => scenRound(shuffle(SCEN.map(s => s.id)).slice(0, 5));
+  $("#freeGo").onclick = () => scenRound(shuffle(scenAvail().map(s => s.id)).slice(0, 5));
 }
 
 // dati che app.js salva nell'account e unisce al login: per ogni scenario vince quello più avanti

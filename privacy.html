@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="tasti-hover.css">
 <style>
 /* Layout: one reading column on the dojo's chart-paper; two chapters, About and Crediti. */
 :root{
@@ -174,6 +175,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
   </div>
 
   <header>
+    <img src="logo.svg" alt="" height="64" style="display:block;margin-bottom:10px;width:auto">
     <div class="eyebrow">Dojo delle candele · 道場</div>
     <h1>Privacy e <em>cookie</em></h1>
     <p class="lead" style="margin-top:10px">Cosa raccogliamo, perché, dove finisce e come puoi controllarlo. Ultimo aggiornamento: 24 ottobre 2026.</p>
@@ -213,7 +215,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
     <p>Per far funzionare il sito ci appoggiamo a questi servizi, che trattano i dati per nostro conto come responsabili del trattamento:</p>
     <dl class="credits">
       <div><dt>Supabase</dt><dd>Account, password cifrate, progressi e verifica in due passaggi. I dati sono conservati nell'Unione europea, in Irlanda (regione eu-west-1); Supabase Inc. ha sede negli Stati Uniti.</dd></div>
-      <div><dt>Brevo (Sendinblue SAS, Francia)</dt><dd>Invio delle email con i codici e, se l'hai chiesta, della newsletter. Dati nell'Unione europea.</dd></div>
+      <div><dt>Brevo (Sendinblue SAS, Francia)</dt><dd>Invio delle email con i codici e, se l'hai chiesta, della newsletter con le email di benvenuto. Riceve solo la tua email e il nome utente, e li toglie quando ti disiscrivi o cancelli l'account. Dati nell'Unione europea.</dd></div>
       <div><dt>Cloudflare</dt><dd>Pubblica le pagine del sito (registra l'indirizzo IP di chi visita per motivi tecnici e di sicurezza), controllo anti-robot (Turnstile), statistiche anonime delle visite senza cookie (Web Analytics), gestione del dominio e inoltro delle email che ci scrivi.</dd></div>
       <div><dt>GitHub (Microsoft)</dt><dd>Conserva il codice del sito e lo pubblica anche al vecchio indirizzo gmanmik.github.io, dove registra l'indirizzo IP di chi visita per motivi tecnici e di sicurezza.</dd></div>
     </dl>
@@ -229,7 +231,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
       <li><b>Account e progressi</b>: finché tieni l'account. Se chiedi di cancellarlo, eliminiamo account e progressi entro 30 giorni.</li>
       <li><b>Newsletter</b>: finché non ti disiscrivi, dal link in fondo a ogni email o dalla pagina Account.</li>
       <li><b>Tentativi di accesso sbagliati</b>: il contatore si azzera dopo 15 minuti o al primo accesso riuscito.</li>
-      <li><b>Registri tecnici dei fornitori</b> (indirizzi IP, orari): per i tempi brevi previsti da ciascun fornitore.</li>
+      <li><b>Registri tecnici dei fornitori</b> (indirizzi IP, orari): per i tempi brevi previsti da ciascun fornitore. Un indirizzo IP bloccato per spam resta registrato solo per la durata del blocco (da 7 a 90 giorni).</li>
       <li><b>Email che ci scrivi</b>: il tempo necessario a gestire la richiesta.</li>
     </ul>
   </section>
@@ -254,6 +256,8 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
         <tr><td><code>dojo-srs-v1</code>, <code>dojo-stats-v1</code>, <code>dojo-daily-v1</code>, <code>dojo-prefs-v1</code></td><td>Progressi e preferenze di allenamento, anche senza account</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-theme</code></td><td>Ricorda se hai scelto Giorno o Notte</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-guest</code></td><td>Ricorda che hai scelto di usare il Dojo senza account</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td><code>dojo-nl-v1</code></td><td>Solo con l'account: ricorda che la tua iscrizione alla newsletter è già allineata, con un'impronta dell'email e non l'email stessa</td><td>Finché non li cancelli dal browser</td></tr>
+        <tr><td><code>dojo-suoni</code></td><td>Ricorda se hai acceso i suoni (spenti all'inizio)</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-support-day</code></td><td>Ricorda se oggi ti abbiamo già mostrato l'invito a sostenere il Dojo, per non ripeterlo</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td><code>dojo-cookie-info-v1</code></td><td>Ricorda che hai già letto l'avviso sui cookie</td><td>Finché non li cancelli dal browser</td></tr>
         <tr><td>Cloudflare Web Analytics</td><td>Conta le visite in forma anonima e aggregata. Non è un cookie e non salva nulla sul dispositivo.</td><td>Nessuna</td></tr>

@@ -4,15 +4,21 @@ Allenamento sulle 66 figure candlestick giapponesi, con account (username e pass
 
 ## File
 
-- `index.html`: tutta l'app (pagina, stile e codice).
-- `config.js`: indirizzo e chiave pubblica del progetto Supabase. È l'unico file da modificare.
-- `schema.sql`: la tabella dei progressi e le regole che fanno vedere a ciascuno solo i propri dati.
+- Pagine: `index.html` (l'app), `admin.html` (pannello admin), `about.html`, `privacy.html`.
+- Codice (niente script dentro le pagine, per la CSP): `app.js` e `scenari.js` (app), `admin.js` (pannello), `theme-init.js` e `theme.js` (tema giorno/notte), `cookie.js` (avviso cookie), `supabase.js` (libreria, copia locale).
+- `config.js`: indirizzo e chiave pubblica di Supabase, chiave pubblica di Turnstile.
+- `_headers`: regole di sicurezza (CSP e altre intestazioni) che Cloudflare aggiunge a ogni pagina. `.assetsignore`: file che restano nel repository ma non vengono pubblicati (SQL, md, email, funzioni).
+- `robots.txt` e `X-Robots-Tag` in `_headers`: il sito non viene indicizzato finché Michele non decide di aprirlo.
+- File SQL da eseguire in Supabase, in quest'ordine: `schema.sql`, `admin.sql`, `account.sql`, `login.sql`, `security.sql`, `fix-2fa.sql`, `admin2.sql`, `sicurezza-2.sql`, `password.sql`. `archivio/pagamenti-annullato/` contiene la vecchia bozza dei pagamenti: il Pro a pagamento è annullato, non eseguirla.
+- `funzioni/statistiche/index.ts`: funzione Supabase per le statistiche delle visite (vedi in fondo).
+- `email/`: modelli delle email di Supabase.
 
 ## Come funziona il login
 
-- Ci si registra con username (3-24 caratteri: lettere, numeri, `.` `-` `_`) e password (almeno 6 caratteri).
-- Supabase richiede un'email, quindi l'app usa `username@utenti.dojo-delle-candele.app` come email interna. Nessuna email viene mai inviata.
-- Per questo non esiste "password dimenticata": se serve, la password si reimposta a mano dal pannello Supabase (Authentication → Users).
+- Ci si registra con username (3-24 caratteri: lettere, numeri, `.` `-` `_`), email vera e password (almeno 8 caratteri, con lettere e numeri). Si entra con username o email.
+- I vecchi account creati prima delle email hanno un indirizzo interno `username@utenti.dojo-delle-candele.app`.
+- "Password dimenticata" manda un codice via email (Brevo). La verifica in due passaggi è facoltativa per gli allievi e obbligatoria per gli admin.
+- Non si può riusare una delle ultime password (`password.sql`).
 - Si può anche usare il Dojo senza account: i progressi restano solo su quel dispositivo e vengono portati nell'account al primo accesso.
 
 ## Configurazione di Supabase (una volta sola)
@@ -24,11 +30,11 @@ Allenamento sulle 66 figure candlestick giapponesi, con account (username e pass
 
 La chiave anon è pensata per stare nel browser: i dati sono protetti dalle regole di `schema.sql`. Non mettere mai la chiave `service_role` in questi file.
 
-## Pubblicazione con GitHub Pages
+## Pubblicazione
 
-1. Carica i file in un repository GitHub.
-2. Apri **Settings → Pages**, scegli **Deploy from a branch**, ramo `main`, cartella `/ (root)`.
-3. Dopo un minuto il sito è su `https://<tuo-utente>.github.io/<nome-repo>/`.
+Il sito è un Worker di Cloudflare con file statici (`wrangler.jsonc`), collegato al repository GitHub Gmanmik/Dojo-delle-candere: ogni modifica sul ramo `main` va online da sola in un minuto, su https://dojodellecandele.com e https://www.dojodellecandele.com.
+
+Ordine di lavoro: si prova in anteprima, il Tester controlla, Michele dà l'ok; poi i file si copiano prima nella cartella `backup\` del PC di Michele, si controlla che siano identici e solo dopo si mandano su GitHub.
 
 Per provarlo in locale basta un server statico nella cartella, per esempio `python3 -m http.server`, poi apri http://localhost:8000.
 
@@ -37,8 +43,7 @@ Per provarlo in locale basta un server statico nella cartella, per esempio `pyth
 Mostra tutti gli allievi con i loro progressi e permette di cambiare la password, azzerare i progressi, dare o togliere il ruolo di admin ed eliminare un account.
 
 1. Nel SQL Editor di Supabase esegui `admin.sql`. L'ultima riga rende admin l'account `gmanmik`.
-2. Carica `admin.html` nel repository, accanto a `index.html`.
-3. Apri `https://<tuo-utente>.github.io/<nome-repo>/admin.html` ed entra con il tuo account.
+2. Apri https://www.dojodellecandele.com/admin.html ed entra con il tuo account e la verifica in due passaggi.
 
 Le azioni passano da funzioni del database che controllano ogni volta che chi le chiama sia admin. Nel browser c'è solo la chiave pubblica, mai la `service_role`.
 
@@ -83,7 +88,7 @@ Manda la newsletter solo a quella lista: per legge (GDPR) servono il consenso e 
 
 Protegge registrazione, accesso, reinvio codice e reset password dai bot. L'ordine conta: se attivi il CAPTCHA su Supabase prima di aver pubblicato il sito con la chiave, nessuno riesce più a entrare.
 
-1. Cloudflare → **Turnstile → Add widget**: nome "Dojo", modalità *Managed*, hostname `dojodellecandele.com` e `gmanmik.github.io` (più l'indirizzo `.pages.dev` se usi Cloudflare Pages). Ottieni una **Site Key** (pubblica) e una **Secret Key** (segreta).
+1. Cloudflare → **Turnstile → Add widget**: nome "Dojo", modalità *Managed*, hostname `dojodellecandele.com` e `www.dojodellecandele.com`. Ottieni una **Site Key** (pubblica) e una **Secret Key** (segreta).
 2. In `config.js` aggiungi la riga `turnstileSiteKey: "<Site Key>"` e carica il file su GitHub. Controlla che il sito funzioni ancora.
 3. Supabase → **Authentication → Attack Protection → Enable Captcha protection**, provider *Cloudflare Turnstile*, incolla la **Secret Key** e salva. La Secret Key va solo lì.
 
@@ -104,3 +109,19 @@ Il sito usa Cloudflare Web Analytics (senza cookie). La pagina admin mostra i nu
 4. **Supabase, funzione**: Edge Functions → Deploy a new function → Via Editor. Nome `statistiche`, incolla tutto il contenuto di `funzioni/statistiche/index.ts`, Deploy. Lascia attivo "Verify JWT".
 5. **Supabase, segreti**: Edge Functions → Secrets → aggiungi `CF_API_TOKEN` (il token), `CF_ACCOUNT_ID` e `CF_SITE_TAG`.
 6. Apri la pagina admin: sotto i riquadri degli allievi compare "Visite al sito".
+
+## Registro delle versioni
+
+- 24/10/2026 22:29, `7e59be5`: statistiche Cloudflare Web Analytics (CSP, Privacy, avviso cookie), sezione "Visite al sito" in admin, frase meme leggibile nel tema scuro, l'avviso cookie non copre più i pulsanti.
+- 24/10/2026 17:13, `40ca2bc`: tasto "Sostieni il Dojo" (PayPal) e righe in Privacy.
+- 24/10/2026 17:05, `240602a`: 4 livelli, frase meme animata, impaginazione 16:9, blocco delle password già usate, sito non indicizzato.
+- 24/10/2026, `3a69144`: modalità Scenari, tolto il menu a tendina in Figura → Nome.
+- 24/10/2026 mattina: login con username/email, 2FA, pannello admin, Privacy, Turnstile, dominio dojodellecandele.com su Cloudflare, revisione di sicurezza (CSP, niente script nelle pagine).
+
+## Novità del 25/10/2026 (v22)
+- **Livelli**: i quattro livelli sono l'unica progressione (le cinture sono state tolte). Aprono 20 / 44 / 66 figure; La Prova del Dojo si apre al livello 2. File nuovi: `figure.js` (le 66 figure), `prova-dojo.js/.css`, `icone-livelli.css` + `livello-*.svg`, `tasti-hover.css`.
+- **Landing**: pagina d'ingresso per chi non è iscritto (`landing.css/js`, vista `#landing` in index.html, `logo.svg`, foto `storia-borsa-riso.jpg`).
+- **Suoni**: `suoni.js` (spenti di default).
+- **Brevo**: funzioni Supabase `funzioni/newsletter` e `funzioni/brevo-disiscrizioni` (Verify JWT disattivato solo per la seconda). Segreti: `BREVO_API_KEY` (chiave API, non SMTP), `BREVO_LIST_ID`, `BREVO_WEBHOOK_TOKEN`. Webhook Brevo (evento unsubscribe) verso `.../functions/v1/brevo-disiscrizioni?token=...`. Poi premere "Allinea newsletter con Brevo" nell'admin. Le newsletter sono in `/newsletter/`.
+- **Admin**: bandierine dei paesi (font Twemoji), statistiche Brevo, impara/dimentica una figura, "Blocca IP" con elenco IP bloccati.
+- **SQL (solo in locale, mai su GitHub)**: `figure-forzate.sql` e `ip-bloccati.sql`. Per il blocco IP: Supabase → Authentication → Hooks → "Before User Created" → `public.hook_before_user_created`.
