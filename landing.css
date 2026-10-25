@@ -16,7 +16,7 @@ body.is-landing .wrap{display:none}
 #landing .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 16px 72px;overflow:hidden}
 #landing .hanko{display:block;height:min(42svh,80vw);width:auto;filter:drop-shadow(0 2px 0 rgba(0,0,0,.08))}
 #landing .giu{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);text-decoration:none}
-#landing .riga{display:block;width:100%;max-width:760px;margin-top:-6px;height:clamp(50px,10svh,90px);opacity:.9}
+#landing .riga{display:block;width:100%;max-width:760px;margin-top:-6px;height:clamp(64px,12svh,110px);opacity:.9}
 #landing .arco{width:min(98vw,760px);height:auto;margin-top:-6px;overflow:visible}
 #landing .arco text{font-family:var(--display);font-weight:800;font-size:55px;fill:var(--ink);letter-spacing:.04em}
 #landing .frase{margin:clamp(22px,5svh,44px) 0 clamp(24px,5svh,40px);font-family:var(--display);font-weight:700;font-size:clamp(17px,4.4vw,22px);text-align:center;max-width:28ch;line-height:1.3}
@@ -42,7 +42,7 @@ body.is-landing .wrap{display:none}
   #landing .hero{padding:52px 16px 56px}
   #landing .hanko{height:min(30svh,70vw)}
   #landing .arco{width:min(98vw,540px)}
-  #landing .riga{height:clamp(36px,7svh,64px)}
+  #landing .riga{height:clamp(48px,8svh,76px)}
   #landing .frase{margin:clamp(12px,3svh,26px) 0 clamp(14px,3svh,26px)}
 }
 

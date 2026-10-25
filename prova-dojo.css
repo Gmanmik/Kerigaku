@@ -83,7 +83,9 @@
 .mode.prova-mode .lockchip{justify-self:start;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center}
 @media (max-width:900px){#view-home .mode:nth-child(5){border-left:0}#view-home .mode.scen-mode{grid-column:auto;border-top:1px solid var(--line)}}
 @media (max-width:900px) and (min-width:641px){#view-home .mode.scen-mode{border-left:1px solid var(--line)}}
-@media (min-width:901px){#view-home .modes{grid-template-columns:repeat(3,minmax(0,1fr))}#view-home .mode:nth-child(4){border-left:0}#view-home .mode:nth-child(n+4){border-top:1px solid var(--line)}}
+/* cinque modalità (Studia è a parte): cinque colonne sugli schermi larghi, 3+2 in mezzo */
+@media (min-width:1100px){#view-home .modes{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (min-width:641px) and (max-width:1099px){#view-home .modes{grid-template-columns:repeat(3,minmax(0,1fr))}#view-home .mode:nth-child(4){border-left:0}#view-home .mode:nth-child(n+4){border-top:1px solid var(--line)}}
 @media (prefers-reduced-motion:reduce){.pd *{transition:none!important;animation:none!important}}
 
 /* A · Busta: la figura è incartata nella carta washi, legata con una fascia d'inchiostro.

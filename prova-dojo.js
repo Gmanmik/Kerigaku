@@ -235,8 +235,8 @@ function start(){
   clearTimeout(timer);
   if(!unlocked()){
     box.innerHTML="<div class=\"panel pd-locked\"><h2>La Prova del Dojo si apre al livello "+(PROVA_LEVEL+1)+": "+html(LEVELS[PROVA_LEVEL].n)+"</h2>"+
-      "<p>È il gioco in cui tracci tu il supporto o la resistenza che una figura difende, e poi scopri il futuro candela per candela. È gratis: basta salire di livello rispondendo giusto nel Ripasso del giorno.</p>"+
-      "<div class=\"actions\"><button class=\"btn\" data-pd=\"go\">Vai al Ripasso del giorno</button><button class=\"btn ghost\" data-pd=\"home\">Torna al menu</button></div></div>";
+      "<p>È il gioco in cui tracci tu il supporto o la resistenza che una figura difende, e poi scopri il futuro candela per candela. È gratis: basta salire di livello rispondendo giusto in Studia e ripassa.</p>"+
+      "<div class=\"actions\"><button class=\"btn\" data-pd=\"go\">Vai a Studia e ripassa</button><button class=\"btn ghost\" data-pd=\"home\">Torna al menu</button></div></div>";
     box.querySelector("[data-pd='go']").onclick=function(){setTab("srs")};
     box.querySelector("[data-pd='home']").onclick=goHome;
     return;
@@ -251,7 +251,7 @@ function start(){
   bindDrag();nuova();
 }
 function hint(){
-  if(!unlocked()) return "Si apre al livello "+(PROVA_LEVEL+1)+": "+LEVELS[PROVA_LEVEL].n+". Rispondi giusto nel Ripasso del giorno per salire.";
+  if(!unlocked()) return "Si apre al livello "+(PROVA_LEVEL+1)+": "+LEVELS[PROVA_LEVEL].n+". Rispondi giusto in Studia e ripassa per salire.";
   var best=+prefs.provaBest||0;
   return "5 grafici: traccia il supporto o la resistenza che la figura difende."+(best?" Il tuo record è "+best+" punti su 500.":"");
 }

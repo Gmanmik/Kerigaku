@@ -123,6 +123,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline-color:var(--sea
 .chapter{border-top:3px solid var(--seal)}
 .note{border-left-color:var(--seal)}
 .boxes span{font-family:var(--body);border-radius:2px;border-color:var(--line2)}
+.boxes.belts span{display:inline-flex;align-items:center;gap:6px;color:var(--ink)!important;border-color:var(--line2)!important}
+.boxes.belts i{width:16px;height:8px;border-radius:2px;background:var(--k);border:1px solid #8d8476}
+.k0{--k:#f7f3ea}.k1{--k:#e3b23c}.k2{--k:#e07b2e}.k3{--k:#3f8d58}.k4{--k:#2f62a3}.k5{--k:#1d1a17}
 .steps .n{font-family:var(--display);font-weight:800;color:var(--seal)}
 .credits div,.tbl th,.tbl td,.tbl tr{border-color:var(--line)}
 .tbl code,.secret,.exportbox textarea{font-family:ui-monospace,Menlo,Consolas,monospace}
@@ -187,12 +190,13 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 
     <h3>Come si allena</h3>
     <ol class="steps">
-      <li><span class="n">1</span><span><b>Studia.</b> Ogni figura ha il suo disegno, il trend da cui nasce e una spiegazione breve, con la sua gemella di segno opposto.</span></li>
+      <li><span class="n">1</span><span><b>Studia.</b> Sempre aperto, fuori dalle modalità: ogni figura ha il suo disegno, il trend da cui nasce, una spiegazione breve, la sua gemella di segno opposto e la cintura che hai raggiunto.</span></li>
       <li><span class="n">2</span><span><b>Figura → Nome e Nome → Figura.</b> Giri da 10 domande su grafici generati ogni volta in modo diverso, così riconosci la forma e non il disegno a memoria.</span></li>
-      <li><span class="n">3</span><span><b>Ripasso del giorno.</b> Ogni giorno 5 figure nuove e quelle da ripassare. Una figura che sai torna dopo sempre più tempo; una che sbagli torna subito.</span></li>
+      <li><span class="n">3</span><span><b>Studia e ripassa.</b> Ogni giorno vedi prima le figure nuove (fino a 5) e poi ripassi quelle che tornano oggi. Una figura che sai torna dopo sempre più tempo; una che sbagli torna subito. Quante figure al massimo per sessione lo scegli tu nelle Impostazioni.</span></li>
     </ol>
-    <p>Il ripasso usa il metodo Leitner: ogni figura sta in una scatola, e ogni risposta giusta la sposta in quella successiva.</p>
-    <div class="boxes" aria-label="Intervalli di ripasso"><span>oggi</span><span>1 giorno</span><span>3 giorni</span><span>7 giorni</span><span>16 giorni</span><span>35 giorni</span></div>
+    <p>Il ripasso usa il metodo Leitner, ideato dal giornalista tedesco Sebastian Leitner negli anni Settanta per le schede di studio: ogni figura sta in una scatola, ogni risposta giusta la sposta nella scatola successiva, che si riapre dopo più tempo, e ogni errore la riporta all'inizio. Nel Dojo le scatole sono cinture, come nelle arti marziali: ogni figura ha la sua, dalla bianca alla nera.</p>
+    <div class="boxes belts" aria-label="Cinture e intervalli di ripasso"><span><i class="k0"></i>bianca · da scoprire</span><span><i class="k1"></i>gialla · ogni giorno</span><span><i class="k2"></i>arancione · ogni 3 giorni</span><span><i class="k3"></i>verde · ogni 7 giorni</span><span><i class="k4"></i>blu · ogni 16 giorni</span><span><i class="k5"></i>nera · ogni 35 giorni</span></div>
+    <p>Una risposta sbagliata riporta la figura alla cintura gialla, così torna già il giorno dopo. In Studia, passando con il mouse sopra la cintura di una figura (o toccandola dal telefono), vedi ogni quanto torna e quando la rivedrai. Le cinture delle figure sono una cosa diversa dai quattro livelli del Dojo, che salgono con il totale delle risposte giuste e aprono figure nuove.</p>
 
     <h3>I tuoi dati</h3>
     <p>Con un account, il Dojo salva i tuoi progressi (quali figure conosci, quando ripassarle, le risposte giuste e sbagliate) e le preferenze di allenamento. Li vedi solo tu, più gli amministratori del Dojo, che possono aiutarti a reimpostare la password o ad azzerare i progressi. Senza account, tutto resta solo nel tuo browser. I dettagli sono nella pagina <a href="privacy.html">Privacy e cookie</a>.</p>

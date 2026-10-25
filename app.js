@@ -271,7 +271,14 @@ const cloud = (() => {
 
 /* ---------- ripasso a intervalli (Leitner) ---------- */
 const INT = [0, 1, 3, 7, 16, 35];          // giorni di attesa per ogni scatola
-const NEW_PER_DAY = 5, SRS_MAX = 20;
+const NEW_PER_DAY = 5, SRS_MAX = 20, PER_SESSION = [5, 10, 15, 20];
+// ogni scatola di Leitner è una cintura: dalla bianca (mai vista) alla nera (la conosci, torna ogni 35 giorni)
+const BELTS = ["bianca", "gialla", "arancione", "verde", "blu", "nera"];
+const BELTS_PL = ["bianche", "gialle", "arancioni", "verdi", "blu", "nere"];
+const beltName = b => "Cintura " + BELTS[b];
+const perSession = () => PER_SESSION.includes(+prefs.perSession) ? +prefs.perSession : SRS_MAX;
+const everyText = b => b === 0 ? "Non l'hai ancora incontrata in Studia e ripassa" : INT[b] === 1 ? "Torna ogni giorno" : `Torna ogni ${INT[b]} giorni`;
+const BELT_SVG = b => `<svg class="belt k${b}" viewBox="0 0 34 16" aria-hidden="true"><rect x="1" y="4.5" width="32" height="5" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><path d="M15 10.5l-3.5 4.5h3.5l2-3zM19 10.5l3.5 4.5H19l-2-3z"/></svg>`;
 let srs = store.get(K("dojo-srs-v1"), {});    // id -> {b: scatola 0..5, due: giorno}
 let daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
 // azzeramenti e figure imposte dall'admin: ricordo l'ultimo visto, così un altro dispositivo non riporta indietro i vecchi progressi
@@ -318,10 +325,19 @@ function grade(id, ok, relearn){
   srs[id] = c; saveSrs(); return c;
 }
 function srsQueue(){
-  const t = today(), list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam);
-  const due = list.filter(p => sc(p.id).b > 0 && sc(p.id).due <= t).sort((a, b) => sc(a.id).due - sc(b.id).due).slice(0, SRS_MAX);
-  const fresh = list.filter(p => sc(p.id).b === 0).slice(0, newLeft());
+  const t = today(), list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam), max = perSession();
+  // prima le figure da ripassare, poi le nuove; in tutto non più di quante ne hai scelte nelle Impostazioni
+  const due = list.filter(p => sc(p.id).b > 0 && sc(p.id).due <= t).sort((a, b) => sc(a.id).due - sc(b.id).due).slice(0, max);
+  const fresh = list.filter(p => sc(p.id).b === 0).slice(0, Math.min(newLeft(), max - due.length));
   return {due, fresh};
+}
+// quando arriva una figura mai vista in Studia e ripassa (se ripassi ogni giorno): "oggi", "domani", "tra 3 giorni"
+function arrivalText(id){
+  const list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam).filter(p => sc(p.id).b === 0);
+  const k = list.findIndex(p => p.id === id);
+  if(k < 0) return "Arriva quando alleni anche la sua famiglia";
+  const perDay = Math.max(1, Math.min(NEW_PER_DAY, perSession())), left = newLeft();
+  return "Arriva " + whenText(today() + (k < left ? 0 : 1 + Math.floor((k - left) / perDay)));
 }
 function whenText(day){
   const d = day - today();
@@ -336,7 +352,6 @@ function nextDueDay(){
   const ds = Object.values(srs).filter(c => c.b > 0).map(c => c.due);
   return ds.length ? Math.min(...ds) : null;
 }
-function mastery(id){ const b = sc(id).b; return b >= 5 ? 3 : b >= 3 ? 2 : b >= 1 ? 1 : 0; }
 const learnedFig = id => sc(id).b >= 2;
 // gruppo di figure aperto dal livello raggiunto
 function groupNow(){ return LEVEL_GROUP[levelInfo().i]; }
@@ -430,10 +445,10 @@ function chartSVG(p, o = {}){
 
 /* ---------- views & menu ---------- */
 let view = "home";
-const MODE_TITLE = {srs:"Ripasso del giorno", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari", prova:"La Prova del Dojo"};
+const MODE_TITLE = {srs:"Studia e ripassa", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari", prova:"La Prova del Dojo"};
 function setTab(t){
   leaveLanding();
-  view = t; prefs.mode = t; savePrefs();
+  view = t; if(t !== "studia"){ prefs.mode = t; savePrefs(); }
   $("#view-home").hidden = true; $("#view-auth").hidden = true; $("#view-account").hidden = true;
   $("#bar").hidden = false;
   $("#barTitle").textContent = MODE_TITLE[t];
@@ -464,19 +479,20 @@ function selectMode(m, quiet){
   prefs.mode = m; if(!quiet) savePrefs();
   document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
   $("#settings").hidden = m === "studia" || m === "scen" || m === "prova";
-  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Inizia il ripasso " : m === "scen" ? "Apri gli scenari " : m === "prova" ? (window.Prova && Prova.unlocked() ? "Inizia la prova " : "Scopri la prova ") : "Inizia il giro ";
-  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : m === "prova" ? (window.Prova ? Prova.hint() : "") : "10 domande di allenamento libero.";
+  $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Studia e ripassa " : m === "scen" ? "Apri gli scenari " : m === "prova" ? (window.Prova && Prova.unlocked() ? "Inizia la prova " : "Scopri la prova ") : "Inizia il giro ";
+  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : m === "prova" ? (window.Prova ? Prova.hint() : "") : `${Math.min(ROUND, perSession())} domande di allenamento libero.`;
 }
 document.querySelectorAll(".mode").forEach(b => {
   b.onclick = () => selectMode(b.dataset.mode);
   b.ondblclick = () => setTab(b.dataset.mode);
   b.onkeydown = e => {
-    const ms = ["srs","studia","f2n","n2f","scen","prova"], i = ms.indexOf(b.dataset.mode);
+    const ms = ["srs","f2n","n2f","scen","prova"], i = ms.indexOf(b.dataset.mode);
     if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); selectMode(ms[(i+1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
     if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); selectMode(ms[(i+ms.length-1)%ms.length]); $("#mode-"+prefs.mode).focus(); }
   };
 });
 $("#startBtn").onclick = () => setTab(prefs.mode);
+$("#studyLink").onclick = () => setTab("studia");
 
 function srsHint(){
   const {due, fresh} = srsQueue();
@@ -524,12 +540,11 @@ function renderHome(){
   $("#progDots").innerHTML = order.map(p => {
     if(!isOpen(p, bi)) return `<i class="lk" title="Figura chiusa: si apre salendo di livello"></i>`;
     const b = sc(p.id).b;
-    const cls = b >= 5 ? "l3" : b >= 3 ? "l2" : (b >= 1 || stats[p.id]) ? "l1" : "";
-    return `<i class="${cls}" title="${esc(label(p))}"></i>`;
+    return `<i class="k${b}" title="${esc(label(p))} · ${beltName(b)}"></i>`;
   }).join("");
   renderLevel();
   const nd = nextDueDay();
-  $("#nextDue").textContent = nd === null ? "Comincia dal Ripasso del giorno: ogni giorno ti presenta 5 figure nuove." : `Prossime figure da ripassare: ${whenText(nd)}.`;
+  $("#nextDue").textContent = nd === null ? `Comincia da Studia e ripassa: ogni giorno ti presenta fino a ${Math.min(NEW_PER_DAY, perSession())} figure nuove.` : `Prossime figure da ripassare: ${whenText(nd)}.`;
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
   if(prefs.mode === "scen" && window.Scenari) $("#startHint").textContent = Scenari.hint();
   const pl = $("#provaLock"); if(pl) pl.hidden = !!(window.Prova && Prova.unlocked());
@@ -623,7 +638,7 @@ function syncControls(){
   [["#famSeg","fam"],["#studySeg","sfilter"]].forEach(([id, k]) =>
     $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === prefs[k])));
   $("#hlToggle").checked = prefs.hl;
-  selectMode(["srs","studia","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs", true);
+  selectMode(["srs","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs", true);
 }
 function bindSeg(id, key, cb){
   const el = $(id);
@@ -655,17 +670,27 @@ function distractors(t, list, k){
   shuffle(others.slice()).forEach(p => { if(chosen.length < k) add(p); });
   return chosen.slice(0, k);
 }
+// con il filtro famiglia può non esserci nessuna figura aperta (al livello 1 ci sono solo figure d'inversione)
+function renderEmptyPool(mode){
+  const fam = {inv:"d'inversione", cont:"di continuazione"}[prefs.fam] || "";
+  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">${esc(MODE_TITLE[mode] || "")}</div><p class="score">Nessuna figura ${fam} aperta.</p>
+    <p style="margin:0;color:var(--muted);max-width:60ch">Al tuo livello le figure ${fam} sono ancora chiuse: si aprono salendo di livello. Intanto puoi allenarti su tutte le figure aperte.</p>
+    <div class="actions"><button class="btn" id="allGo">Allenati su tutte</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
+  $("#allGo").onclick = () => { prefs.fam = "all"; savePrefs(); syncControls(); setTab(mode); };
+  $("#homeGo").onclick = goHome;
+}
 function newRound(mode, only){
+  if(!only && !pool().length) return renderEmptyPool(mode);
   if(mode === "srs" && !only){
     const {due, fresh} = srsQueue();
     if(!due.length && !fresh.length) return renderDone();
     const qs = shuffle(due.slice()).concat(fresh);
     Q = {mode, list: pool(), qs, dirs: qs.map(() => Math.random() < .5 ? "f2n" : "n2f"), intro: new Set(fresh.map(p => p.id)),
          relearn: new Set(), requeued: {}, i:0, res:[], streak:0, best:0, answered:false};
-    return renderQuestion();
+    return renderToday(due, fresh);
   }
   const list = pool();
-  const qs = only ? only.map(id => BYID[id]) : pickQuestions(list, Math.min(ROUND, list.length));
+  const qs = only ? only.map(id => BYID[id]) : pickQuestions(list, Math.min(ROUND, perSession(), list.length));
   Q = {mode, list, qs, i:0, res:[], streak:0, best:0, answered:false};
   renderQuestion();
 }
@@ -773,6 +798,19 @@ function feedback(t){
   return h;
 }
 function next(){ Q.i++; Q.cur = null; renderQuestion(); window.scrollTo({top: Math.min(window.scrollY, $("#quiz").offsetTop - 80), behavior:"smooth"}); }
+// apertura di Studia e ripassa: le figure nuove di oggi si vedono subito; quelle da ripassare solo come cinture, per non suggerire la risposta
+function renderToday(due, fresh){
+  const byBelt = [1,2,3,4,5].map(b => [b, due.filter(p => sc(p.id).b === b).length]).filter(x => x[1]);
+  $("#quiz").innerHTML = `<div class="panel summary today"><div class="eyebrow">Studia e ripassa · oggi</div>
+    <p class="score">${fresh.length ? (fresh.length === 1 ? "1 figura nuova" : `${fresh.length} figure nuove`) : "Nessuna figura nuova"}${due.length ? ` e ${due.length === 1 ? "1 da ripassare" : `${due.length} da ripassare`}` : ""}.</p>
+    ${fresh.length ? `<div class="eyebrow" style="margin-bottom:8px">Nuove: prima le guardi, poi te le chiedo</div><div class="grid mini">${fresh.map(p => `<article class="panel card"><div class="well">${chartSVG(p, {arrow:true, w:240, h:150, maxSlot:30, maxBody:14, aria: label(p)})}</div><h3>${esc(p.name)}</h3><div class="chips">${chipDir(p)}<span class="chip fam">${famName(p.fam)}</span></div></article>`).join("")}</div>` : ""}
+    ${byBelt.length ? `<div class="eyebrow" style="margin:14px 0 8px">Da ripassare</div><div class="beltrow">${byBelt.map(([b, n]) => `<span class="beltcount">${BELT_SVG(b)}${n} ${n === 1 ? beltName(b).toLowerCase() : "cinture " + BELTS_PL[b]}</span>`).join("")}</div>` : ""}
+    <p class="hint" style="margin:12px 0 0">Ogni risposta giusta fa salire la figura di cintura e la fa tornare più tardi; una sbagliata la riporta alla gialla. Le figure per sessione si cambiano nelle Impostazioni (ora ${perSession()}).</p>
+    <div class="actions"><button class="btn" id="todayGo">Comincia</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
+  $("#todayGo").onclick = renderQuestion;
+  $("#homeGo").onclick = goHome;
+  $("#todayGo").focus({preventScroll:true});
+}
 function renderIntro(t){
   const twin = t.twin ? BYID[t.twin] : null;
   $("#quiz").innerHTML = `<div class="qhead"><div class="pips">${Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("")}</div></div>
@@ -791,7 +829,7 @@ function renderIntro(t){
 }
 function renderDone(){
   const nd = nextDueDay();
-  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Ripasso del giorno</div><p class="score">Per oggi hai finito.</p>
+  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Studia e ripassa</div><p class="score">Per oggi hai finito.</p>
     <p style="margin:0;color:var(--muted);max-width:60ch">${nd !== null ? `Le prossime figure da ripassare arrivano ${whenText(nd)}. ` : ""}Le figure nuove sono finite per oggi: domani ne arrivano altre. Se vuoi, puoi allenarti liberamente.</p>
     <div class="actions"><button class="btn" id="freeGo">Allenamento libero</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
   $("#freeGo").onclick = () => setTab("f2n");
@@ -851,15 +889,21 @@ function lockedCardHTML(p){
     <div class="ghostline"></div><div class="ghostline" style="width:80%"></div>
   </article>`;
 }
+// la cintura della figura; al passaggio del mouse (o toccandola) un piccolo menu dice ogni quanto torna e quando
+function beltHTML(p){
+  const c = sc(p.id), b = c.b;
+  const when = b === 0 ? arrivalText(p.id) : "Prossimo ripasso: " + whenText(c.due);
+  return `<span class="beltbox" tabindex="0" role="button" aria-label="${esc(beltName(b))}. ${esc(everyText(b))}. ${esc(when)}.">${BELT_SVG(b)}<span class="bn">${BELTS[b]}</span>
+    <span class="tip" role="tooltip"><b>${beltName(b)}</b><span class="sc">${[0,1,2,3,4,5].map(i => `<i class="k${i}${i === b ? " on" : ""}"></i>`).join("")}</span>${esc(everyText(b))}<br>${esc(when)}</span></span>`;
+}
 function cardHTML(p){
-  const m = mastery(p.id);
   const twin = p.twin && isOpen(BYID[p.twin]) ? BYID[p.twin] : null;
   return `<article class="panel card" id="c-${p.id}">
     <div class="well">${chartSVG(p, {arrow:true, w:240, h:150, maxSlot:30, maxBody:14, aria: label(p)})}</div>
     <h3>${esc(p.name)}</h3>
     <div class="chips">${chipDir(p)}${chipN(p)}<span class="chip fam">${famName(p.fam)}</span></div>
     <p>${esc(p.d)}</p>
-    <div class="foot">${twin ? `<button data-go="${twin.id}">Gemella: ${esc(label(twin))}</button>` : "<span></span>"}<span class="meter" title="Quanto la conosci">${[0,1,2].map(i => `<i class="${i < m ? "on" : ""}"></i>`).join("")}</span></div>
+    <div class="foot">${twin ? `<button data-go="${twin.id}">Gemella: ${esc(label(twin))}</button>` : "<span></span>"}${beltHTML(p)}</div>
   </article>`;
 }
 function bindTwinLinks(root){
@@ -1010,6 +1054,21 @@ function nlSync(u, force){
 }
 
 /* ---------- pagina impostazioni (account + suoni) ---------- */
+function trainHTML(){
+  const n = perSession();
+  return `<section class="panel acard"><div class="eyebrow">Allenamento</div>
+    <p>Quante figure al massimo in una sessione di Studia e ripassa e in un giro libero. Se ti senti sotto pressione, abbassale: le figure da ripassare aspettano il giorno dopo.</p>
+    <div class="seg" id="perSeg" role="group" aria-label="Figure per sessione">${PER_SESSION.map(v => `<button type="button" data-v="${v}" aria-pressed="${v === n}">${v}</button>`).join("")}</div>
+    <p class="hint" id="m-per" role="status"></p>
+  </section>`;
+}
+function bindTrain(){
+  document.querySelectorAll("#perSeg button").forEach(b => b.onclick = () => {
+    prefs.perSession = +b.dataset.v; savePrefs();
+    document.querySelectorAll("#perSeg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("#m-per").textContent = `Fatto: al massimo ${b.dataset.v} figure per sessione.`;
+  });
+}
 function soundHTML(){
   return `<section class="panel acard"><div class="eyebrow">Suoni</div>
     <p>Un suono breve per risposta giusta, risposta sbagliata e salita di livello. Sono spenti all'inizio.</p>
@@ -1023,8 +1082,8 @@ async function showAccount(){
   $("#view-account").hidden = false;
   heroAnim.stop(); window.scrollTo({top:0});
   if(!cloud.user){
-    $("#accountBox").innerHTML = soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>`;
-    $("#st-login").onclick = () => showAuth("in");
+    $("#accountBox").innerHTML = trainHTML() + soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>`;
+    $("#st-login").onclick = () => showAuth("in"); bindTrain();
     if(window.DojoSuoni) DojoSuoni.paint();
     return;
   }
@@ -1035,7 +1094,7 @@ async function showAccount(){
   ]);
   const totp = ((fac && fac.totp) || []).find(f => f.status === "verified");
   const box = $("#accountBox");
-  box.innerHTML = soundHTML() + `
+  box.innerHTML = trainHTML() + soundHTML() + `
     <section class="panel acard"><div class="eyebrow">Profilo</div>
       <p><span class="hint">Username</span><br><b class="u-name"></b></p>
       <p><span class="hint">Email</span><br><b class="u-mail"></b></p>
@@ -1071,6 +1130,7 @@ async function showAccount(){
     </section>
     <div class="actions"><button class="btn ghost" type="button" id="ac-out">Esci dall'account</button></div>`;
   if(window.DojoSuoni) DojoSuoni.paint();
+  bindTrain();
   box.querySelector(".u-name").textContent = (prof && prof.username) || (u.user_metadata && u.user_metadata.username) || "";
   box.querySelector(".u-mail").textContent = legacy ? "Nessuna: aggiungila per recuperare la password e ricevere le email" : u.email;
   const say = (id, m, ok) => { const el = $(id); el.textContent = m; el.className = ok ? "au-ok" : "au-err"; };
@@ -1138,7 +1198,7 @@ function start(data){
   bindSeg("#studySeg", "sfilter", renderStudy);
   $("#hlToggle").checked = prefs.hl;
   $("#hlToggle").onchange = e => { prefs.hl = e.target.checked; savePrefs(); };
-  selectMode(["srs","studia","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs");
+  selectMode(["srs","f2n","n2f","scen","prova"].includes(prefs.mode) ? prefs.mode : "srs");
   renderIllustrations();
   if(data && data.view && data.view !== "home") setTab(data.view); else goHome();
 }
