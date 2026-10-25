@@ -892,11 +892,14 @@ function showLanding(){
   document.body.classList.add("is-landing"); $("#landing").hidden = false;
   heroAnim.stop();
   const fig = (id, ctx) => { const p = BYID[id]; return chartSVG(p, {context: ctx ? makeContext(p) : [], w: 320, h: 200, maxSlot: 30, maxBody: 14, aria: p.name}); };
+  $("#lp-gear").innerHTML = GEAR; if(window.DojoSuoni) DojoSuoni.paint();
   $("#lp-1").innerHTML = fig("hammer_p", true); $("#lp-2").innerHTML = fig("mstar_p", true);
   window.scrollTo({top:0});
 }
 function leaveLanding(){ document.body.classList.remove("is-landing"); $("#landing").hidden = true; }
 document.addEventListener("click", e => { const b = e.target.closest("#landing [data-go]"); if(b) showAuth(b.dataset.go); });
+document.addEventListener("keydown", e => { const s = $("#lp-set"); if(e.key === "Escape" && s && !s.hidden){ s.hidden = true; $("#lp-gear").setAttribute("aria-expanded", "false"); $("#lp-gear").focus(); } });
+document.addEventListener("click", e => { const g = $("#lp-gear"), s = $("#lp-set"); if(!g || !s) return; if(e.target.closest("#lp-gear")){ s.hidden = !s.hidden; g.setAttribute("aria-expanded", String(!s.hidden)); } else if(!e.target.closest("#lp-set")){ s.hidden = true; g.setAttribute("aria-expanded", "false"); } });
 function showAuth(step){
   leaveLanding();
   view = "auth";
