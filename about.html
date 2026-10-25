@@ -64,6 +64,7 @@ a{color:var(--accent)}
 .note{border-left:3px solid var(--hl-line);padding:4px 0 4px 14px;color:var(--muted);font-size:14.5px}
 .compare-fig{margin:0;display:grid;gap:8px}
 .compare-fig svg{width:100%;height:auto;max-width:560px;background:var(--well);border:1px solid var(--line);border-radius:6px}
+.compare-fig img{width:100%;height:auto;max-width:720px;border:1px solid var(--line);border-radius:6px}
 .compare-fig figcaption{font-size:13.5px;color:var(--muted);max-width:62ch}
 .plain{margin:0;padding-left:20px;display:grid;gap:8px}
 .credits{display:grid;gap:0;margin:0}
@@ -207,9 +208,11 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 
     <h3>Il mercato del riso di Osaka</h3>
     <p>Nel Giappone del Settecento il riso era il vero denaro: con il riso si pagavano le tasse e gli stipendi dei samurai. Il centro di tutto era Dojima, a Osaka, dove i mercanti compravano e vendevano riso <b>non ancora raccolto</b>, con contratti che somigliano molto ai nostri future. Nel 1730 lo shogunato riconobbe ufficialmente il mercato di Dojima, che a quel punto era già uno dei più organizzati del mondo.</p>
+    <figure class="compare-fig"><img src="dojima-stampa-sasaki.jpg" alt="Stampa giapponese del mercato del riso di Dojima a Osaka" width="1200" height="519" loading="lazy"><figcaption>Il mercato del riso di Dojima, a Osaka, in una stampa di Yoshimitsu Sasaki (1880 circa).</figcaption></figure>
 
     <h3>Munehisa Homma</h3>
     <p>Il nome che si lega alle candele è quello di <b>Munehisa Homma</b> (1724–1803), figlio di una ricca famiglia di mercanti di riso di Sakata. La leggenda racconta che a Osaka abbia fatto una fortuna enorme, perfino con una lunga serie di operazioni quasi senza errori, e che per questo lo shogunato lo abbia fatto samurai e consigliere. Su quante di queste storie siano vere gli storici sono prudenti. È più sicuro dire che a Homma si attribuisce un'idea nuova per l'epoca: <b>il prezzo non dipende solo dal raccolto, ma anche dalle emozioni di chi compra e vende</b>. Speranza, paura e avidità muovono il mercato quanto i numeri.</p>
+    <figure class="compare-fig"><img src="mercanti-mitsui-echigoya-1768.jpg" alt="Interno di un grande negozio di mercanti a Edo, stampa del 1768" width="1000" height="678" loading="lazy"><figcaption>Mercanti al lavoro nel grande negozio Mitsui Echigoya, a Edo, nel 1768: lo stesso mondo di Homma (stampa di Utagawa Toyoharu).</figcaption></figure>
     <p>Le candele, nella forma che usiamo oggi, si sono definite dopo di lui, nell'Ottocento e nel Novecento, nelle mani di analisti giapponesi. Ma partono da quell'idea: ogni candela racconta una piccola battaglia fra compratori e venditori.</p>
 
     <h3>Come arrivano in Occidente</h3>
@@ -243,7 +246,7 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
       <div><dt>Progetto e codice</dt><dd>Scritto insieme a <b>Claude</b>, l'assistente di Anthropic</dd></div>
       <div><dt>Le figure</dt><dd>La tradizione delle candele giapponesi nasce nel Settecento con <b>Munehisa Homma</b>, mercante di riso a Osaka, ed è arrivata in Occidente con i libri di <b>Steve Nison</b>. Nomi e descrizioni seguono la terminologia inglese ormai standard.</dd></div>
       <div><dt>Caratteri</dt><dd><b>Shippori Mincho</b> di FONTDASU e <b>Zen Kaku Gothic New</b> di Yoshimichi Ohira, entrambi con licenza SIL Open Font License, ospitati direttamente sul sito</dd></div>
-      <div><dt>Foto</dt><dd>La Borsa del riso di Dojima a Osaka (1914), dalla Prefettura di Osaka, in pubblico dominio (<a href="https://commons.wikimedia.org/wiki/File:OsakaRiceMarket.jpg" rel="noopener noreferrer" target="_blank">Wikimedia Commons</a>)</dd></div>
+      <div><dt>Immagini storiche</dt><dd>Stampa del mercato del riso di Dojima di Yoshimitsu Sasaki (1880 circa) e interno del negozio Mitsui Echigoya di Utagawa Toyoharu (1768), entrambe di pubblico dominio via Wikimedia Commons. Fotografia della Borsa del riso di Dojima a Osaka (1914), dalla Prefettura di Osaka, in pubblico dominio (<a href="https://commons.wikimedia.org/wiki/File:OsakaRiceMarket.jpg" rel="noopener noreferrer" target="_blank">Wikimedia Commons</a>)</dd></div>
       <div><dt>Bandiere dei paesi</dt><dd><b>Twemoji</b> (grafica CC-BY 4.0, codice MIT), ospitate sul sito</dd></div>
       <div><dt>Account e database</dt><dd><b>Supabase</b>, con la libreria supabase-js (licenza MIT)</dd></div>
       <div><dt>Hosting</dt><dd><b>Cloudflare</b> (Workers), con il codice del sito conservato su <b>GitHub</b></dd></div>
