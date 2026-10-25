@@ -69,7 +69,8 @@
   function paint(){
     document.querySelectorAll("[data-suoni]").forEach(b => {
       b.setAttribute("aria-pressed", on);
-      b.title = on ? "Suoni accesi: tocca per spegnerli" : "Suoni spenti: tocca per accenderli";
+      b.textContent = on ? "Suoni accesi" : "Suoni spenti";
+      b.title = on ? "Tocca per spegnerli" : "Tocca per accenderli";
     });
   }
   function setOn(v){
@@ -79,21 +80,7 @@
     if(on) play("giusto");   // assaggio: così si sente subito il volume
   }
 
-  // il tasto: se nella pagina c'è un bottone con data-suoni lo usa, altrimenti lo crea accanto a Giorno/Notte
-  function mount(){
-    let btns = document.querySelectorAll("[data-suoni]");
-    if(!btns.length){
-      const seg = document.getElementById("themeSeg"); if(!seg) return;
-      const box = document.createElement("div");
-      box.className = "seg suoni"; box.setAttribute("role", "group"); box.setAttribute("aria-label", "Suoni");
-      box.innerHTML = '<button type="button" data-suoni aria-pressed="false">Suoni</button>';
-      seg.insertAdjacentElement("afterend", box);
-      btns = box.querySelectorAll("[data-suoni]");
-    }
-    btns.forEach(b => b.addEventListener("click", () => setOn(!on)));
-    paint();
-  }
-
-  window.DojoSuoni = {play, set: setOn, get on(){ return on; }};
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount); else mount();
+  // il tasto sta nelle Impostazioni: un bottone con data-suoni (creato quando si apre la pagina); il clic è gestito qui per tutti
+  document.addEventListener("click", e => { if(e.target.closest("[data-suoni]")) setOn(!on); });
+  window.DojoSuoni = {play, set: setOn, paint, get on(){ return on; }};
 })();

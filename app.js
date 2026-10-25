@@ -1,4 +1,5 @@
 const BYID = Object.fromEntries(P.map(p => [p.id, p]));
+const GEAR = `<svg class="gear" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" fill-rule="evenodd" d="M20.05 10.44 L22.91 10.56 L22.91 13.44 L20.05 13.56 L19.58 15.14 L18.80 16.59 L20.73 18.70 L18.70 20.73 L16.59 18.80 L15.14 19.58 L13.56 20.05 L13.44 22.91 L10.56 22.91 L10.44 20.05 L8.86 19.58 L7.41 18.80 L5.30 20.73 L3.27 18.70 L5.20 16.59 L4.42 15.14 L3.95 13.56 L1.09 13.44 L1.09 10.56 L3.95 10.44 L4.42 8.86 L5.20 7.41 L3.27 5.30 L5.30 3.27 L7.41 5.20 L8.86 4.42 L10.44 3.95 L10.56 1.09 L13.44 1.09 L13.56 3.95 L15.14 4.42 L16.59 5.20 L18.70 3.27 L20.73 5.30 L18.80 7.41 L19.58 8.86ZM15.4 12a3.4 3.4 0 1 0 -6.8 0a3.4 3.4 0 1 0 6.8 0Z"/></svg> `;
 const ROUND = 10;
 
 /* ---------- livelli e figure aperte: al livello 1 sono aperte le 20 figure più note, il livello 2 ne apre altre 24 e il 3 le ultime 22.
@@ -89,10 +90,12 @@ const cloud = (() => {
       error: "Non riesco a salvare online: riprovo alla prossima risposta"
     }[state];
     box.innerHTML = `<span class="who noav"><span class="st ${dot}"></span><span class="txt">${user ? "<b></b> · " : ""}<span class="m"></span></span></span>` +
-      (ready ? (user ? `<button class="linkbtn" id="accountBtn">Account</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "");
+      (ready ? (user ? `<button class="linkbtn" id="accountBtn">${GEAR}Impostazioni</button>` : `<button class="linkbtn" id="loginBtn">Accedi o registrati</button>`) : "") +
+      `<button class="linkbtn" id="settingsBtn"${user ? " hidden" : ""} aria-label="Impostazioni">${GEAR}</button>`;
     if(user) box.querySelector("b").textContent = uname(user);
     box.querySelector(".m").textContent = msg + (state === "error" && lastErr ? ` (${lastErr})` : "");
     const ab = $("#accountBtn"); if(ab) ab.onclick = showAccount;
+    const sb2 = $("#settingsBtn"); if(sb2) sb2.onclick = showAccount;
     const li = $("#loginBtn"); if(li) li.onclick = () => showAuth("in");
   }
   async function flush(){
@@ -414,6 +417,7 @@ function chartSVG(p, o = {}){
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria || "Grafico a candele")}">${g}</svg>`;
 }
+
 
 /* ---------- views & menu ---------- */
 let view = "home";
@@ -993,13 +997,25 @@ function nlSync(u, force){
   }catch(e){}
 }
 
-/* ---------- pagina account ---------- */
+/* ---------- pagina impostazioni (account + suoni) ---------- */
+function soundHTML(){
+  return `<section class="panel acard"><div class="eyebrow">Suoni</div>
+    <p>Un suono breve per risposta giusta, risposta sbagliata e salita di livello. Sono spenti all'inizio.</p>
+    <button class="btn ghost" type="button" data-suoni aria-pressed="false">Suoni spenti</button>
+  </section>`;
+}
 async function showAccount(){
   view = "account";
   ["#view-home", "#view-quiz", "#view-studia", "#view-auth"].forEach(s => $(s).hidden = true);
-  $("#bar").hidden = false; $("#barTitle").textContent = "Il tuo account"; $("#barCfg").innerHTML = "";
+  $("#bar").hidden = false; $("#barTitle").textContent = "Impostazioni"; $("#barCfg").innerHTML = "";
   $("#view-account").hidden = false;
   heroAnim.stop(); window.scrollTo({top:0});
+  if(!cloud.user){
+    $("#accountBox").innerHTML = soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>`;
+    $("#st-login").onclick = () => showAuth("in");
+    if(window.DojoSuoni) DojoSuoni.paint();
+    return;
+  }
   const sb = cloud.sb, u = cloud.user, legacy = isLegacy(u.email);
   const [{data: prof}, {data: fac}] = await Promise.all([
     sb.from("profiles").select("username, marketing").eq("id", u.id).maybeSingle(),
@@ -1007,7 +1023,7 @@ async function showAccount(){
   ]);
   const totp = ((fac && fac.totp) || []).find(f => f.status === "verified");
   const box = $("#accountBox");
-  box.innerHTML = `
+  box.innerHTML = soundHTML() + `
     <section class="panel acard"><div class="eyebrow">Profilo</div>
       <p><span class="hint">Username</span><br><b class="u-name"></b></p>
       <p><span class="hint">Email</span><br><b class="u-mail"></b></p>
@@ -1038,6 +1054,7 @@ async function showAccount(){
       ${dangerHTML("dz", "Cancello tutti i tuoi progressi, sul tuo account e su tutti i tuoi dispositivi: figure imparate, ripasso, statistiche, scenari, livello e record della Prova. L'account, l'email e la newsletter restano come sono.")}
     </section>
     <div class="actions"><button class="btn ghost" type="button" id="ac-out">Esci dall'account</button></div>`;
+  if(window.DojoSuoni) DojoSuoni.paint();
   box.querySelector(".u-name").textContent = (prof && prof.username) || (u.user_metadata && u.user_metadata.username) || "";
   box.querySelector(".u-mail").textContent = legacy ? "Nessuna: aggiungila per recuperare la password e ricevere le email" : u.email;
   const say = (id, m, ok) => { const el = $(id); el.textContent = m; el.className = ok ? "au-ok" : "au-err"; };

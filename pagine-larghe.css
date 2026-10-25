@@ -1,0 +1,13 @@
+/* About e Privacy sui monitor larghi (16:9): colonna di testo a destra e indice dei capitoli fisso a sinistra.
+   Sotto i 1100 px l'indice non si vede e la pagina resta com'è. */
+.toc{display:none}
+@media (min-width:1100px) and (min-aspect-ratio:4/3){
+  body .wrap{max-width:1180px;grid-template-columns:230px minmax(0,1fr);column-gap:48px;align-items:start}
+  body .wrap>.topbar,.wrap>header,.wrap>.sitefoot{grid-column:1 / -1}
+  body .wrap>.chapter{grid-column:2}
+  .toc{display:grid;gap:4px;grid-column:1;grid-row:3 / span 12;position:sticky;top:22px;align-self:start;font-size:14px}
+  .toc b{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:6px}
+  .toc a{color:var(--muted);text-decoration:none;padding:6px 0 6px 12px;border-left:2px solid var(--line)}
+  .toc a:hover{color:var(--ink);border-left-color:var(--seal)}
+  .chapter p,.chapter li{max-width:72ch}
+}
