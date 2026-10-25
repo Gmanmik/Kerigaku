@@ -228,20 +228,62 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 .stats .lists li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:3px}
 .stats .lists li span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stats .lists li span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
+/* Pannello admin (schizzo di Michele, 25/10): titolo e tema in alto, a sinistra una colonna di icone
+   che si apre in un menu a comparsa con i nomi; si vede una sezione per volta, all'inizio il benvenuto. */
+:root{--rail:60px;--rail-open:236px}
+.wrap{max-width:1180px}
+body.adm-on .wrap{padding-left:calc(var(--rail) + max(16px, env(safe-area-inset-left, 0px)))}
+.top{align-items:center}
+.top h1{margin:0}
+.rail{position:fixed;z-index:30;inset:0 auto 0 0;width:var(--rail);display:flex;flex-direction:column;gap:2px;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:calc(8px + env(safe-area-inset-left,0px));background:var(--card);border-right:1px solid var(--line2);overflow:hidden auto;transition:width .2s ease,box-shadow .2s ease}
+.rail.open{width:calc(var(--rail-open) + env(safe-area-inset-left,0px));box-shadow:6px 0 24px rgba(0,0,0,.18)}
+.rail-btn{display:flex;align-items:center;gap:14px;min-height:44px;padding:0 10px;border:0;border-radius:9px;background:none;color:var(--ink);font:inherit;font-weight:600;font-size:15px;
+  text-decoration:none;cursor:pointer;white-space:nowrap;text-align:left;width:100%}
+.rail-btn svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail-btn img{width:24px;height:auto;flex:none}
+.rail-btn span{opacity:0;transition:opacity .15s}
+.rail.open .rail-btn span{opacity:1}
+.rail-btn:hover{background:var(--well);color:var(--ink)}
+.rail-btn[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.rail-toggle span{font-family:var(--display);font-size:20px;font-weight:400}
+.rail-logo{margin-bottom:8px;border-bottom:1px solid var(--line);border-radius:9px 9px 0 0;min-height:52px}
+.rail-logo[aria-current="page"]{background:var(--well);color:var(--ink)}
+.rail-logo span{font-family:var(--display);font-weight:400;font-size:15px}
+.rail-foot{margin-top:auto;display:grid;gap:2px;border-top:1px solid var(--line);padding-top:8px}
+.rail-foot .who-name{font-size:12.5px;color:var(--muted);padding:0 10px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0}
+.rail.open .rail-foot .who-name{opacity:1}
+.scrim{position:fixed;inset:0;z-index:29;background:rgba(0,0,0,.28)}
+.content{min-width:0;display:grid;gap:18px}
+.sect{display:grid;gap:18px;min-width:0}
+.sect-h{font-family:var(--display);font-weight:400;font-size:28px;margin:0}
+.welcome{min-height:55vh;display:grid;place-content:center;justify-items:center;text-align:center;gap:10px;padding:24px 0}
+.welcome .hello{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,60px);line-height:1.1;margin:0;text-wrap:balance}
+.welcome #wname{color:var(--seal)}
+@media (max-width:640px){
+  :root{--rail:52px}
+  .rail{padding-inline:4px}
+  .rail-btn{padding:0 10px}
+  .welcome{min-height:45vh}
+}
+@media (prefers-reduced-motion:reduce){.rail,.rail-btn span{transition:none}}
 </style>
 </head>
 <body>
+<nav class="rail" id="rail" aria-label="Menu del pannello" hidden>
+  <button class="rail-btn rail-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="rail" title="Apri il menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+  <a class="rail-btn rail-logo" href="#benvenuto" data-s="benvenuto" title="Benvenuto"><img src="logo.svg" alt="" width="26" height="34"><span>Dojo delle candele</span></a>
+  <a class="rail-btn" href="#allievi" data-s="allievi" title="Allievi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5"/></svg><span>Allievi</span></a>
+  <a class="rail-btn" href="#statistiche" data-s="statistiche" title="Statistiche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M6 17v-5M11 17V7M16 17v-8M21 17V4"/></svg><span>Statistiche</span></a>
+  <a class="rail-btn" href="#newsletter" data-s="newsletter" title="Newsletter"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6l8.5 7 8.5-7"/></svg><span>Newsletter</span></a>
+  <div class="rail-foot" id="who"></div>
+</nav>
+<div class="scrim" id="scrim" hidden></div>
 <div class="wrap">
   <header class="top">
-    <div>
-      <div class="eyebrow">Dojo delle candele · pannello admin</div>
-      <h1>Gli <em>allievi</em> del dojo</h1>
-    </div>
-    <div class="side">
-      <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
+    <h1>Pannello <em>admin</em></h1>
+    <div class="seg themes" id="themeSeg" role="group" aria-label="Tema">
       <button type="button" data-t="auto" title="Segue il giorno o la notte del tuo dispositivo">Auto</button><button type="button" data-t="light">Giorno</button><button type="button" data-t="dark">Notte</button>
-    </div>
-      <div class="who" id="who"></div>
     </div>
   </header>
 
@@ -270,25 +312,19 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
     <a href="./">Torna al Dojo</a>
   </section>
 
-  <main id="main" hidden>
-    <div style="display:grid;gap:18px">
-      <div class="tiles" id="tiles"></div>
-      <section class="panel stats" id="stats" aria-labelledby="statsTitle">
-        <div class="stats-head"><h2 id="statsTitle">Statistiche</h2>
-          <div class="seg" id="statsTab" role="tablist" aria-label="Quali statistiche"><button type="button" role="tab" data-t="sito" aria-pressed="true" aria-selected="true">Visite al sito</button><button type="button" role="tab" data-t="brevo" aria-pressed="false" aria-selected="false">Newsletter (Brevo)</button></div>
-          <div class="seg" id="statsSeg" role="group" aria-label="Periodo"><button type="button" data-d="1">24 ore</button><button type="button" data-d="7" aria-pressed="true">7 giorni</button><button type="button" data-d="30">30 giorni</button><button type="button" data-d="90">90 giorni</button></div>
-        </div>
-        <div id="statsBody"><p class="empty">Carico le statistiche…</p></div>
+  <main id="main" class="content" hidden>
+      <section class="sect" id="s-benvenuto" aria-label="Benvenuto">
+        <div class="welcome"><p class="hello">Benvenuto <span id="wname"></span>!</p>
+          <p class="meta">Scegli una sezione dal menu a sinistra: Allievi, Statistiche o Newsletter.</p></div>
       </section>
-      <div class="bar">
-        <input id="q" type="search" placeholder="Cerca un allievo per username" aria-label="Cerca un allievo">
-        <button class="btn ghost" id="reload" type="button">Aggiorna</button>
-        <button class="btn ghost" id="mktcopy" type="button">Copia iscritti newsletter</button>
-        <button class="btn ghost" id="nlsync" type="button">Allinea newsletter con Brevo</button>
-      </div>
-      <p class="meta" id="nlMsg" role="status"></p>
-      <div class="exportbox" id="exportBox" hidden><p class="meta" id="exportMsg"></p><textarea id="exportTxt" rows="5" readonly aria-label="Iscritti alla newsletter in formato CSV"></textarea></div>
-      <div class="legend">
+      <section class="sect" id="s-allievi" hidden aria-labelledby="h-allievi">
+        <h2 class="sect-h" id="h-allievi">Allievi</h2>
+        <div class="tiles" id="tiles"></div>
+        <div class="bar">
+          <input id="q" type="search" placeholder="Cerca un allievo per username" aria-label="Cerca un allievo">
+          <button class="btn ghost" id="reload" type="button">Aggiorna</button>
+        </div>
+        <div class="legend">
         <span><i class="k0"></i>bianca · da scoprire</span>
         <span><i class="k1"></i>gialla · ogni giorno</span>
         <span><i class="k2"></i>arancione · ogni 3 giorni</span>
@@ -296,9 +332,32 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
         <span><i class="k4"></i>blu · ogni 16 giorni</span>
         <span><i class="k5"></i>nera · ogni 35 giorni, la conosce</span>
       </div>
-      <div class="panel" id="ipBox" hidden style="padding:12px 16px;margin-bottom:12px"></div>
-      <div class="list" id="list"><p class="empty">Carico gli allievi…</p></div>
-    </div>
+        <div class="panel" id="ipBox" hidden style="padding:12px 16px;margin-bottom:12px"></div>
+        <div class="list" id="list"><p class="empty">Carico gli allievi…</p></div>
+      </section>
+      <section class="sect" id="s-statistiche" hidden aria-label="Statistiche">
+      <section class="panel stats" id="stats" aria-labelledby="statsTitle">
+        <div class="stats-head"><h2 id="statsTitle">Visite al sito</h2>
+          <div class="seg" id="statsSeg" role="group" aria-label="Periodo"><button type="button" data-d="1">24 ore</button><button type="button" data-d="7" aria-pressed="true">7 giorni</button><button type="button" data-d="30">30 giorni</button><button type="button" data-d="90">90 giorni</button></div>
+        </div>
+        <div id="statsBody"><p class="empty">Carico le statistiche…</p></div>
+      </section>
+      </section>
+      <section class="sect" id="s-newsletter" hidden aria-label="Newsletter">
+        <section class="panel stats" aria-labelledby="nlTitle">
+          <div class="stats-head"><h2 id="nlTitle">Newsletter (Brevo)</h2>
+            <div class="seg" id="nlSeg" role="group" aria-label="Periodo"><button type="button" data-d="1">24 ore</button><button type="button" data-d="7" aria-pressed="true">7 giorni</button><button type="button" data-d="30">30 giorni</button><button type="button" data-d="90">90 giorni</button></div>
+          </div>
+          <div id="nlBody"><p class="empty">Carico le statistiche della newsletter…</p></div>
+        </section>
+        <div class="bar">
+          <button class="btn ghost" id="mktcopy" type="button">Copia iscritti newsletter</button>
+          <button class="btn ghost" id="nlsync" type="button">Allinea newsletter con Brevo</button>
+        </div>
+        <p class="meta">L'allineamento parte da solo ogni lunedì mattina; il tasto serve solo se vuoi farlo subito.</p>
+        <p class="meta" id="nlMsg" role="status"></p>
+        <div class="exportbox" id="exportBox" hidden><p class="meta" id="exportMsg"></p><textarea id="exportTxt" rows="5" readonly aria-label="Iscritti alla newsletter in formato CSV"></textarea></div>
+      </section>
   </main>
   <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a><a href="about.html#contatti">Contatti</a><a href="privacy.html">Privacy</a><a href="privacy.html#cookie">Cookie</a><a class="foot-support" href="https://paypal.me/Gmanmik" target="_blank" rel="noopener noreferrer"><span class="cha" aria-hidden="true">茶</span>Sostieni il Dojo</a></footer>
 </div>

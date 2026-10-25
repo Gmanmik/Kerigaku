@@ -41,18 +41,22 @@ function summary(u){
 
 function gate(title, text, showForm, showMfa){
   $("#main").hidden = true; $("#gate").hidden = false;
+  $("#rail").hidden = true; document.body.classList.remove("adm-on"); openMenu(false);
   $("#gateTitle").textContent = title; $("#gateText").textContent = text;
   $("#loginForm").hidden = !showForm;
   $("#mfaForm").hidden = !showMfa;
   if(showMfa) $("#mf-code").focus();
   paintWho();
 }
+const HOME_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>`;
+const OUT_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h10"/></svg>`;
 function paintWho(){
   const w = $("#who");
-  if(!me){ w.innerHTML = `<a href="./">Vai al Dojo</a>`; return; }
+  if(!me){ w.innerHTML = ""; return; }
   const n = (me.user_metadata && me.user_metadata.username) || me.email.split("@")[0];
-  w.innerHTML = `<span>Sei entrato come <b></b></span><a href="./">Vai al Dojo</a><button class="linkbtn" id="out" type="button">Esci</button>`;
+  w.innerHTML = `<span class="who-name">Sei entrato come <b></b></span><a class="rail-btn" href="./" title="Vai al Dojo">${HOME_SVG}<span>Vai al Dojo</span></a><button class="rail-btn" id="out" type="button" title="Esci">${OUT_SVG}<span>Esci</span></button>`;
   w.querySelector("b").textContent = n;
+  $("#wname").textContent = n;
   $("#out").onclick = async () => { await sb.auth.signOut(); me = null; gate("Accesso admin", "Entra con il tuo username (o la tua email) e la password del Dojo.", true); };
 }
 
@@ -74,7 +78,8 @@ async function enter(){
   if(error) return gate("Pannello non installato", "Esegui admin.sql nel SQL Editor di Supabase, poi ricarica.", false);
   if(!isAdmin) return gate("Non sei admin", "Questo account non ha i permessi per il pannello. Un admin può darteli dall'elenco degli allievi.", false);
   $("#gate").hidden = true; $("#main").hidden = false; paintWho();
-  loadStats(7);
+  $("#rail").hidden = false; document.body.classList.add("adm-on");
+  showSection();
   await load();
 }
 async function load(){
@@ -296,7 +301,7 @@ $("#mfaForm").addEventListener("submit", async e => {
 boot();
 
 // visite al sito: la funzione Supabase "statistiche" chiede i numeri a Cloudflare Web Analytics (il token resta sul server)
-let statsTab = "sito", statsDays = 7;
+let statsDays = 7, nlDays = 7;
 // motivo preciso di un errore delle funzioni Supabase (404 funzione mancante, 403 non admin, 502 servizio esterno)
 async function fnError(error, data, name){
   let why = data && data.error ? data.error + (data.dettagli && data.dettagli.length ? ": " + data.dettagli.join("; ") : "") : "";
@@ -308,10 +313,12 @@ async function fnError(error, data, name){
   return why;
 }
 async function loadBrevo(days){
-  const box = $("#statsBody");
+  nlDays = days;
+  document.querySelectorAll("#nlSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === days)));
+  const box = $("#nlBody");
   box.innerHTML = `<p class="empty">Carico le statistiche della newsletter…</p>`;
   const {data, error} = await sb.functions.invoke("newsletter", {body: {action: "stats", days}});
-  if(statsTab !== "brevo") return;
+  if(nlDays !== days) return;
   if(error || !data || data.error){
     const why = await fnError(error, data, "newsletter");
     box.innerHTML = `<p class="empty">Statistiche Brevo non disponibili${why ? ` (${esc(why)})` : ""}. Servono la funzione "newsletter" e i segreti BREVO_API_KEY e BREVO_LIST_ID.</p>`;
@@ -331,11 +338,10 @@ async function loadBrevo(days){
 async function loadStats(days){
   statsDays = days;
   document.querySelectorAll("#statsSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === days)));
-  if(statsTab === "brevo") return loadBrevo(days);
   const box = $("#statsBody");
   box.innerHTML = `<p class="empty">Carico le statistiche…</p>`;
   const {data, error} = await sb.functions.invoke("statistiche", {body: {days}});
-  if(statsTab !== "sito") return;
+  if(statsDays !== days) return;
   if(error || !data || data.error){
     // motivo preciso, per capire cosa sistemare: funzione mancante (404), non admin (403) o risposta di Cloudflare (502)
     let why = data && data.error ? data.error + (data.dettagli && data.dettagli.length ? ": " + data.dettagli.join("; ") : "") : "";
@@ -359,8 +365,25 @@ async function loadStats(days){
     <div class="lists">${list("Pagine più viste", data.pagine)}${list("Da dove arrivano", data.provenienza)}${list("Paesi", data.paesi, countryHTML)}${list("Dispositivi", data.dispositivi)}</div></div>`;
 }
 document.querySelectorAll("#statsSeg button").forEach(b => b.onclick = () => loadStats(+b.dataset.d));
-document.querySelectorAll("#statsTab button").forEach(b => b.onclick = () => {
-  statsTab = b.dataset.t;
-  document.querySelectorAll("#statsTab button").forEach(x => { x.setAttribute("aria-pressed", String(x === b)); x.setAttribute("aria-selected", String(x === b)); });
-  loadStats(statsDays);
-});
+document.querySelectorAll("#nlSeg button").forEach(b => b.onclick = () => loadBrevo(+b.dataset.d));
+
+// menu a comparsa: a sinistra resta una colonna di icone, il tasto Menu la apre con i nomi delle sezioni
+const SECTIONS = ["benvenuto", "allievi", "statistiche", "newsletter"], loaded = {};
+function openMenu(on){
+  const rail = $("#rail"), t = $("#navToggle");
+  rail.classList.toggle("open", on); $("#scrim").hidden = !on;
+  t.setAttribute("aria-expanded", String(on)); t.title = on ? "Chiudi il menu" : "Apri il menu";
+}
+// una sezione per volta, scelta dall'indirizzo (#allievi…); le statistiche si caricano la prima volta che le apri
+function showSection(){
+  const want = location.hash.slice(1), s = SECTIONS.includes(want) ? want : "benvenuto";
+  SECTIONS.forEach(x => { $("#s-" + x).hidden = x !== s; });
+  document.querySelectorAll("#rail [data-s]").forEach(a => a.dataset.s === s ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  if(s === "statistiche" && !loaded.s){ loaded.s = true; loadStats(statsDays); }
+  if(s === "newsletter" && !loaded.n){ loaded.n = true; loadBrevo(nlDays); }
+}
+$("#navToggle").onclick = () => openMenu(!$("#rail").classList.contains("open"));
+$("#scrim").onclick = () => openMenu(false);
+document.querySelectorAll("#rail [data-s]").forEach(a => a.addEventListener("click", () => openMenu(false)));
+document.addEventListener("keydown", e => { if(e.key === "Escape" && $("#rail").classList.contains("open")){ openMenu(false); $("#navToggle").focus(); } });
+window.addEventListener("hashchange", () => { if(!$("#main").hidden){ showSection(); window.scrollTo(0, 0); } });
