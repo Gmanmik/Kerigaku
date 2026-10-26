@@ -379,11 +379,220 @@ function showSection(){
   const want = location.hash.slice(1), s = SECTIONS.includes(want) ? want : "benvenuto";
   SECTIONS.forEach(x => { $("#s-" + x).hidden = x !== s; });
   document.querySelectorAll("#rail [data-s]").forEach(a => a.dataset.s === s ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-  if(s === "statistiche" && !loaded.s){ loaded.s = true; loadStats(statsDays); }
-  if(s === "newsletter" && !loaded.n){ loaded.n = true; loadBrevo(nlDays); }
+  if(s === "statistiche" && !loaded.s){ loaded.s = true; loadStats(statsDays); loadBrevo(nlDays); }
+  if(s === "newsletter" && !loaded.n){ loaded.n = true; loadNews(); }
 }
 $("#navToggle").onclick = () => openMenu(!$("#rail").classList.contains("open"));
 $("#scrim").onclick = () => openMenu(false);
 document.querySelectorAll("#rail [data-s]").forEach(a => a.addEventListener("click", () => openMenu(false)));
 document.addEventListener("keydown", e => { if(e.key === "Escape" && $("#rail").classList.contains("open")){ openMenu(false); $("#navToggle").focus(); } });
 window.addEventListener("hashchange", () => { if(!$("#main").hidden){ showSection(); window.scrollTo(0, 0); } });
+
+
+// ---- Newsletter: si scrivono qui, si mettono in coda e partono da sole al ritmo scelto (tabelle newsletters e newsletter_settings, newsletter-coda.sql)
+const DAYS = ["", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"];
+let rhythm = {every_weeks: 1, weekday: 2, hour: 9}, letters = [], editing = null, kind = "testo";
+$("#rHour").innerHTML = Array.from({length: 24}, (_, h) => `<option value="${h}">${h}:00</option>`).join("");
+const UNSUB = /\{\{\s*unsubscribe\s*\}\}/;
+const escE = s => esc(s).replace(/'/g, "&#39;");
+const safeUrl = u => /^(https?:\/\/|mailto:)/i.test(u) ? u : "https://dojodellecandele.com/";
+const okUrl = u => /^(https?:\/\/|mailto:)/i.test(u);
+// testo semplice → paragrafi, titoletti, grassetto, link e bottoni, dentro il modello delle email del Dojo (come newsletter/newsletter-01-doji.html)
+const TD = "font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#17201C;";
+function inline(t){
+  return escE(t)
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, a, u) => okUrl(u) ? `<a href="${escE(u.replace(/&amp;/g, "&"))}" style="color:#2C46A6;">${a}</a>` : a);
+}
+function textToRows(text){
+  // un titoletto può stare anche sulla riga subito sopra il suo paragrafo
+  return text.replace(/\r/g, "").replace(/^(##\s+.+)\n(?=\S)/gm, "$1\n\n").split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).map(b => {
+    let m = b.match(/^##\s+(.+)$/);
+    if(m) return `<tr><td style="padding:16px 32px 2px 32px;font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#17201C;">${inline(m[1])}</td></tr>`;
+    m = b.match(/^\[\[(.+?)\s*->\s*(\S+)\]\]$/);
+    if(m) return `<tr><td style="padding:14px 32px 6px 32px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#17201C;border-radius:10px;"><a href="${escE(safeUrl(m[2]))}" style="display:inline-block;padding:13px 22px;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#F1F4F0;text-decoration:none;">${escE(m[1])} &rarr;</a></td></tr></table></td></tr>`;
+    return `<tr><td style="padding:6px 32px 6px 32px;${TD}">${inline(b).replace(/\n/g, "<br>")}</td></tr>`;
+  }).join("");
+}
+const FOOT = `<tr><td style="padding:22px 32px 28px 32px;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#5A6660;border-top:1px solid #EEF1EE;">Ricevi questa email perché ti sei iscritto alla newsletter del Dojo delle candele. Il Dojo serve a imparare, non dà consigli di investimento. <a href="{{ unsubscribe }}" style="color:#2C46A6;">Disiscriviti</a> con un clic, oppure dalla pagina Account.<br>Inviata da Michele, Dojo delle candele &middot; <a href="mailto:admin@dojodellecandele.com" style="color:#2C46A6;">admin@dojodellecandele.com</a> &middot; <a href="https://dojodellecandele.com/privacy.html" style="color:#2C46A6;">Privacy</a></td></tr>`;
+function wrapEmail(subject, pre, rows){
+  return `<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escE(subject)}</title></head>
+<body style="margin:0;padding:0;background:#F1F4F0;">
+${pre ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escE(pre)}</div>` : ""}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F1F4F0;"><tr><td align="center" style="padding:28px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#FFFFFF;border:1px solid #D7DDD8;border-radius:14px;">
+<tr><td style="padding:28px 32px 0 32px;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5A6660;">Dojo delle candele &middot; newsletter</td></tr>
+<tr><td style="padding:14px 32px 6px 32px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:#17201C;">${escE(subject)}</td></tr>
+${rows}
+<tr><td style="padding:6px 32px 6px 32px;${TD}">A presto,<br>Michele &middot; Dojo delle candele</td></tr>
+${FOOT}
+</table>
+<p style="font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#7A857F;margin:14px 0 0 0;">Dojo delle candele &middot; allenamento sulle figure candlestick giapponesi</p>
+</td></tr></table>
+</body></html>`;
+}
+// HTML incollato: se manca il link per disiscriversi aggiungo il piè di pagina del Dojo
+function withFooter(html){
+  if(UNSUB.test(html)) return html;
+  const foot = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;margin:0 auto;">${FOOT}</table>`;
+  return /<\/body>/i.test(html) ? html.replace(/<\/body>/i, foot + "</body>") : html + foot;
+}
+function formData(){
+  const subject = $("#nlSubject").value.trim(), pre = $("#nlPre").value.trim();
+  const content = kind === "testo" ? $("#nlText").value : $("#nlHtml").value;
+  if(!subject) return {err: "Scrivi l'oggetto."};
+  if(!content.trim()) return {err: kind === "testo" ? "Scrivi il testo." : "Incolla o carica l'HTML."};
+  const html = kind === "testo" ? wrapEmail(subject, pre, textToRows(content)) : withFooter(content);
+  return {subject, preheader: pre, kind, content, html};
+}
+function setKind(k){
+  kind = k;
+  document.querySelectorAll("#nlKind button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
+  $("#kTesto").hidden = k !== "testo"; $("#kHtml").hidden = k !== "html";
+}
+document.querySelectorAll("#nlKind button").forEach(b => b.onclick = () => setKind(b.dataset.k));
+$("#nlFile").onchange = e => {
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  if(f.size > 300000) return $("#nlErr").textContent = "File troppo grande (massimo 300 kB).";
+  const r = new FileReader();
+  r.onload = () => {
+    const html = String(r.result); $("#nlHtml").value = html;
+    // oggetto dal <title> del file, se l'oggetto è ancora vuoto
+    const t = html.match(/<title>([^<]*)<\/title>/i);
+    if(t && !$("#nlSubject").value.trim()){ const d = document.createElement("textarea"); d.innerHTML = t[1]; $("#nlSubject").value = d.value.trim().slice(0, 150); }
+    $("#nlFormMsg").textContent = `Caricato «${f.name}».`;
+  };
+  r.readAsText(f); e.target.value = "";
+};
+function formMsg(t, ko){ $("#nlErr").textContent = ko ? t : ""; $("#nlFormMsg").textContent = ko ? "" : t; }
+function clearForm(){
+  editing = null; $("#nlForm").reset(); $("#nlText").value = ""; $("#nlHtml").value = ""; setKind("testo");
+  $("#nlPrevBox").hidden = true; $("#h-edit").textContent = "Nuova newsletter"; formMsg("");
+}
+$("#nlClear").onclick = clearForm;
+$("#nlPreview").onclick = () => {
+  const d = formData(); if(d.err) return formMsg(d.err, true);
+  formMsg(""); $("#nlFrame").srcdoc = d.html.replace(UNSUB, "#"); $("#nlPrevBox").hidden = false;
+};
+async function saveLetter(status){
+  const d = formData(); if(d.err){ formMsg(d.err, true); return null; }
+  const row = {subject: d.subject, preheader: d.preheader, kind: d.kind, content: d.content, html: d.html, status, updated_at: new Date().toISOString()};
+  const cur = editing && letters.find(n => n.id === editing);
+  // chi entra in coda va in fondo; chi c'era già tiene il suo posto
+  if(status === "coda" && !(cur && cur.status === "coda")) row.pos = Date.now() / 1000;
+  const q = editing ? sb.from("newsletters").update(row).eq("id", editing).select().single() : sb.from("newsletters").insert(row).select().single();
+  const {data, error} = await q;
+  if(error){ formMsg("Non salvata: " + error.message, true); return null; }
+  return data;
+}
+$("#nlDraft").onclick = async e => {
+  e.target.disabled = true; const n = await saveLetter("bozza"); e.target.disabled = false;
+  if(n){ editing = n.id; $("#h-edit").textContent = "Modifica newsletter"; formMsg("Bozza salvata."); loadLetters(); }
+};
+$("#nlQueue").onclick = async e => {
+  e.target.disabled = true; const n = await saveLetter("coda"); e.target.disabled = false;
+  if(n){ clearForm(); formMsg(`«${n.subject}» è in coda.`); loadLetters(); }
+};
+$("#nlTest").onclick = async e => {
+  const d = formData(); if(d.err) return formMsg(d.err, true);
+  e.target.disabled = true; formMsg("Mando la prova…");
+  const {data, error} = await sb.functions.invoke("newsletter", {body: {action: "test", subject: d.subject, html: d.html}});
+  e.target.disabled = false;
+  if(error || !data || data.error) return formMsg("Prova non mandata: " + (await fnError(error, data, "newsletter") || "errore"), true);
+  formMsg(`Prova mandata a ${data.a}: controlla la posta.`);
+};
+
+// ritmo
+function paintRhythm(){ $("#rEvery").value = String(rhythm.every_weeks); $("#rDay").value = String(rhythm.weekday); $("#rHour").value = String(rhythm.hour); }
+$("#rhythmForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const v = {every_weeks: +$("#rEvery").value, weekday: +$("#rDay").value, hour: +$("#rHour").value, updated_at: new Date().toISOString()};
+  $("#rSave").disabled = true;
+  const {error} = await sb.from("newsletter_settings").update(v).eq("id", 1);
+  $("#rSave").disabled = false;
+  if(error){ $("#rMsg").className = "meta ko"; $("#rMsg").textContent = "Non salvato: " + error.message; return; }
+  Object.assign(rhythm, v); $("#rMsg").className = "meta";
+  $("#rMsg").textContent = v.every_weeks ? `Salvato: ogni ${v.every_weeks === 1 ? "settimana" : v.every_weeks + " settimane"}, il ${DAYS[v.weekday]} alle ${v.hour}:00.` : "Salvato: invio automatico in pausa.";
+  renderLetters();
+});
+$("#rEvery").onchange = () => { $("#rDay").disabled = $("#rHour").disabled = $("#rEvery").value === "0"; };
+
+// date previste: prossimo giorno e ora del ritmo, non prima di (settimane × 7 − 1) giorni dall'ultima mandata
+function plannedDates(count){
+  if(!rhythm.every_weeks) return [];
+  const sent = letters.filter(n => n.sent_at).map(n => Date.parse(n.sent_at));
+  const after = Math.max(Date.now(), sent.length ? Math.max(...sent) + (7 * rhythm.every_weeks - 1) * 86400000 : 0);
+  const d = new Date(after); d.setMinutes(0, 0, 0); d.setHours(rhythm.hour);
+  while(d.getTime() <= after || ((d.getDay() + 6) % 7) + 1 !== rhythm.weekday) d.setDate(d.getDate() + 1);
+  return Array.from({length: count}, (_, i) => new Date(d.getTime() + i * 7 * rhythm.every_weeks * 86400000));
+}
+const when = d => d.toLocaleDateString("it-IT", {weekday: "short", day: "numeric", month: "short"}) + ", " + d.getHours() + ":00";
+const dayTime = s => { const d = new Date(s); return isNaN(d) ? "" : d.toLocaleString("it-IT", {day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"}); };
+function renderLetters(){
+  const queue = letters.filter(n => n.status === "coda" || n.status === "invio" || n.status === "errore").sort((a, b) => a.pos - b.pos);
+  const waiting = queue.filter(n => n.status === "coda"), dates = plannedDates(waiting.length);
+  const row = (n, extra, acts) => `<li data-id="${n.id}"><span class="t"><b>${esc(n.subject)}</b><span class="when">${extra}</span></span><span class="acts">${acts}</span></li>`;
+  $("#nlQueueList").innerHTML = queue.length ? `<ul class="nl-list">${queue.map(n => {
+    if(n.status === "invio") return row(n, "sta partendo…", "");
+    if(n.status === "errore") return row(n, "non partita: " + esc(n.error || "errore"), `<button class="btn ghost" data-a="edit">Modifica</button><button class="btn ghost" data-a="requeue">Rimetti in coda</button><button class="btn ghost" data-a="del">Elimina</button>`);
+    const i = waiting.indexOf(n);
+    return row(n, rhythm.every_weeks ? "partirà " + when(dates[i]) : "in pausa: parte solo con «Manda adesso»",
+      `<button class="btn ghost" data-a="up" ${i ? "" : "disabled"} aria-label="Più su">↑</button><button class="btn ghost" data-a="down" ${i < waiting.length - 1 ? "" : "disabled"} aria-label="Più giù">↓</button><button class="btn ghost" data-a="edit">Modifica</button><button class="btn ghost" data-a="send">Manda adesso</button><button class="btn ghost" data-a="del">Elimina</button>`);
+  }).join("")}</ul>` : `<p class="empty">La coda è vuota. Scrivi una newsletter qui sopra e premi «Metti in coda».</p>`;
+  const drafts = letters.filter(n => n.status === "bozza").sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at));
+  $("#nlDrafts").innerHTML = drafts.length ? `<ul class="nl-list">${drafts.map(n => row(n, "salvata " + dayTime(n.updated_at), `<button class="btn ghost" data-a="edit">Modifica</button><button class="btn ghost" data-a="requeue">Metti in coda</button><button class="btn ghost" data-a="del">Elimina</button>`)).join("")}</ul>` : `<p class="empty">Nessuna bozza.</p>`;
+  const sent = letters.filter(n => n.status === "inviata").sort((a, b) => Date.parse(b.sent_at) - Date.parse(a.sent_at));
+  $("#nlSent").innerHTML = sent.length ? `<ul class="nl-list">${sent.map(n => row(n, "mandata " + dayTime(n.sent_at), `<button class="btn ghost" data-a="copy">Usa come base</button>`)).join("")}</ul>` : `<p class="empty">Ancora nessuna newsletter mandata da qui.</p>`;
+}
+function editLetter(n, asNew){
+  editing = asNew ? null : n.id; setKind(n.kind || "html");
+  $("#nlSubject").value = n.subject; $("#nlPre").value = n.preheader || "";
+  $("#nlText").value = n.kind === "testo" ? n.content : ""; $("#nlHtml").value = n.kind === "testo" ? "" : (n.content || n.html);
+  $("#h-edit").textContent = asNew ? "Nuova newsletter" : "Modifica newsletter"; $("#nlPrevBox").hidden = true;
+  formMsg(asNew ? "Copiata: cambiala e salvala come nuova." : "Stai modificando «" + n.subject + "».");
+  $("#h-edit").scrollIntoView({behavior: "smooth", block: "start"});
+}
+const armed = new WeakMap();
+async function letterAction(e){
+  const b = e.target.closest("button[data-a]"); if(!b) return;
+  const id = +b.closest("li").dataset.id, n = letters.find(x => x.id === id); if(!n) return;
+  const a = b.dataset.a;
+  if(a === "edit") return editLetter(n, false);
+  if(a === "copy") return editLetter(n, true);
+  // le azioni che non si annullano chiedono un secondo tocco
+  if(a === "send" || a === "del"){
+    if(!armed.get(b)){ armed.set(b, b.textContent); b.textContent = a === "send" ? "Tocca di nuovo per mandarla a tutti" : "Tocca di nuovo per eliminarla"; b.classList.add("danger"); setTimeout(() => { if(armed.get(b)){ b.textContent = armed.get(b); armed.delete(b); b.classList.remove("danger"); } }, 5000); return; }
+    armed.delete(b);
+  }
+  b.disabled = true;
+  let error = null;
+  if(a === "del") ({error} = await sb.from("newsletters").delete().eq("id", id));
+  if(a === "requeue") ({error} = await sb.from("newsletters").update({status: "coda", error: null, pos: Date.now() / 1000, updated_at: new Date().toISOString()}).eq("id", id));
+  if(a === "up" || a === "down"){
+    const waiting = letters.filter(x => x.status === "coda").sort((x, y) => x.pos - y.pos), i = waiting.indexOf(n), o = waiting[a === "up" ? i - 1 : i + 1];
+    if(o){ ({error} = await sb.from("newsletters").update({pos: o.pos}).eq("id", n.id)); if(!error) ({error} = await sb.from("newsletters").update({pos: n.pos}).eq("id", o.id)); }
+  }
+  if(a === "send"){
+    const {data, error: err} = await sb.functions.invoke("newsletter", {body: {action: "send", id}});
+    if(err || !data || data.error) error = {message: await fnError(err, data, "newsletter") || "errore"};
+    else $("#nlFormMsg").textContent = `«${n.subject}» è partita.`;
+  }
+  if(error) alert("Non riuscito: " + error.message);
+  loadLetters();
+}
+["#nlQueueList", "#nlDrafts", "#nlSent"].forEach(s => $(s).addEventListener("click", letterAction));
+async function loadLetters(){
+  const {data, error} = await sb.from("newsletters").select("id, subject, preheader, kind, content, html, status, pos, created_at, updated_at, sent_at, error").order("pos");
+  if(error){
+    const msg = /does not exist|schema cache/i.test(error.message) ? "Manca la tabella delle newsletter: esegui newsletter-coda.sql su Supabase." : "Non riesco a caricare le newsletter: " + error.message;
+    $("#nlQueueList").innerHTML = `<p class="empty">${esc(msg)}</p>`; $("#nlDrafts").innerHTML = $("#nlSent").innerHTML = ""; return;
+  }
+  letters = data || []; renderLetters();
+}
+async function loadNews(){
+  const {data} = await sb.from("newsletter_settings").select("every_weeks, weekday, hour").eq("id", 1).maybeSingle();
+  if(data) rhythm = data;
+  paintRhythm(); $("#rEvery").onchange();
+  await loadLetters();
+}
