@@ -712,12 +712,12 @@ function newRound(mode, only){
     if(!due.length && !fresh.length) return renderDone();
     const qs = shuffle(due.slice()).concat(fresh);
     Q = {mode, list: pool(), qs, dirs: qs.map(() => Math.random() < .5 ? "f2n" : "n2f"), intro: new Set(fresh.map(p => p.id)),
-         relearn: new Set(), requeued: {}, i:0, res:[], streak:0, best:0, answered:false};
+         relearn: new Set(), requeued: {}, i:0, res:[], streak:0, best:0, answered:false}; festaReset();
     return renderToday(due, fresh);
   }
   const list = pool();
   const qs = only ? only.map(id => BYID[id]) : pickQuestions(list, Math.min(ROUND, perSession(), list.length));
-  Q = {mode, list, qs, i:0, res:[], streak:0, best:0, answered:false};
+  Q = {mode, list, qs, i:0, res:[], streak:0, best:0, answered:false}; festaReset();
   renderQuestion();
 }
 function renderQuestion(){
@@ -745,6 +745,7 @@ function renderQuestion(){
   }
   if(Q.answered) body += feedback(t);
   box.innerHTML = `<div class="qhead"><div class="pips" aria-label="Avanzamento">${pips}</div><div class="streak">Di fila <b>${Q.streak}</b> · Record <b>${Q.best}</b></div></div><div class="panel qcard">${body}</div>`;
+  box.querySelector(".qhead").appendChild(FESTA);
   box.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(b.dataset.id));
   const nx = $("#next"); if(nx) { nx.onclick = next; nx.focus({preventScroll:true}); }
 }
@@ -784,8 +785,13 @@ function answer(id){
   if(lvAfter > lvBefore) Q.opens = opensHTML(lvBefore, lvAfter);
   if(window.DojoSuoni) DojoSuoni.play(lvAfter > lvBefore ? "livello" : ok ? "giusto" : "sbagliato");
   renderQuestion();
-  if(ok) memePop();
+  if(ok){ const wait = festa(); if(wait) setTimeout(memePop, wait); else memePop(); }   // la frase scherzosa aspetta la fine della festa grande
 }
+// rinforzo positivo «D · Unione» (Grafica, approvato da Michele il 31/10): tavolette, striscia della fortuna, timbro, coriandoli (rinforzo.js)
+// la fila di tavolette vive in un elemento che resta tra una domanda e l'altra: renderQuestion lo riattacca sotto i pallini
+const FESTA = document.createElement("div"); FESTA.id = "festa";
+function festaReset(){ if(window.DojoFesta) DojoFesta.reset(FESTA); }
+function festa(){ if(window.DojoFesta) try{ return DojoFesta.giusto({host: FESTA, streak: Q.streak, n: Q.res.filter(Boolean).length}) || 0; }catch(e){} return 0; }
 // frasi scherzose sulla finanza online, una a caso a ogni risposta giusta (mai la stessa due volte di fila)
 const MEME = ["Sei prossimo alla FIRE!", "Mantieni la mano d'oro!", "Pubblicato su r/wallstreetbets!", "To the moon! 🚀", "Stonks! 📈",
   "Diamond hands! 💎🙌", "Warren Buffett ha messo like.", "Il tuo commercialista è fiero di te.", "Interesse composto sbloccato.",

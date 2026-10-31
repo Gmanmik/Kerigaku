@@ -737,7 +737,17 @@ window.DOJO_I18N = {
 "Harami cross smentito dal rising three methods": "Harami cross démenti par le rising three methods",
 "Harami smentito dal falling three methods": "Harami démenti par le falling three methods",
 "continuazione rialzista": "continuation haussière",
-"continuazione ribassista": "continuation baissière"
+"continuazione ribassista": "continuation baissière",
+"Fortuna enorme": "Grande fortune",
+"Un giorno intero di fortuna.": "Une journée entière de chance.",
+"Fortuna alta": "Belle fortune",
+"La mano oggi è buona.": "La main est bonne aujourd’hui.",
+"Piccola fortuna": "Petite fortune",
+"Una alla volta, e il grafico si apre.": "Une à la fois, et le graphique s’ouvre.",
+"Fortuna": "Fortune",
+"Giusto. Avanti così.": "Juste. Continue comme ça.",
+"DI FILA": "D’AFFILÉE",
+"Sessione completa: dieci tavolette!": "Séance complète : dix tablettes !"
 },
 "h": {
 "Un dojo per allenare <em>l'occhio</em>": "Un dojo pour entraîner <em>l'œil</em>",

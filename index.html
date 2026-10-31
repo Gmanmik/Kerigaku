@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="landing.css">
 <link rel="stylesheet" href="icone-livelli.css">
 <link rel="stylesheet" href="tasti-hover.css">
+<link rel="stylesheet" href="rinforzo.css">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}</style>
 <style>
 /* Versione A · Sumi. Carta washi e inchiostro: tanto bianco, filetti sottili al posto delle scatole,
@@ -24,7 +25,7 @@
 :root{
   --paper:#F3EEE4; --grain:rgba(60,40,10,.035); --card:#FBF8F2; --well:#F7F2E9;
   --ink:#1D1A16; --muted:#6E665A; --line:#DCD2C1; --line2:#C9BDA8;
-  --bull:#2E6A4E; --bull-soft:#E1EBDF; --bear:#BF3A22; --bear-soft:#F5E0D7; --doji:#3A352E;
+  --gold:#B8963E; --bull:#2E6A4E; --bull-soft:#E1EBDF; --bear:#BF3A22; --bear-soft:#F5E0D7; --doji:#3A352E;
   --accent:#BF3A22; --accent-soft:#F5E0D7; --hl:#F1E6C6; --hl-line:#B8963E;
   --seal:#C0392B; --seal-ink:#FFFFFF;
   --display:"Shippori Mincho", "Hiragino Mincho ProN", Georgia, serif;
@@ -35,12 +36,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#15130F; --grain:rgba(255,240,210,.03); --card:#201C17; --well:#1A1713;
   --ink:#F4EEE3; --muted:#C4BBAC; --line:#4D463B; --line2:#6A6152;
-  --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B; --doji:#E8E0D1;
+  --gold:#D8B24E; --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B; --doji:#E8E0D1;
   --accent:#E8714F; --accent-soft:#35201A; --hl:#2E2817; --hl-line:#9C8236; --seal:#D9503A; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#15130F; --grain:rgba(255,240,210,.03); --card:#201C17; --well:#1A1713;
   --ink:#F4EEE3; --muted:#C4BBAC; --line:#4D463B; --line2:#6A6152;
-  --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B; --doji:#E8E0D1;
+  --gold:#D8B24E; --bull:#86C29C; --bull-soft:#20302A; --bear:#EE7B59; --bear-soft:#3A221B; --doji:#E8E0D1;
   --accent:#E8714F; --accent-soft:#35201A; --hl:#2E2817; --hl-line:#9C8236; --seal:#D9503A; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -144,6 +145,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 
 /* ---------- quiz ---------- */
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#festa{flex-basis:100%}#festa .wall:empty,#festa .sigs:empty{display:none}
 .pips{display:flex;gap:7px;flex-wrap:wrap}
 .pip{width:11px;height:11px;border-radius:50%;background:transparent;border:1.5px solid var(--line2)}
 .pip.cur{background:var(--ink);border-color:var(--ink)}
@@ -540,6 +542,7 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
 <script src="suoni.js"></script>
 <script src="landing.js" defer></script>
 <script src="figure.js"></script>
+<script src="rinforzo.js"></script>
 <script src="app.js"></script>
 <script src="scenari.js"></script>
 <script src="prova-dojo.js"></script>

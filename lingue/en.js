@@ -735,7 +735,17 @@ window.DOJO_I18N = {
 "Homing pigeon e doji star": "Homing pigeon and doji star",
 "Deliberation, poi side by side white lines": "Deliberation, then side by side white lines",
 "Harami cross smentito dal rising three methods": "Harami cross contradicted by rising three methods",
-"Harami smentito dal falling three methods": "Harami contradicted by falling three methods"
+"Harami smentito dal falling three methods": "Harami contradicted by falling three methods",
+"Fortuna enorme": "Great fortune",
+"Un giorno intero di fortuna.": "A whole day of luck.",
+"Fortuna alta": "High fortune",
+"La mano oggi è buona.": "Your hand is good today.",
+"Piccola fortuna": "Small fortune",
+"Una alla volta, e il grafico si apre.": "One at a time, and the chart opens up.",
+"Fortuna": "Fortune",
+"Giusto. Avanti così.": "Correct. Keep it up.",
+"DI FILA": "IN A ROW",
+"Sessione completa: dieci tavolette!": "Session complete: ten tablets!"
 },
 "h": {
 "Un dojo per allenare <em>l'occhio</em>": "A dojo to train <em>your eye</em>",
