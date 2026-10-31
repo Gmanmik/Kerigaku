@@ -57,7 +57,7 @@ const captcha = (() => {
     el = box; token = "";
     if(id !== null && window.turnstile){ try{ turnstile.remove(id); }catch(e){} id = null; }
     if(!key || !box || !window.turnstile || !box.isConnected) return;
-    id = turnstile.render(box, {sitekey: key, size: "flexible", appearance: "interaction-only", language: "it",
+    id = turnstile.render(box, {sitekey: key, size: "flexible", appearance: "interaction-only", language: window.DOJO_LANG || "it",
       theme: document.documentElement.dataset.theme || "auto",
       callback: t => { token = t; waiters.splice(0).forEach(f => f(t)); },
       "expired-callback": () => { token = ""; }, "error-callback": () => { token = ""; }});
@@ -166,6 +166,9 @@ const cloud = (() => {
     const guest = {srs, stats, daily};
     user = u; setSpace(u.id); paint("loading");
     nlSync(u);
+    // la lingua del sito finisce nei dati dell'account, così le email di Supabase (codici, reset) arrivano nella stessa lingua
+    const lang = window.DOJO_LANG || "it";
+    if((u.user_metadata || {}).lang !== lang) try{ sb.auth.updateUser({data: {lang}}).catch(() => {}); }catch(e){}
     const {data, error} = await sb.from("progress").select("data").eq("user_id", u.id).maybeSingle();
     if(error){ if(await recover(error, true)) return; paint("error"); }
     else if(data){ if(merge(data.data || {})) flush(); else paint("ok"); }
@@ -232,7 +235,7 @@ const cloud = (() => {
     async signUp(name, email, pw, marketing){
       const free = await must(sb.rpc("username_available", {u: name}));
       if(!free) throw "Questo username è già preso: scegline un altro.";
-      const d = await must(sb.auth.signUp({email, password: pw, options: {data: {username: name, marketing: !!marketing}, captchaToken: await captcha.take()}}));
+      const d = await must(sb.auth.signUp({email, password: pw, options: {data: {username: name, marketing: !!marketing, lang: window.DOJO_LANG || "it"}, captchaToken: await captcha.take()}}));
       if(d.session) await enter(d.user);   // conferma email disattivata
       return !d.session;
     },
@@ -589,8 +592,9 @@ function bindDanger(id, onYes, word = DANGER_WORD){
   const show = on => { c.hidden = !on; open.hidden = on; open.setAttribute("aria-expanded", String(on)); w.value = ""; go.disabled = true; if(on) w.focus(); else open.focus(); };
   open.onclick = () => { $("#" + id + "-m").textContent = ""; show(true); };
   $("#" + id + "-no").onclick = () => show(false);
-  w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== word; };
-  go.onclick = () => { if(w.value.trim().toUpperCase() !== word) return; go.disabled = true; w.value = ""; c.hidden = true; open.hidden = false; open.setAttribute("aria-expanded", "false"); onYes(); };
+  const want = window.t ? t(word) : word;
+  w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== want; };
+  go.onclick = () => { if(w.value.trim().toUpperCase() !== want) return; go.disabled = true; w.value = ""; c.hidden = true; open.hidden = false; open.setAttribute("aria-expanded", "false"); onYes(); };
 }
 function renderIllustrations(){
   const mini = (id, o) => chartSVG(BYID[id], Object.assign({arrow:true, w:90, h:80, maxSlot:16, maxBody:8}, o));
@@ -1100,6 +1104,13 @@ function soundHTML(){
   return `<section class="panel acard"><div class="eyebrow">Suoni</div>
     <p>Un suono breve per risposta giusta, risposta sbagliata e salita di livello. Sono spenti all'inizio.</p>
     <button class="btn ghost" type="button" data-suoni aria-pressed="false">Suoni spenti</button>
+  </section>` + langHTML();
+}
+// lingua del sito: i pulsanti data-set-lang li gestisce lingua.js
+function langHTML(){
+  const langs = window.DOJO_LANGS || {it: "Italiano"}, cur = window.DOJO_LANG || "it";
+  return `<section class="panel acard"><div class="eyebrow">Lingua</div>
+    <div class="seg" role="group" aria-label="Lingua">${Object.keys(langs).map(c => `<button type="button" data-set-lang="${c}" lang="${c}" translate="no" aria-pressed="${c === cur}">${langs[c]}</button>`).join("")}</div>
   </section>`;
 }
 async function showAccount(){
