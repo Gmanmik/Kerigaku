@@ -971,7 +971,7 @@ function showLanding(){
   document.body.classList.add("is-landing"); $("#landing").hidden = false;
   heroAnim.stop();
   const fig = (id, ctx) => { const p = BYID[id]; return chartSVG(p, {context: ctx ? makeContext(p) : [], w: 320, h: 200, maxSlot: 30, maxBody: 14, aria: p.name}); };
-  $("#lp-gear").innerHTML = GEAR; if(window.DojoSuoni) DojoSuoni.paint();
+  $("#lp-gear").innerHTML = GEAR; $("#lp-lingue").innerHTML = langButtons(); if(window.DojoSuoni) DojoSuoni.paint();
   $("#lp-1").innerHTML = fig("hammer_p", true); $("#lp-2").innerHTML = fig("mstar_p", true);
   window.scrollTo({top:0});
 }
@@ -1106,11 +1106,16 @@ function soundHTML(){
     <button class="btn ghost" type="button" data-suoni aria-pressed="false">Suoni spenti</button>
   </section>` + langHTML();
 }
-// lingua del sito: i pulsanti data-set-lang li gestisce lingua.js
-function langHTML(){
+// lingua del sito: si sceglie solo nelle Impostazioni (e nell'ingranaggio della landing); i clic su data-set-lang li gestisce lingua.js
+// le bandierine sono emoji disegnate dal font Twemoji Country Flags, ospitato sul sito, così si vedono anche su Windows
+const LANG_FLAGS = {it: "🇮🇹", en: "🇬🇧", es: "🇪🇸", pt: "🇧🇷", fr: "🇫🇷"};
+function langButtons(){
   const langs = window.DOJO_LANGS || {it: "Italiano"}, cur = window.DOJO_LANG || "it";
+  return Object.keys(langs).map(c => `<button type="button" data-set-lang="${c}" lang="${c}" translate="no" aria-pressed="${c === cur}"><span class="flag" aria-hidden="true">${LANG_FLAGS[c] || ""}</span>${langs[c]}</button>`).join("");
+}
+function langHTML(){
   return `<section class="panel acard"><div class="eyebrow">Lingua</div>
-    <div class="seg" role="group" aria-label="Lingua">${Object.keys(langs).map(c => `<button type="button" data-set-lang="${c}" lang="${c}" translate="no" aria-pressed="${c === cur}">${langs[c]}</button>`).join("")}</div>
+    <div class="lingue" role="group" aria-label="Lingua">${langButtons()}</div>
   </section>`;
 }
 async function showAccount(){

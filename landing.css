@@ -50,6 +50,9 @@ body.is-landing .wrap{display:none}
 #landing .gearbtn{display:inline-grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:2px;background:transparent;color:var(--ink);cursor:pointer}
 #landing .gearbtn svg{width:20px;height:20px}
 #landing .gearbtn:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
-#landing #lp-set{position:absolute;top:60px;right:max(16px,env(safe-area-inset-right));background:var(--paper);border:1px solid var(--line2);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+#landing #lp-set{position:absolute;top:60px;right:max(16px,env(safe-area-inset-right));background:var(--paper);border:1px solid var(--line2);padding:12px 14px;display:grid;gap:12px;width:min(320px,calc(100vw - 32px));box-sizing:border-box;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+#landing #lp-set .lp-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#landing #lp-set .lp-col{display:grid;justify-content:stretch;gap:8px}
+#landing #lp-set .lingue{grid-template-columns:1fr 1fr}
 #landing #lp-set[hidden]{display:none}
 #landing #lp-set p{margin:0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}

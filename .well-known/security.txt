@@ -1,0 +1,6 @@
+# Dojo delle candele: come segnalare un problema di sicurezza
+Contact: mailto:admin@dojodellecandele.com
+Expires: 2027-10-31T00:00:00.000Z
+Preferred-Languages: it, en
+Canonical: https://dojodellecandele.com/.well-known/security.txt
+Policy: https://dojodellecandele.com/privacy.html

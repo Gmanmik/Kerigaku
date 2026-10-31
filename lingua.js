@@ -2,7 +2,7 @@
    "frase italiana → traduzione", e traduce la pagina mentre si disegna (anche quello che app.js aggiunge dopo).
    Si carica nell'<head>, subito dopo theme-init.js. La scelta resta nel browser (dojo-lang); al primo accesso segue la lingua del browser. */
 (function(){
-  var LANGS = {it: "Italiano", en: "English"};
+  var LANGS = {it: "Italiano", en: "English", es: "Español", pt: "Português", fr: "Français"};
   var lang = "it";
   try{ lang = localStorage.getItem("dojo-lang") || ""; }catch(e){}
   // un link con ?lang=en apre il sito in quella lingua e la ricorda
