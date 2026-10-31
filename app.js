@@ -200,10 +200,13 @@ const cloud = (() => {
     if(m.includes("troppi tentativi")) return "Troppi tentativi sbagliati con questo username: riprova tra 15 minuti o entra con l'email.";
     if(m.includes("already registered") || m.includes("already been registered")) return "Questa email ha già un account: prova ad accedere.";
     if(m.includes("database error saving new user")) return "Questo username è già preso o non è valido: scegline un altro.";
+    if(m.includes("totp")) return "Codice dell'app sbagliato o scaduto: scrivi quello che vedi adesso nell'app (se continua, controlla che l'ora del telefono sia giusta).";
     if(m.includes("token has expired") || m.includes("invalid") && m.includes("otp") || m.includes("token")) return "Codice sbagliato o scaduto: controlla l'ultima email o fattene mandare un altro.";
     if(m.includes("rate limit") || m.includes("security purposes")) return "Troppe richieste in poco tempo: aspetta un minuto e riprova.";
     if(m.includes("should be different")) return "La nuova password deve essere diversa da quella attuale.";
     if(m.includes("aal2")) return "Prima inserisci il codice della tua app di autenticazione.";
+    if(m.includes("only request this after") || m.includes("rate limit")) return "Hai chiesto troppi codici: aspetta un minuto e riprova.";
+    if(m.includes("token has expired") || m.includes("otp_expired") || m.includes("invalid token")) return "Codice sbagliato o scaduto: chiedine uno nuovo.";
     if(m.includes("password")) return "La password deve avere almeno 8 caratteri, con lettere e numeri.";
     if(m.includes("email") && m.includes("invalid")) return "Questo indirizzo email non sembra valido.";
     return "Qualcosa non ha funzionato: " + (e && e.message || "riprova tra poco.");
@@ -236,6 +239,13 @@ const cloud = (() => {
     async verifySignup(email, code){ const d = await must(sb.auth.verifyOtp({email, token: code, type: "signup"})); await enter(d.user); },
     resendSignup: async email => must(sb.auth.resend({type: "signup", email, options: {captchaToken: await captcha.take()}})),
     sendReset: async email => must(sb.auth.resetPasswordForEmail(email, {captchaToken: await captcha.take()})),
+    // entrare senza password: un codice a 6 cifre via email (solo per account che esistono già; il modello "Magic Link" di Supabase ha {{ .Token }})
+    async sendLoginCode(email){
+      const {error} = await sb.auth.signInWithOtp({email, options: {shouldCreateUser: false, captchaToken: await captcha.take()}});
+      // se l'email non ha un account non lo diciamo, così nessuno può scoprire chi è iscritto
+      if(error && !/signups not allowed|user not found/i.test(error.message)) throw errText(error);
+    },
+    async verifyLogin(email, code){ const d = await must(sb.auth.verifyOtp({email, token: code, type: "email"})); await enter(d.user); },
     // prima di cambiare password chiede al database se è una di quelle già usate (password.sql); se la funzione non c'è, va avanti
     async setPassword(pw){
       const {data: used, error} = await sb.rpc("password_used_before", {pw});
@@ -983,9 +993,11 @@ function paintAuth(step){
     code: ["Controlla la tua email", ""],
     forgot: ["Password dimenticata", "Scrivi l'email del tuo account: ti mandiamo un codice per sceglierne una nuova."],
     reset: ["Scegli la nuova password", ""],
-    mfa: ["Verifica in due passaggi", "Apri l'app di autenticazione e scrivi il codice a 6 cifre del Dojo."]
+    mfa: ["Verifica in due passaggi", "Apri l'app di autenticazione e scrivi il codice a 6 cifre del Dojo."],
+    otp: ["Entra con un codice", "Scrivi l'email del tuo account: ti mandiamo un codice a 6 cifre per entrare senza password."],
+    otpcode: ["Controlla la tua email", ""]
   }[step];
-  const code = `inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="123456"`;
+  const code = `inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456"`;
   let f = "";
   if(step === "in") f = fieldHTML("au-id", "Email o username", `autocomplete="username" autocapitalize="none" spellcheck="false"`) + fieldHTML("au-pw", "Password", `type="password" autocomplete="current-password"`);
   if(step === "up") f = fieldHTML("au-name", "Username", `autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24"`) +
@@ -993,26 +1005,27 @@ function paintAuth(step){
     fieldHTML("au-pw", "Password", `type="password" autocomplete="new-password"`) + fieldHTML("au-pw2", "Ripeti la password", `type="password" autocomplete="new-password"`) +
     `<label class="check"><input type="checkbox" id="au-mkt"> <span>Voglio ricevere via email novità e consigli dal Dojo. Puoi disiscriverti quando vuoi.</span></label>
     <p class="hint">Creando l'account confermi di aver letto l'<a href="privacy.html" target="_blank" rel="noopener">informativa privacy</a>.</p>`;
-  if(step === "code" || step === "mfa") f = fieldHTML("au-code", "Codice a 6 cifre", code);
-  if(step === "forgot") f = fieldHTML("au-email", "Email", `type="email" autocomplete="email" autocapitalize="none" spellcheck="false"`);
+  if(step === "code" || step === "mfa" || step === "otpcode") f = fieldHTML("au-code", "Codice a 6 cifre", code);
+  if(step === "forgot" || step === "otp") f = fieldHTML("au-email", "Email", `type="email" autocomplete="email" autocapitalize="none" spellcheck="false"`);
   if(step === "reset") f = fieldHTML("au-code", "Codice a 6 cifre", code) + fieldHTML("au-pw", "Nuova password", `type="password" autocomplete="new-password"`) + fieldHTML("au-pw2", "Ripeti la password", `type="password" autocomplete="new-password"`);
-  const go = {in: "Entra", up: "Crea account", code: "Conferma", forgot: "Mandami il codice", reset: "Salva e entra", mfa: "Verifica"}[step];
+  const go = {in: "Entra", up: "Crea account", code: "Conferma", forgot: "Mandami il codice", reset: "Salva e entra", mfa: "Verifica", otp: "Mandami il codice", otpcode: "Entra"}[step];
   card.innerHTML = `<div class="eyebrow">Dojo delle candele · 道場</div><h2></h2><p class="hint au-sub"></p>
     ${tabs ? `<div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati"><button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button></div>` : ""}
-    <form id="authForm" novalidate>${f}${["in", "up", "code", "forgot"].includes(step) ? `<div class="cf-ts" id="au-ts"></div>` : ""}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
+    <form id="authForm" novalidate>${f}${["in", "up", "code", "forgot", "otp", "otpcode"].includes(step) ? `<div class="cf-ts" id="au-ts"></div>` : ""}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
     <div class="au-links">
-      ${step === "in" ? `<button class="linkbtn" type="button" data-s="forgot">Password dimenticata?</button>` : ""}
-      ${step === "code" ? `<button class="linkbtn" type="button" id="au-resend">Mandami un altro codice</button>` : ""}
+      ${step === "in" ? `<button class="linkbtn" type="button" data-s="otp">Entra con un codice via email</button><button class="linkbtn" type="button" data-s="forgot">Password dimenticata?</button>` : ""}
+      ${step === "code" || step === "otpcode" ? `<button class="linkbtn" type="button" id="au-resend">Mandami un altro codice</button>` : ""}
       ${tabs ? `<button class="linkbtn" id="au-guest" type="button">Continua senza account</button>` : `<button class="linkbtn" type="button" data-s="in">Torna all'accesso</button>`}
     </div>`;
   card.querySelector("h2").textContent = T[0];
   card.querySelector(".au-sub").textContent = step === "code" ? `Abbiamo mandato un codice a 6 cifre a ${AUTH.email}. Scrivilo qui per attivare l'account.` :
-    step === "reset" ? `Scrivi il codice che abbiamo mandato a ${AUTH.email} e la nuova password.` : T[1];
+    step === "reset" ? `Scrivi il codice che abbiamo mandato a ${AUTH.email} e la nuova password.` :
+    step === "otpcode" ? `Se ${AUTH.email} è l'email di un account del Dojo, ti abbiamo mandato un codice a 6 cifre. Scrivilo qui per entrare.` : T[1];
   card.querySelectorAll("#authSeg button").forEach(b => { b.setAttribute("aria-pressed", b.dataset.v === step); b.onclick = () => paintAuth(b.dataset.v); });
   card.querySelectorAll("[data-s]").forEach(b => b.onclick = async () => { if(step === "mfa") await cloud.sb.auth.signOut(); paintAuth(b.dataset.s); });
   const guest = $("#au-guest"); if(guest) guest.onclick = () => { store.set("dojo-guest", true); goHome(); };
   const resend = $("#au-resend"); if(resend) resend.onclick = async () => {
-    try{ await cloud.resendSignup(AUTH.email); $("#au-ok").textContent = "Codice rimandato: controlla anche lo spam."; $("#au-err").textContent = ""; }
+    try{ await (step === "otpcode" ? cloud.sendLoginCode(AUTH.email) : cloud.resendSignup(AUTH.email)); $("#au-ok").textContent = "Codice rimandato: controlla anche lo spam."; $("#au-err").textContent = ""; }
     catch(m){ $("#au-err").textContent = m; }
   };
   $("#authForm").addEventListener("submit", submitAuth);
@@ -1021,7 +1034,7 @@ function paintAuth(step){
 }
 async function submitAuth(e){
   e.preventDefault();
-  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const v = id => { const el = document.getElementById(id); return !el ? "" : id === "au-code" ? el.value.replace(/\s+/g, "") : el.value.trim(); };
   const err = $("#au-err"), go = $("#au-go"), step = AUTH.step;
   const fail = m => { err.textContent = m; };
   const okEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -1033,8 +1046,8 @@ async function submitAuth(e){
   }
   if((step === "up" || step === "reset") && weakPw(pw)) return fail("La password deve avere almeno 8 caratteri, con lettere e numeri.");
   if((step === "up" || step === "reset") && pw !== $("#au-pw2").value) return fail("Le due password non coincidono.");
-  if((step === "code" || step === "reset" || step === "mfa") && !/^\d{6}$/.test(v("au-code"))) return fail("Il codice è fatto di 6 cifre.");
-  if(step === "forgot" && !okEmail(v("au-email"))) return fail("Scrivi l'email del tuo account.");
+  if((step === "code" || step === "reset" || step === "mfa" || step === "otpcode") && !/^\d{6}$/.test(v("au-code"))) return fail("Il codice è fatto di 6 cifre.");
+  if((step === "forgot" || step === "otp") && !okEmail(v("au-email"))) return fail("Scrivi l'email del tuo account.");
   go.disabled = true; err.textContent = "";
   try{
     if(step === "in"){
@@ -1046,6 +1059,8 @@ async function submitAuth(e){
       if(pending) return paintAuth("code");
     }
     if(step === "code") await cloud.verifySignup(AUTH.email, v("au-code"));
+    if(step === "otp"){ AUTH.email = v("au-email").toLowerCase(); await cloud.sendLoginCode(AUTH.email); return paintAuth("otpcode"); }
+    if(step === "otpcode") await cloud.verifyLogin(AUTH.email, v("au-code"));
     if(step === "forgot"){ AUTH.email = v("au-email").toLowerCase(); await cloud.sendReset(AUTH.email); return paintAuth("reset"); }
     if(step === "reset" && await cloud.resetWithCode(AUTH.email, v("au-code"), pw) === "mfa"){ AUTH.newPw = pw; return paintAuth("mfa"); }
     if(step === "mfa"){ await cloud.verifyMfa(v("au-code"), AUTH.newPw); AUTH.newPw = ""; }
@@ -1116,7 +1131,7 @@ async function showAccount(){
       <p><span class="hint">Username</span><br><b class="u-name"></b></p>
       <p><span class="hint">Email</span><br><b class="u-mail"></b></p>
       <form id="f-mail" class="row" novalidate><input id="ac-mail" type="email" autocomplete="email" autocapitalize="none" placeholder="${legacy ? "La tua email" : "Nuova email"}" aria-label="Email"><button class="btn" type="submit">${legacy ? "Aggiungi email" : "Cambia email"}</button></form>
-      <form id="f-mailcode" class="row" novalidate hidden><input id="ac-mailcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Codice a 6 cifre" aria-label="Codice"><button class="btn" type="submit">Conferma</button></form>
+      <form id="f-mailcode" class="row" novalidate hidden><input id="ac-mailcode" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="Codice a 6 cifre" aria-label="Codice"><button class="btn" type="submit">Conferma</button></form>
       <p class="au-err" id="m-mail" role="status"></p>
     </section>
     <section class="panel acard"><div class="eyebrow">Newsletter</div>
@@ -1166,7 +1181,7 @@ async function showAccount(){
   };
   $("#f-mailcode").onsubmit = async e => {
     e.preventDefault();
-    const {error} = await sb.auth.verifyOtp({email: newMail, token: $("#ac-mailcode").value.trim(), type: "email_change"});
+    const {error} = await sb.auth.verifyOtp({email: newMail, token: $("#ac-mailcode").value.replace(/\s+/g, ""), type: "email_change"});
     if(error) return say("#m-mail", cloud.errText(error));
     const {data: ref} = await sb.auth.refreshSession(); if(ref && ref.user) nlSync(ref.user, true);
     showAccount();
@@ -1189,11 +1204,11 @@ async function showAccount(){
     const {data, error} = await sb.auth.mfa.enroll({factorType: "totp", issuer: "Dojo delle candele", friendlyName: "Dojo " + Date.now()});
     if(error) return say("#m-mfa", cloud.errText(error));
     $("#mfaBox").innerHTML = `<ol class="mfasteps"><li>Inquadra il codice QR con l'app di autenticazione.</li><li>Se non puoi inquadrarlo, inserisci a mano la chiave <code class="secret"></code></li><li>Scrivi qui il codice a 6 cifre che compare nell'app.</li></ol>
-      <img class="qr" alt="Codice QR per l'app di autenticazione"><form id="f-mfa" class="row" novalidate><input id="ac-mfacode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-label="Codice dell'app"><button class="btn" type="submit">Attiva</button></form>`;
+      <img class="qr" alt="Codice QR per l'app di autenticazione"><form id="f-mfa" class="row" novalidate><input id="ac-mfacode" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456" aria-label="Codice dell'app"><button class="btn" type="submit">Attiva</button></form>`;
     $("#mfaBox .qr").src = data.totp.qr_code; $("#mfaBox .secret").textContent = data.totp.secret;
     $("#f-mfa").onsubmit = async e => {
       e.preventDefault();
-      const r = await sb.auth.mfa.challengeAndVerify({factorId: data.id, code: $("#ac-mfacode").value.trim()});
+      const r = await sb.auth.mfa.challengeAndVerify({factorId: data.id, code: $("#ac-mfacode").value.replace(/\s+/g, "")});
       if(r.error) return say("#m-mfa", "Codice sbagliato: controlla l'orario del dispositivo e riprova.");
       showAccount();
     };
