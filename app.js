@@ -2,8 +2,8 @@ const BYID = Object.fromEntries(P.map(p => [p.id, p]));
 const GEAR = `<svg class="gear" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" fill-rule="evenodd" d="M20.05 10.44 L22.91 10.56 L22.91 13.44 L20.05 13.56 L19.58 15.14 L18.80 16.59 L20.73 18.70 L18.70 20.73 L16.59 18.80 L15.14 19.58 L13.56 20.05 L13.44 22.91 L10.56 22.91 L10.44 20.05 L8.86 19.58 L7.41 18.80 L5.30 20.73 L3.27 18.70 L5.20 16.59 L4.42 15.14 L3.95 13.56 L1.09 13.44 L1.09 10.56 L3.95 10.44 L4.42 8.86 L5.20 7.41 L3.27 5.30 L5.30 3.27 L7.41 5.20 L8.86 4.42 L10.44 3.95 L10.56 1.09 L13.44 1.09 L13.56 3.95 L15.14 4.42 L16.59 5.20 L18.70 3.27 L20.73 5.30 L18.80 7.41 L19.58 8.86ZM15.4 12a3.4 3.4 0 1 0 -6.8 0a3.4 3.4 0 1 0 6.8 0Z"/></svg> `;
 const ROUND = 10;
 
-/* ---------- livelli e figure aperte: al livello 1 sono aperte le 20 figure più note, il livello 2 ne apre altre 24 e il 3 le ultime 22.
-   I livelli salgono con le risposte giuste (vedi LEVELS); le figure già studiate restano sempre aperte. La Prova del Dojo si apre dal livello 2. */
+/* ---------- livelli e formazioni aperte: al livello 1 sono aperte le 20 formazioni più note, il livello 2 ne apre altre 24 e il 3 le ultime 22.
+   I livelli salgono con le risposte giuste (vedi LEVELS); le formazioni già studiate restano sempre aperte. La Prova del Dojo si apre dal livello 2. */
 const FIG_GROUPS = [
   ["hammer_p","hanging_m","invhammer_p","shooting_m","engulf_p","engulf_m","harami_p","harami_m","haramix_p","haramix_m",  "piercing_p","darkcloud_m","dojistar_p","dojistar_m","mstar_p","estar_m","mdoji_p","edoji_m","3soldiers_p","3crows_m"],
   ["belthold_p","belthold_m","seplines_p","seplines_m","rising3_p","falling3_m","matchlow_p","matchhigh_m",
@@ -111,8 +111,8 @@ const cloud = (() => {
     if(dirty && user) flush();
   }
   function schedule(){ if(!user) return; clearTimeout(timer); timer = setTimeout(flush, 700); }
-  // unisce i progressi del server con quelli locali: per ogni figura vince quella più avanti
-  // i dati arrivano dal server: tiene solo le figure conosciute e solo numeri
+  // unisce i progressi del server con quelli locali: per ogni formazione vince quella più avanti
+  // i dati arrivano dal server: tiene solo le formazioni conosciute e solo numeri
   const num = v => Number.isFinite(+v) ? +v : 0;
   function clean(r){
     const srs = {}, stats = {}, ids = new Set(P.map(p => p.id));
@@ -176,7 +176,7 @@ const cloud = (() => {
       // primo accesso: porta nell'account quello che hai fatto senza account
       merge(guest); flush();
     }
-    // figure imposte dall'admin (la tabella può non esserci ancora: in quel caso non succede nulla)
+    // formazioni imposte dall'admin (la tabella può non esserci ancora: in quel caso non succede nulla)
     const fz = await sb.from("progress_forced").select("item, box, t").eq("user_id", u.id);
     if(!fz.error && applyForced(fz.data)) flush();
     goHome();
@@ -294,7 +294,7 @@ const everyText = b => b === 0 ? "Non l'hai ancora incontrata in Studia e ripass
 const BELT_SVG = b => `<svg class="belt k${b}" viewBox="0 0 34 16" aria-hidden="true"><rect x="1" y="4.5" width="32" height="5" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><path d="M15 10.5l-3.5 4.5h3.5l2-3zM19 10.5l3.5 4.5H19l-2-3z"/></svg>`;
 let srs = store.get(K("dojo-srs-v1"), {});    // id -> {b: scatola 0..5, due: giorno}
 let daily = store.get(K("dojo-daily-v1"), {day:0, newCount:0});
-// azzeramenti e figure imposte dall'admin: ricordo l'ultimo visto, così un altro dispositivo non riporta indietro i vecchi progressi
+// azzeramenti e formazioni imposte dall'admin: ricordo l'ultimo visto, così un altro dispositivo non riporta indietro i vecchi progressi
 let resetSeen = store.get(K("dojo-reset-v1"), 0), forcedSeen = store.get(K("dojo-forced-v1"), {});
 function loadLocal(){
   stats = store.get(K("dojo-stats-v1"), {});
@@ -313,7 +313,7 @@ function wipeProgress(at){
   if(window.Scenari) Scenari.reset();
   saveLocal();
 }
-// figure fatte imparare (box 5) o dimenticare (box 0) dall'admin, dalla tabella progress_forced
+// formazioni fatte imparare (box 5) o dimenticare (box 0) dall'admin, dalla tabella progress_forced
 function applyForced(rows){
   let changed = false;
   for(const r of rows || []){
@@ -339,12 +339,12 @@ function grade(id, ok, relearn){
 }
 function srsQueue(){
   const t = today(), list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam), max = perSession();
-  // prima le figure da ripassare, poi le nuove; in tutto non più di quante ne hai scelte nelle Impostazioni
+  // prima le formazioni da ripassare, poi le nuove; in tutto non più di quante ne hai scelte nelle Impostazioni
   const due = list.filter(p => sc(p.id).b > 0 && sc(p.id).due <= t).sort((a, b) => sc(a.id).due - sc(b.id).due).slice(0, max);
   const fresh = list.filter(p => sc(p.id).b === 0).slice(0, Math.min(newLeft(), max - due.length));
   return {due, fresh};
 }
-// quando arriva una figura mai vista in Studia e ripassa (se ripassi ogni giorno): "oggi", "domani", "tra 3 giorni"
+// quando arriva una formazione mai vista in Studia e ripassa (se ripassi ogni giorno): "oggi", "domani", "tra 3 giorni"
 function arrivalText(id){
   const list = openP().filter(p => prefs.fam === "all" || p.fam === prefs.fam).filter(p => sc(p.id).b === 0);
   const k = list.findIndex(p => p.id === id);
@@ -366,7 +366,7 @@ function nextDueDay(){
   return ds.length ? Math.min(...ds) : null;
 }
 const learnedFig = id => sc(id).b >= 2;
-// gruppo di figure aperto dal livello raggiunto
+// gruppo di formazioni aperto dal livello raggiunto
 function groupNow(){ return LEVEL_GROUP[levelInfo().i]; }
 // aperta: compresa nel gruppo del livello raggiunto, oppure già studiata
 const isOpen = (p, gi = groupNow()) => GROUP_OF[p.id] <= gi || sc(p.id).b > 0;
@@ -447,7 +447,7 @@ function chartSVG(p, o = {}){
       g += `<line x1="${cx-bw*.62}" x2="${cx+bw*.62}" y1="${Y(b)}" y2="${Y(b)}" stroke="${o.mono ? "var(--line2)" : "var(--doji)"}" stroke-width="${sw*1.1}"/>`;
       return;
     }
-    const col = o.mono ? "var(--line2)" : k === "w" ? "var(--bull)" : "var(--bear)";   // mono: figura chiusa, nessun indizio dal colore
+    const col = o.mono ? "var(--line2)" : k === "w" ? "var(--bull)" : "var(--bear)";   // mono: formazione chiusa, nessun indizio dal colore
     g += `<line x1="${cx}" x2="${cx}" y1="${Y(h)}" y2="${Y(l)}" stroke="${col}" stroke-width="${sw}"/>`;
     const yt = Y(t), hh = Math.max(1.6, (t - b) * s);
     g += `<rect x="${(cx-bw/2).toFixed(1)}" y="${yt.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="1.5" fill="${col}"/>`;
@@ -458,7 +458,7 @@ function chartSVG(p, o = {}){
 
 /* ---------- views & menu ---------- */
 let view = "home";
-const MODE_TITLE = {srs:"Studia e ripassa", studia:"Studia", f2n:"Figura → Nome", n2f:"Nome → Figura", scen:"Scenari", prova:"La Prova del Dojo"};
+const MODE_TITLE = {srs:"Studia e ripassa", studia:"Studia", f2n:"Formazione → Nome", n2f:"Nome → Formazione", scen:"Scenari", prova:"La Prova del Dojo"};
 function setTab(t){
   leaveLanding();
   view = t; if(t !== "studia"){ prefs.mode = t; savePrefs(); }
@@ -466,9 +466,9 @@ function setTab(t){
   $("#bar").hidden = false;
   $("#barTitle").textContent = MODE_TITLE[t];
   const famTxt = {all:"Tutte le famiglie", inv:"Solo inversione", cont:"Solo continuazione"}[prefs.fam];
-  $("#barCfg").innerHTML = t === "studia" || t === "scen" || t === "prova" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>` :
+  $("#barCfg").innerHTML = t === "studia" || t === "scen" || t === "prova" ? "" : t === "srs" ? `<span class="chip n">${famTxt}</span><span class="chip n">${prefs.hl ? "Formazione evidenziata" : "Senza aiuto"}</span>` :
     `<span class="chip n">${famTxt}</span>` +
-    `<span class="chip n">${prefs.hl ? "Figura evidenziata" : "Senza aiuto"}</span>`;
+    `<span class="chip n">${prefs.hl ? "Formazione evidenziata" : "Senza aiuto"}</span>`;
   $("#view-studia").hidden = t !== "studia";
   $("#view-quiz").hidden = t === "studia";
   heroAnim.stop();
@@ -493,7 +493,7 @@ function selectMode(m, quiet){
   document.querySelectorAll(".mode").forEach(b => { const on = b.dataset.mode === m; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
   $("#settings").hidden = m === "studia" || m === "scen" || m === "prova";
   $("#startBtn").firstChild.textContent = m === "studia" ? "Apri lo studio " : m === "srs" ? "Studia e ripassa " : m === "scen" ? "Apri gli scenari " : m === "prova" ? (window.Prova && Prova.unlocked() ? "Inizia la prova " : "Scopri la prova ") : "Inizia il giro ";
-  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le figure con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre figure in fila: riconoscile e leggile insieme.") : m === "prova" ? (window.Prova ? Prova.hint() : "") : `${Math.min(ROUND, perSession())} domande di allenamento libero.`;
+  $("#startHint").textContent = m === "studia" ? "Sfoglia tutte le formazioni con calma." : m === "srs" ? srsHint() : m === "scen" ? (window.Scenari ? Scenari.hint() : "Due o tre formazioni in fila: riconoscile e leggile insieme.") : m === "prova" ? (window.Prova ? Prova.hint() : "") : `${Math.min(ROUND, perSession())} domande di allenamento libero.`;
 }
 document.querySelectorAll(".mode").forEach(b => {
   b.onclick = () => selectMode(b.dataset.mode);
@@ -511,11 +511,11 @@ function srsHint(){
   const {due, fresh} = srsQueue();
   if(!due.length && !fresh.length){ const nd = nextDueDay(); return "Per oggi hai finito." + (nd !== null ? ` Il prossimo ripasso è ${whenText(nd)}.` : ""); }
   const parts = [];
-  if(due.length) parts.push(due.length === 1 ? "1 figura da ripassare" : `${due.length} figure da ripassare`);
+  if(due.length) parts.push(due.length === 1 ? "1 formazione da ripassare" : `${due.length} formazioni da ripassare`);
   if(fresh.length) parts.push(fresh.length === 1 ? "1 nuova" : `${fresh.length} nuove`);
   return "Oggi ti aspettano " + parts.join(" e ") + ".";
 }
-// livelli: si sale con le risposte giuste in totale; per l'ultimo servono anche tutte le figure imparate almeno una volta
+// livelli: si sale con le risposte giuste in totale; per l'ultimo servono anche tutte le formazioni imparate almeno una volta
 const LEVELS = [{n:"Fuffaguru mancato", r:0}, {n:"Amante dei corsi di trading", r:50}, {n:"Fidanzato di Murphy", r:200}, {n:"Figlio di Buffett", r:500, all:true}];
 function levelInfo(){
   const right = Object.values(stats).reduce((s, c) => s + (+c.r || 0), 0), learned = P.filter(p => sc(p.id).b >= 1).length;
@@ -529,50 +529,50 @@ function renderLevel(){
     pct = Math.min(100, Math.round((L.right - L.cur.r) / (L.next.r - L.cur.r) * 100));
     const miss = Math.max(0, L.next.r - L.right);
     txt = `Prossimo livello: ${esc(L.next.n)}. ` + (miss ? (miss === 1 ? "Ti manca 1 risposta giusta" : `Ti mancano ${miss} risposte giuste`) : "Risposte giuste raggiunte") +
-      (L.next.all && L.learned < P.length ? `${miss ? " e" : ", ora"} ${P.length - L.learned} figure da imparare.` : ".") + opensNext(L.i);
+      (L.next.all && L.learned < P.length ? `${miss ? " e" : ", ora"} ${P.length - L.learned} formazioni da imparare.` : ".") + opensNext(L.i);
   }
-  box.innerHTML = `<span class="lv-ico l${L.i + 1}" role="img" aria-label="${esc(L.cur.n)}"></span><div class="lv-main"><div class="lv-name">${esc(L.cur.n)}<small>Livello ${L.i + 1} di ${LEVELS.length} · ${openP().length} figure aperte su ${P.length}</small></div><div class="lv-bar"><i style="width:${pct}%"></i></div><div class="lv-next">${txt}</div></div>`;
+  box.innerHTML = `<span class="lv-ico l${L.i + 1}" role="img" aria-label="${esc(L.cur.n)}"></span><div class="lv-main"><div class="lv-name">${esc(L.cur.n)}<small>Livello ${L.i + 1} di ${LEVELS.length} · ${openP().length} formazioni aperte su ${P.length}</small></div><div class="lv-bar"><i style="width:${pct}%"></i></div><div class="lv-next">${txt}</div></div>`;
 }
-// messaggio quando un livello apre figure nuove o La Prova del Dojo
+// messaggio quando un livello apre formazioni nuove o La Prova del Dojo
 function opensHTML(from, to){
   const g0 = LEVEL_GROUP[from], g1 = LEVEL_GROUP[to], n = P.filter(p => GROUP_OF[p.id] > g0 && GROUP_OF[p.id] <= g1).length;
-  const bits = [n ? `${n} figure nuove` : "", from < PROVA_LEVEL && to >= PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
+  const bits = [n ? `${n} formazioni nuove` : "", from < PROVA_LEVEL && to >= PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
   return bits.length ? `<p class="levelup">Si aprono ${bits.join(" e ")}.</p>` : "";
 }
 // cosa apre il prossimo livello, per il riquadro dei progressi
 function opensNext(i){
   const g = LEVEL_GROUP[i + 1] - LEVEL_GROUP[i], n = g > 0 ? P.filter(p => GROUP_OF[p.id] > LEVEL_GROUP[i] && GROUP_OF[p.id] <= LEVEL_GROUP[i + 1]).length : 0;
-  const bits = [n ? `${n} figure nuove` : "", i + 1 === PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
+  const bits = [n ? `${n} formazioni nuove` : "", i + 1 === PROVA_LEVEL ? "La Prova del Dojo" : ""].filter(Boolean);
   return bits.length ? ` Si aprono ${bits.join(" e ")}.` : "";
 }
 function renderHome(){
   const order = ["inv","cont"].flatMap(f => [true,false].flatMap(b => P.filter(p => p.fam === f && p.bull === b)));
   const bi = groupNow();
-  // le figure chiuse vanno in fondo, in ordine di gruppo, così la posizione del pallino non dice nulla
+  // le formazioni chiuse vanno in fondo, in ordine di gruppo, così la posizione del pallino non dice nulla
   order.sort((a, b) => (isOpen(a, bi) ? -1 : GROUP_OF[a.id]) - (isOpen(b, bi) ? -1 : GROUP_OF[b.id]) || (isOpen(a, bi) || a.id === b.id ? 0 : a.id < b.id ? -1 : 1));
   $("#progDots").innerHTML = order.map(p => {
-    if(!isOpen(p, bi)) return `<i class="lk" title="Figura chiusa: si apre salendo di livello"></i>`;
+    if(!isOpen(p, bi)) return `<i class="lk" title="Formazione chiusa: si apre salendo di livello"></i>`;
     const b = sc(p.id).b;
     return `<i class="k${b}" title="${esc(label(p))} · ${beltName(b)}"></i>`;
   }).join("");
   renderLevel();
   const nd = nextDueDay();
-  $("#nextDue").textContent = nd === null ? `Comincia da Studia e ripassa: ogni giorno ti presenta fino a ${Math.min(NEW_PER_DAY, perSession())} figure nuove.` : `Prossime figure da ripassare: ${whenText(nd)}.`;
+  $("#nextDue").textContent = nd === null ? `Comincia da Studia e ripassa: ogni giorno ti presenta fino a ${Math.min(NEW_PER_DAY, perSession())} formazioni nuove.` : `Prossime formazioni da ripassare: ${whenText(nd)}.`;
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
   if(prefs.mode === "scen" && window.Scenari) $("#startHint").textContent = Scenari.hint();
   const pl = $("#provaLock"); if(pl) pl.hidden = !!(window.Prova && Prova.unlocked());
   renderPeek();
 }
-// tessera "Studia e ripassa": le prime figure che ti chiederà, con cintura e ogni quanto tornano
+// tessera "Studia e ripassa": le prime formazioni che ti chiederà, con cintura e ogni quanto tornano
 // (riquadro al passaggio del mouse; sui telefoni una riga nella tessera)
 function renderPeek(){
   const box = $("#srsPeek"), line = $("#srsPeekLine"); if(!box || !line) return;
   const {due, fresh} = srsQueue(), next = due.concat(fresh).slice(0, 4);
   if(!next.length){
     const nd = nextDueDay(), t = "Per oggi hai finito." + (nd !== null ? ` Il prossimo ripasso è ${whenText(nd)}.` : "");
-    box.innerHTML = `<b>Le prossime figure</b><span class="pk-empty">${t}</span>`; line.textContent = t; return;
+    box.innerHTML = `<b>Le prossime formazioni</b><span class="pk-empty">${t}</span>`; line.textContent = t; return;
   }
-  box.innerHTML = `<b>Le prossime figure</b>` + next.map(p => { const b = sc(p.id).b;
+  box.innerHTML = `<b>Le prossime formazioni</b>` + next.map(p => { const b = sc(p.id).b;
     return `<span class="pk-row">${BELT_SVG(b)}<span class="pk-n">${esc(label(p))}</span><span class="pk-w">${b ? BELTS[b] + " · " + (INT[b] === 1 ? "ogni giorno" : `ogni ${INT[b]} giorni`) : "nuova"}</span></span>`; }).join("");
   line.textContent = "Prossime: " + next.map(label).join(", ");
 }
@@ -696,11 +696,11 @@ function distractors(t, list, k){
   shuffle(others.slice()).forEach(p => { if(chosen.length < k) add(p); });
   return chosen.slice(0, k);
 }
-// con il filtro famiglia può non esserci nessuna figura aperta (al livello 1 ci sono solo figure d'inversione)
+// con il filtro famiglia può non esserci nessuna formazione aperta (al livello 1 ci sono solo formazioni d'inversione)
 function renderEmptyPool(mode){
   const fam = {inv:"d'inversione", cont:"di continuazione"}[prefs.fam] || "";
-  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">${esc(MODE_TITLE[mode] || "")}</div><p class="score">Nessuna figura ${fam} aperta.</p>
-    <p style="margin:0;color:var(--muted);max-width:60ch">Al tuo livello le figure ${fam} sono ancora chiuse: si aprono salendo di livello. Intanto puoi allenarti su tutte le figure aperte.</p>
+  $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">${esc(MODE_TITLE[mode] || "")}</div><p class="score">Nessuna formazione ${fam} aperta.</p>
+    <p style="margin:0;color:var(--muted);max-width:60ch">Al tuo livello le formazioni ${fam} sono ancora chiuse: si aprono salendo di livello. Intanto puoi allenarti su tutte le formazioni aperte.</p>
     <div class="actions"><button class="btn" id="allGo">Allenati su tutte</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
   $("#allGo").onclick = () => { prefs.fam = "all"; savePrefs(); syncControls(); setTab(mode); };
   $("#homeGo").onclick = goHome;
@@ -733,11 +733,11 @@ function renderQuestion(){
   const pips = Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("");
   let body = "";
   if(mode === "f2n"){
-    body += `<h2 class="prompt">Che figura è questa?<small>${prefs.hl ? "La figura è nella zona evidenziata. Le candele prima mostrano il trend." : "Le prime candele mostrano il trend, poi arriva la figura."}</small></h2>`;
+    body += `<h2 class="prompt">Che formazione è questa?<small>${prefs.hl ? "La formazione è nella zona evidenziata. Le candele prima mostrano il trend." : "Le prime candele mostrano il trend, poi arriva la formazione."}</small></h2>`;
     body += `<div class="bigchart">${chartSVG(t, {context: Q.cur.ctx, hl: prefs.hl, w: 560, h: 260, maxSlot: 52, maxBody: 22, aria: "Grafico da riconoscere"})}</div>`;
     body += `<div class="opts">${Q.cur.opts.map((p, i) => `<button class="opt ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""}><span class="nm">${esc(p.name)}</span><span style="display:flex;gap:6px;align-items:center">${chipDir(p)}<span class="k">${i+1}</span></span></button>`).join("")}</div>`;
   } else {
-    body += `<h2 class="prompt">Trova: ${esc(t.name)} ${chipDir(t)}<small>Scegli il grafico giusto. In ogni grafico la zona evidenziata è la figura.</small></h2>`;
+    body += `<h2 class="prompt">Trova: ${esc(t.name)} ${chipDir(t)}<small>Scegli il grafico giusto. In ogni grafico la zona evidenziata è la formazione.</small></h2>`;
     body += `<div class="opts figs">${Q.cur.opts.map((p, i) => {
       const ctx = Q.cur.ctxFor[p.id] || (Q.cur.ctxFor[p.id] = makeContext(p));
       return `<button class="opt fig ${optClass(p, t)}" data-id="${p.id}" ${Q.answered?"disabled":""} aria-label="Opzione ${i+1}"><span class="k">${i+1}</span>${chartSVG(p, {context: ctx, hl: prefs.hl, w: 300, h: 170, maxSlot: 34, maxBody: 15, aria: "Opzione " + (i+1)})}</button>`;
@@ -824,14 +824,14 @@ function feedback(t){
   return h;
 }
 function next(){ Q.i++; Q.cur = null; renderQuestion(); window.scrollTo({top: Math.min(window.scrollY, $("#quiz").offsetTop - 80), behavior:"smooth"}); }
-// apertura di Studia e ripassa: le figure nuove di oggi si vedono subito; quelle da ripassare solo come cinture, per non suggerire la risposta
+// apertura di Studia e ripassa: le formazioni nuove di oggi si vedono subito; quelle da ripassare solo come cinture, per non suggerire la risposta
 function renderToday(due, fresh){
   const byBelt = [1,2,3,4,5].map(b => [b, due.filter(p => sc(p.id).b === b).length]).filter(x => x[1]);
   $("#quiz").innerHTML = `<div class="panel summary today"><div class="eyebrow">Studia e ripassa · oggi</div>
-    <p class="score">${fresh.length ? (fresh.length === 1 ? "1 figura nuova" : `${fresh.length} figure nuove`) : "Nessuna figura nuova"}${due.length ? ` e ${due.length === 1 ? "1 da ripassare" : `${due.length} da ripassare`}` : ""}.</p>
+    <p class="score">${fresh.length ? (fresh.length === 1 ? "1 formazione nuova" : `${fresh.length} formazioni nuove`) : "Nessuna formazione nuova"}${due.length ? ` e ${due.length === 1 ? "1 da ripassare" : `${due.length} da ripassare`}` : ""}.</p>
     ${fresh.length ? `<div class="eyebrow" style="margin-bottom:8px">Nuove: prima le guardi, poi te le chiedo</div><div class="grid mini">${fresh.map(p => `<article class="panel card"><div class="well">${chartSVG(p, {arrow:true, w:240, h:150, maxSlot:30, maxBody:14, aria: label(p)})}</div><h3>${esc(p.name)}</h3><div class="chips">${chipDir(p)}<span class="chip fam">${famName(p.fam)}</span></div></article>`).join("")}</div>` : ""}
     ${byBelt.length ? `<div class="eyebrow" style="margin:14px 0 8px">Da ripassare</div><div class="beltrow">${byBelt.map(([b, n]) => `<span class="beltcount">${BELT_SVG(b)}${n} ${n === 1 ? beltName(b).toLowerCase() : "cinture " + BELTS_PL[b]}</span>`).join("")}</div>` : ""}
-    <p class="hint" style="margin:12px 0 0">Ogni risposta giusta fa salire la figura di cintura e la fa tornare più tardi; una sbagliata la riporta alla gialla. Le figure per sessione si cambiano nelle Impostazioni (ora ${perSession()}).</p>
+    <p class="hint" style="margin:12px 0 0">Ogni risposta giusta fa salire la formazione di cintura e la fa tornare più tardi; una sbagliata la riporta alla gialla. Le formazioni per sessione si cambiano nelle Impostazioni (ora ${perSession()}).</p>
     <div class="actions"><button class="btn" id="todayGo">Comincia</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
   $("#todayGo").onclick = renderQuestion;
   $("#homeGo").onclick = goHome;
@@ -841,7 +841,7 @@ function renderIntro(t){
   const twin = t.twin ? BYID[t.twin] : null;
   $("#quiz").innerHTML = `<div class="qhead"><div class="pips">${Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("")}</div></div>
   <div class="panel intro">
-    <div class="eyebrow">Figura nuova · guardala bene</div>
+    <div class="eyebrow">Formazione nuova · guardala bene</div>
     <h2>${esc(t.name)}</h2>
     <div style="display:flex;gap:6px;flex-wrap:wrap">${chipDir(t)}${chipN(t)}<span class="chip fam">${famName(t.fam)}</span></div>
     <div class="big">${chartSVG(t, {arrow:true, w:520, h:240, maxSlot:56, maxBody:24, aria: label(t)})}</div>
@@ -856,7 +856,7 @@ function renderIntro(t){
 function renderDone(){
   const nd = nextDueDay();
   $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Studia e ripassa</div><p class="score">Per oggi hai finito.</p>
-    <p style="margin:0;color:var(--muted);max-width:60ch">${nd !== null ? `Le prossime figure da ripassare arrivano ${whenText(nd)}. ` : ""}Le figure nuove sono finite per oggi: domani ne arrivano altre. Se vuoi, puoi allenarti liberamente.</p>
+    <p style="margin:0;color:var(--muted);max-width:60ch">${nd !== null ? `Le prossime formazioni da ripassare arrivano ${whenText(nd)}. ` : ""}Le formazioni nuove sono finite per oggi: domani ne arrivano altre. Se vuoi, puoi allenarti liberamente.</p>
     <div class="actions"><button class="btn" id="freeGo">Allenamento libero</button><button class="btn ghost" id="homeGo">Torna al menu</button></div></div>`;
   $("#freeGo").onclick = () => setTab("f2n");
   $("#homeGo").onclick = goHome;
@@ -870,7 +870,7 @@ function renderSrsSummary(){
     const da = Math.min(...groups[a].map(p => sc(p.id).due)), db = Math.min(...groups[b].map(p => sc(p.id).due)); return da - db; });
   const good = Q.res.filter(Boolean).length;
   $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">Ripasso finito</div>
-    <p class="score">${good === Q.res.length ? "Tutto giusto, ottimo." : "Fatto. Le figure sbagliate le hai ripassate subito."}</p>
+    <p class="score">${good === Q.res.length ? "Tutto giusto, ottimo." : "Fatto. Le formazioni sbagliate le hai ripassate subito."}</p>
     <div class="pips">${Q.res.map(r => `<span class="pip ${r ? "ok" : "ko"}"></span>`).join("")}</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Quando le rivedrai</div>
     <div class="sched">${keys.map(k => `<div><b>${k[0].toUpperCase() + k.slice(1)}</b><span>${groups[k].map(p => esc(label(p))).join(", ")}</span></div>`).join("")}</div></div>
@@ -908,14 +908,14 @@ document.addEventListener("keydown", e => {
 /* ---------- study ---------- */
 function lockedCardHTML(p){
   const N = LEVEL_FOR_GROUP[GROUP_OF[p.id]] + 1, tk = "<i></i>".repeat(N);
-  return `<article class="panel card locked" aria-label="Figura chiusa">
-    <div class="well wrap" role="img" aria-label="Figura chiusa"><span class="band"></span><span class="seal">?</span><span class="tk">${tk}</span></div>
+  return `<article class="panel card locked" aria-label="Formazione chiusa">
+    <div class="well wrap" role="img" aria-label="Formazione chiusa"><span class="band"></span><span class="seal">?</span><span class="tk">${tk}</span></div>
     <div class="ghostname">? ? ?</div>
     <div class="unl"><span class="tk2">${tk}</span>Si apre al livello ${N}: ${esc(LEVELS[N - 1].n)}</div>
     <div class="ghostline"></div><div class="ghostline" style="width:80%"></div>
   </article>`;
 }
-// la cintura della figura; al passaggio del mouse (o toccandola) un piccolo menu dice ogni quanto torna e quando
+// la cintura della formazione; al passaggio del mouse (o toccandola) un piccolo menu dice ogni quanto torna e quando
 function beltHTML(p){
   const c = sc(p.id), b = c.b;
   const when = b === 0 ? arrivalText(p.id) : "Prossimo ripasso: " + whenText(c.due);
@@ -943,7 +943,7 @@ function renderStudy(){
   const q = $("#search").value.trim().toLowerCase();
   const f = prefs.sfilter;
   const bi = groupNow();
-  // le figure chiuse compaiono come sagome in fondo a ogni gruppo, ma non nella ricerca
+  // le formazioni chiuse compaiono come sagome in fondo a ogni gruppo, ma non nella ricerca
   const vis = P.filter(p => isOpen(p, bi) && (f === "all" || (f === "bull") === p.bull) && (!q || p.name.toLowerCase().includes(q) || p.d.toLowerCase().includes(q)));
   const groups = [["inv", true, "Inversione al rialzo"], ["inv", false, "Inversione al ribasso"], ["cont", true, "Continuazione al rialzo"], ["cont", false, "Continuazione al ribasso"]];
   let h = "";
@@ -951,12 +951,12 @@ function renderStudy(){
     const items = vis.filter(p => p.fam === fam && p.bull === bull);
     if(!items.length) continue;
     const op = items.filter(p => isOpen(p, bi));
-    if(op.length) h += `<div class="sect"><h2>${title}</h2><span class="eyebrow">${op.length} figure</span></div><div class="grid">${op.map(cardHTML).join("")}</div>`;
+    if(op.length) h += `<div class="sect"><h2>${title}</h2><span class="eyebrow">${op.length} formazioni</span></div><div class="grid">${op.map(cardHTML).join("")}</div>`;
   }
-  // le figure chiuse stanno tutte insieme in fondo, in ordine di livello: né la sezione né il filtro dicono se salgono o scendono
+  // le formazioni chiuse stanno tutte insieme in fondo, in ordine di livello: né la sezione né il filtro dicono se salgono o scendono
   const lk = q ? [] : P.filter(p => !isOpen(p, bi)).sort((a, b) => GROUP_OF[a.id] - GROUP_OF[b.id] || (a.id < b.id ? -1 : 1));
-  if(lk.length) h += `<div class="sect"><h2>Figure chiuse</h2><span class="eyebrow">${lk.length} figure · si aprono salendo di livello</span></div><div class="grid">${lk.map(lockedCardHTML).join("")}</div>`;
-  $("#study").innerHTML = h || `<p class="empty">Nessuna figura trovata. Prova con un altro nome.</p>`;
+  if(lk.length) h += `<div class="sect"><h2>Formazioni chiuse</h2><span class="eyebrow">${lk.length} formazioni · si aprono salendo di livello</span></div><div class="grid">${lk.map(lockedCardHTML).join("")}</div>`;
+  $("#study").innerHTML = h || `<p class="empty">Nessuna formazione trovata. Prova con un altro nome.</p>`;
   bindTwinLinks($("#study"));
 }
 $("#search").addEventListener("input", renderStudy);
@@ -1088,8 +1088,8 @@ function nlSync(u, force){
 function trainHTML(){
   const n = perSession();
   return `<section class="panel acard"><div class="eyebrow">Allenamento</div>
-    <p>Quante figure al massimo in una sessione di Studia e ripassa e in un giro libero. Se ti senti sotto pressione, abbassale: le figure da ripassare aspettano il giorno dopo.</p>
-    <div class="seg" id="perSeg" role="group" aria-label="Figure per sessione">${PER_SESSION.map(v => `<button type="button" data-v="${v}" aria-pressed="${v === n}">${v}</button>`).join("")}</div>
+    <p>Quante formazioni al massimo in una sessione di Studia e ripassa e in un giro libero. Se ti senti sotto pressione, abbassale: le formazioni da ripassare aspettano il giorno dopo.</p>
+    <div class="seg" id="perSeg" role="group" aria-label="Formazioni per sessione">${PER_SESSION.map(v => `<button type="button" data-v="${v}" aria-pressed="${v === n}">${v}</button>`).join("")}</div>
     <p class="hint" id="m-per" role="status"></p>
   </section>`;
 }
@@ -1097,7 +1097,7 @@ function bindTrain(){
   document.querySelectorAll("#perSeg button").forEach(b => b.onclick = () => {
     prefs.perSession = +b.dataset.v; savePrefs();
     document.querySelectorAll("#perSeg button").forEach(x => x.setAttribute("aria-pressed", x === b));
-    $("#m-per").textContent = `Fatto: al massimo ${b.dataset.v} figure per sessione.`;
+    $("#m-per").textContent = `Fatto: al massimo ${b.dataset.v} formazioni per sessione.`;
   });
 }
 function soundHTML(){
@@ -1123,7 +1123,7 @@ async function showAccount(){
     $("#accountBox").innerHTML = trainHTML() + soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>
       <section class="panel acard danger-zone" id="dangerZone"><div class="eyebrow">Danger zone</div>
       <h3>Azzera i progressi</h3>
-      ${dangerHTML("dz", "Cancello tutti i progressi su questo dispositivo: figure imparate, ripasso, statistiche, scenari, livello e record della Prova.")}
+      ${dangerHTML("dz", "Cancello tutti i progressi su questo dispositivo: formazioni imparate, ripasso, statistiche, scenari, livello e record della Prova.")}
       </section>`;
     $("#st-login").onclick = () => showAuth("in"); bindTrain();
     bindDanger("dz", () => { wipeProgress(Date.now()); $("#dz-m").textContent = "Fatto: i progressi sono azzerati. Si riparte dal livello 1."; });
@@ -1165,7 +1165,7 @@ async function showAccount(){
     </section>
     <section class="panel acard danger-zone" id="dangerZone"><div class="eyebrow">Danger zone</div>
       <h3>Azzera i progressi</h3>
-      ${dangerHTML("dz", "Cancello tutti i tuoi progressi, sul tuo account e su tutti i tuoi dispositivi: figure imparate, ripasso, statistiche, scenari, livello e record della Prova. L'account, l'email e la newsletter restano come sono.")}
+      ${dangerHTML("dz", "Cancello tutti i tuoi progressi, sul tuo account e su tutti i tuoi dispositivi: formazioni imparate, ripasso, statistiche, scenari, livello e record della Prova. L'account, l'email e la newsletter restano come sono.")}
     </section>
     <section class="panel acard danger-zone" id="deleteZone"><div class="eyebrow">Danger zone</div>
       <h3>Elimina l'account</h3>

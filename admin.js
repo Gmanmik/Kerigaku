@@ -34,7 +34,7 @@ function summary(u){
   const num = v => Number.isFinite(+v) ? +v : 0;
   for(const c of Object.values(srs)){ const b = Math.max(0, Math.min(5, Math.round(num(c && c.b)))); belts[b]++; if(b >= 5) known++; else if(b >= 3) fixing++; else if(b >= 1) learning++; }
   for(const c of Object.values(st)){ r += num(c && c.r); w += num(c && c.w); }
-  // ogni pallino ha il colore della cintura della figura (scatola di Leitner 0..5)
+  // ogni pallino ha il colore della cintura della formazione (scatola di Leitner 0..5)
   const dots = ORDER.map(p => { const b = Math.max(0, Math.min(5, Math.round(num((srs[p[0]] || {}).b)))); return `<i class="k${b}" title="${esc(p[1] + (p[2] ? " +" : " –"))} · cintura ${BELTS[b]}"></i>`; }).join("");
   return {known, fixing, learning, r, w, dots, belts};
 }
@@ -98,7 +98,7 @@ function render(){
   $("#tiles").innerHTML = [
     [users.length, users.length === 1 ? "allievo registrato" : "allievi registrati"],
     [active, "si sono allenati negli ultimi 7 giorni"],
-    [known, "cinture nere (figure conosciute), in totale"],
+    [known, "cinture nere (formazioni conosciute), in totale"],
     [r + w ? Math.round(100 * r / (r + w)) + "%" : "–", `risposte giuste (${r} su ${r + w})`]
   ].map(([v, l]) => `<div class="panel tile"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
   const q = $("#q").value.trim().toLowerCase();
@@ -118,11 +118,11 @@ function row(u, s){
       ${[5,4,3,2,1].map(b => `<span class="bt"><i class="k${b}"></i><b>${s.belts[b]}</b> ${BELTS[b]}</span>`).join("")}
       <span>risposte giuste <b>${s.r}</b> su <b>${tot}</b>${tot ? ` (${Math.round(100 * s.r / tot)}%)` : ""}</span>
     </div>
-    <div class="dots" aria-label="Figure: ${s.known} conosciute su ${PL.length}">${s.dots}</div>
+    <div class="dots" aria-label="Formazioni: ${s.known} conosciute su ${PL.length}">${s.dots}</div>
     <div class="acts">
       <button class="btn ghost" data-a="pw" type="button">Nuova password</button>
       <button class="btn ghost" data-a="reset" type="button" ${u.progress ? "" : "disabled"}>Azzera progressi</button>
-      <button class="btn ghost" data-a="fig" type="button">Impara o dimentica una figura</button>
+      <button class="btn ghost" data-a="fig" type="button">Impara o dimentica una formazione</button>
       ${self ? "" : `<button class="btn ghost" data-a="ip" type="button">Blocca IP</button>`}
       ${u.mfa && !self ? `<button class="btn ghost" data-a="mfa" type="button">Togli 2FA</button>` : ""}
       ${u.locked ? `<button class="btn ghost" data-a="unlock" type="button">Sblocca accesso</button>` : ""}
@@ -139,20 +139,20 @@ function bindRow(u){
   el.querySelector(".mail").textContent = u.email || "Nessuna email (account creato con il solo username)";
   el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => ask(u, b.dataset.a, el));
 }
-// fa imparare (cintura nera, scatola 5) o dimenticare (torna bianca, nuova) una figura; l'allievo lo vede al prossimo accesso
+// fa imparare (cintura nera, scatola 5) o dimenticare (torna bianca, nuova) una formazione; l'allievo lo vede al prossimo accesso
 function askFigure(u, slot){
   const opts = P.map(p => `<option value="${p.id}">${esc(p.name)} ${p.bull ? "▲" : "▼"}</option>`).join("");
-  slot.innerHTML = `<div class="confirm"><p></p><select aria-label="Figura">${opts}</select>
+  slot.innerHTML = `<div class="confirm"><p></p><select aria-label="Formazione">${opts}</select>
     <button class="btn" type="button" data-learn>Segna come imparata</button><button class="btn danger" type="button" data-forget>Fai dimenticare</button><button class="btn ghost" type="button" data-no>Annulla</button></div><p class="msg" role="status"></p>`;
-  slot.querySelector("p").textContent = `Scegli una figura per ${u.username}. La modifica arriva sul suo Dojo la prossima volta che lo apre.`;
+  slot.querySelector("p").textContent = `Scegli una formazione per ${u.username}. La modifica arriva sul suo Dojo la prossima volta che lo apre.`;
   const sel = slot.querySelector("select"), msg = slot.querySelector(".msg");
   slot.querySelector("[data-no]").onclick = () => slot.innerHTML = "";
   const go = async learn => {
     const p = P.find(x => x.id === sel.value);
     const {error} = await sb.rpc("admin_force_item", {target: u.id, item: p.id, learn});
     msg.className = error ? "msg ko" : "msg";
-    msg.textContent = error ? "Non riuscito: " + (/admin_force_item/.test(error.message) ? "manca la funzione su Supabase (file SQL «figure-forzate»)" : error.message)
-      : `${p.name} ${p.bull ? "▲" : "▼"}: ${learn ? "cintura nera, segnata come imparata" : "dimenticata, torna cintura bianca come figura nuova"} per ${u.username}.`;
+    msg.textContent = error ? "Non riuscito: " + (/admin_force_item/.test(error.message) ? "manca la funzione su Supabase (file SQL «formazioni-forzate»)" : error.message)
+      : `${p.name} ${p.bull ? "▲" : "▼"}: ${learn ? "cintura nera, segnata come imparata" : "dimenticata, torna cintura bianca come formazione nuova"} per ${u.username}.`;
   };
   slot.querySelector("[data-learn]").onclick = () => go(true);
   slot.querySelector("[data-forget]").onclick = () => go(false);
@@ -459,7 +459,7 @@ ${rows}
 <tr><td style="padding:6px 32px 6px 32px;${TD}">A presto,<br>Michele &middot; Dojo delle candele</td></tr>
 ${FOOT}
 </table>
-<p style="font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#7A857F;margin:14px 0 0 0;">Dojo delle candele &middot; allenamento sulle figure candlestick giapponesi</p>
+<p style="font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#7A857F;margin:14px 0 0 0;">Dojo delle candele &middot; allenamento sulle formazioni candlestick giapponesi</p>
 </td></tr></table>
 </body></html>`;
 }

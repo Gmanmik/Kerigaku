@@ -2,10 +2,10 @@
    Usa le funzioni e i dati di app.js (P, BYID, chartSVG, makeContext, store, Q...) ed espone window.Scenari. */
 (() => {
 "use strict";
-/* ---------- scenari: 2-3 figure in fila ----------
-   Ogni scenario mette in sequenza figure dell'array P (più qualche candela di raccordo, "+2u" = 2 candele
-   in salita, "+1d" = 1 in discesa). Chi studia riconosce le figure una per una, poi dice cosa raccontano
-   insieme; alla fine si scoprono le candele successive. Hanno una loro Leitner (scen) separata dalle figure. */
+/* ---------- scenari: 2-3 formazioni in fila ----------
+   Ogni scenario mette in sequenza formazioni dell'array P (più qualche candela di raccordo, "+2u" = 2 candele
+   in salita, "+1d" = 1 in discesa). Chi studia riconosce le formazioni una per una, poi dice cosa raccontano
+   insieme; alla fine si scoprono le candele successive. Hanno una loro Leitner (scen) separata dalle formazioni. */
 const VERDICT = {up:"Svolta al rialzo confermata", down:"Svolta al ribasso confermata", wait:"Segnali opposti: meglio aspettare", cont:"Il trend in corso continua"};
 const VORDER = ["up", "down", "wait", "cont"];
 const SCEN = [
@@ -83,7 +83,7 @@ function load(){ scen = store.get(K("dojo-scen-v1"), {}); scenDaily = store.get(
 function saveScen(){ store.set(K("dojo-scen-v1"), scen); store.set(K("dojo-scen-daily-v1"), scenDaily); cloud.schedule(); }
 const ss = id => scen[id] || {b:0, due:0};
 function scenNewLeft(){ const t = today(); if(scenDaily.day !== t) scenDaily = {day:t, newCount:0}; return Math.max(0, SCEN_NEW - scenDaily.newCount); }
-// uno scenario è disponibile quando tutte le sue figure sono aperte con il livello (o è già stato fatto)
+// uno scenario è disponibile quando tutte le sue formazioni sono aperte con il livello (o è già stato fatto)
 function scenAvail(){ const gi = groupNow(); return SCEN.filter(s => ss(s.id).b > 0 || s.seq.every(t => t[0] === "+" || isOpen(BYID[t], gi))); }
 function scenQueue(){
   const t = today(), list = scenAvail();
@@ -101,7 +101,7 @@ function scenHint(){
   return "Oggi: " + parts.join(" e ") + "." + tail;
 }
 
-// costruisce le candele: trend iniziale, figure in fila, raccordi e 3 candele "dopo" da scoprire alla fine
+// costruisce le candele: trend iniziale, formazioni in fila, raccordi e 3 candele "dopo" da scoprire alla fine
 const cOpen = c => c[0] === "w" ? c[2] : c[3], cClose = c => c[0] === "w" ? c[3] : c[2];
 const lift = (cs, d) => cs.map(([k, l, b, t, h]) => [k, l + d, b + d, t + d, h + d]);
 function walk(from, n, dir){
@@ -123,7 +123,7 @@ function buildScen(s){
     const p = BYID[tok];
     let d = cs.length ? last - cOpen(p.c[0]) + rnd(-1, 1) : 0;
     const lo = Math.min(...p.c.map(c => c[1])), hi = Math.max(...p.c.map(c => c[4]));
-    // una conferma non rompe il minimo (rialzo) o il massimo (ribasso) della prima figura
+    // una conferma non rompe il minimo (rialzo) o il massimo (ribasso) della prima formazione
     if(s.v === "up" && low !== null) d = Math.max(d, low - lo + rnd(.5, 2));
     if(s.v === "down" && high !== null) d = Math.min(d, high - hi - rnd(.5, 2));
     if(low === null){ low = lo + d; high = hi + d; }
@@ -193,8 +193,8 @@ function renderScen(){
   const pips = Q.qs.map((_, i) => `<span class="pip ${i < Q.res.length ? (Q.res[i] ? "ok" : "ko") : (i === Q.i ? "cur" : "")}"></span>`).join("");
   const steps = Array.from({length: nz + 1}, (_, i) => `<span class="${i < step || (i === step && answered) ? (Q.cur.picks[i] ? "ok" : "ko") : i === step ? "cur" : ""}">${i < nz ? i + 1 : "?"}</span>`).join("");
   let body = `<div class="scen-top"><span class="eyebrow">${Q.fresh.has(s.id) && !Q.free ? "Scenario nuovo" : "Scenario"} · ${s.t === "d" ? "dopo un ribasso" : "dopo un rialzo"}</span><span class="scen-steps" aria-label="Passo ${step + 1} di ${nz + 1}">${steps}</span></div>`;
-  if(!last) body += `<h2 class="prompt">Quale figura c'è nella zona ${step + 1}?<small>Le figure sono ${nz}, una per zona. Le candele dopo il punto di domanda le scopri alla fine.</small></h2>`;
-  else body += `<h2 class="prompt">Lette insieme, cosa dicono queste figure?<small>${B.zones.map((z, i) => `${i + 1}: ${esc(BYID[z.id].name)} ${BYID[z.id].bull ? "▲" : "▼"}`).join(" · ")}</small></h2>`;
+  if(!last) body += `<h2 class="prompt">Quale formazione c'è nella zona ${step + 1}?<small>Le formazioni sono ${nz}, una per zona. Le candele dopo il punto di domanda le scopri alla fine.</small></h2>`;
+  else body += `<h2 class="prompt">Lette insieme, cosa dicono queste formazioni?<small>${B.zones.map((z, i) => `${i + 1}: ${esc(BYID[z.id].name)} ${BYID[z.id].bull ? "▲" : "▼"}`).join(" · ")}</small></h2>`;
   const narrow = window.innerWidth < 640;
   body += `<div class="bigchart">${scenSVG(B, {active: last ? null : step, reveal: last && answered, w: narrow ? 380 : 640, h: narrow ? 300 : 280, aria: "Scenario da leggere"})}</div>`;
   if(!last){
@@ -205,7 +205,7 @@ function renderScen(){
     body += `<div class="opts verdicts">${VORDER.map((v, i) => `<button class="opt ${answered ? (v === s.v ? "right" : v === Q.cur.pick ? "wrong" : "") : ""}" data-id="${v}" ${answered ? "disabled" : ""}><span class="nm">${VERDICT[v]}</span><span class="k">${i+1}</span></button>`).join("")}</div>`;
     if(answered){
       const ok = Q.cur.picks[nz], all = Q.cur.picks.every(Boolean), g = Q.cur.grade;
-      body += `<div class="fb ${ok ? "ok" : "ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(VERDICT[s.v])}</h3><p><b>${esc(s.title)}.</b> ${esc(s.x)}</p><p class="hint" style="margin:0">Le candele nella zona del punto di domanda mostrano come è andata dopo. Uno scenario è un esempio di scuola: sui mercati veri nessuna figura è una garanzia.</p>`;
+      body += `<div class="fb ${ok ? "ok" : "ko"}" role="status"><h3>${ok ? "Giusto!" : "Non proprio."} ${esc(VERDICT[s.v])}</h3><p><b>${esc(s.title)}.</b> ${esc(s.x)}</p><p class="hint" style="margin:0">Le candele nella zona del punto di domanda mostrano come è andata dopo. Uno scenario è un esempio di scuola: sui mercati veri nessuna formazione è una garanzia.</p>`;
       if(g) body += `<span class="nextchip">${all ? "Lo rivedrai " + whenText(g.due) : Q.requeued[s.id] ? "Te lo richiedo tra poco" : "Lo rivedrai oggi stesso"}</span>`;
       body += `<div class="actions"><button class="btn" id="next">${Q.i + 1 >= Q.qs.length ? "Vedi il risultato" : "Prossimo scenario"}</button><span class="hint">oppure premi Invio</span></div></div>`;
     }
@@ -268,7 +268,7 @@ function renderScenSummary(){
   $("#quiz").innerHTML = `<div class="panel summary"><div class="eyebrow">${Q.free ? "Fine del giro" : "Scenari di oggi finiti"}</div>
     <p class="score">${good === tot ? "Tutto giusto, ottimo." : good >= tot * .6 ? "Buon lavoro." : "Si impara sbagliando."}</p>
     <div class="pips">${Q.res.map(r => `<span class="pip ${r ? "ok" : "ko"}"></span>`).join("")}</div>
-    <p style="margin:0;color:var(--muted)">Letti senza errori: ${good} su ${tot}. Uno scenario conta giusto solo se riconosci tutte le figure e la lettura finale.</p>
+    <p style="margin:0;color:var(--muted)">Letti senza errori: ${good} su ${tot}. Uno scenario conta giusto solo se riconosci tutte le formazioni e la lettura finale.</p>
     ${wrong.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Da rivedere</div><div class="sched">${wrong.map(t => `<div><span>${esc(t)}</span></div>`).join("")}</div></div>` : ""}
     <div class="actions"><button class="btn" id="homeGo">Torna al menu</button><button class="btn ghost" id="freeGo">5 scenari a caso</button></div></div>`;
   $("#homeGo").onclick = goHome;

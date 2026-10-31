@@ -1,6 +1,6 @@
-/* Dojo delle candele · La Prova del Dojo: 5 grafici simulati, l'utente traccia il livello che la figura difende
+/* Dojo delle candele · La Prova del Dojo: 5 grafici simulati, l'utente traccia il livello che la formazione difende
    (rialzista = minimo, supporto; ribassista = massimo, resistenza) e poi dice se è supporto o resistenza.
-   50 punti alla linea (pieni entro ±2,5% del range, poi a scalare) e 50 alla risposta. 1 volta su 5 la figura fallisce.
+   50 punti alla linea (pieni entro ±2,5% del range, poi a scalare) e 50 alla risposta. 1 volta su 5 la formazione fallisce.
    Gratis dal livello 2. Usa i dati e le funzioni di app.js (openP, provaOpen, LEVELS, PROVA_LEVEL, goHome) ed espone window.Prova. */
 (function(){
 "use strict";
@@ -16,7 +16,7 @@ function mix(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+
 function fmt(u){return (80+u*0.3).toFixed(2).replace(".",",")}
 function html(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function $$(id){return root.querySelector("[data-pd='"+id+"']")}
-// figure con un trend (Kicking esclusa), solo tra quelle aperte
+// formazioni con un trend (Kicking esclusa), solo tra quelle aperte
 function pool(){return openP().filter(function(p){return p.trend})}
 function unlocked(){return provaOpen()}
 
@@ -37,7 +37,7 @@ function genPrior(p,pc,N,L,Hh){
     }
     var off=target-q;
     out.forEach(function(x){x.o+=off;x.c+=off;x.h+=off;x.l+=off});
-    // filtro anti-ambiguità: nelle inversioni nessuna candela precedente supera il livello della figura
+    // filtro anti-ambiguità: nelle inversioni nessuna candela precedente supera il livello della formazione
     if(p.fam!=="inv") return out;
     var ok=p.bull?out.every(function(x){return x.l>L+span*.06}):out.every(function(x){return x.h<Hh-span*.06});
     if(ok) return out;
@@ -80,7 +80,7 @@ function draw(){
   for(var i=1;i<4;i++){var gu=r.lo+(r.hi-r.lo)*i/4,gy=y(gu);
     el("line",{x1:X0,x2:X0+PW,y1:gy,y2:gy,"class":"pd-gl"});
     el("text",{x:X0+2,y:gy-4,"class":"pd-glt"}).textContent=fmt(gu);}
-  // figura evidenziata
+  // formazione evidenziata
   var px=X0+r.N*sw;
   el("rect",{x:px+1,y:TOP-6,width:r.n*sw-2,height:BOT-TOP+12,rx:3,"class":"hl"});
   // futuro nascosto
@@ -132,12 +132,12 @@ function row(list,box){var d=document.createElement("div");d.className="btns";li
 
 function panel(){
   if(r.step==="line"){
-    head("Passo 1 di 2","Traccia il livello che la figura evidenziata difende.","Trascina la linea con il dito o tocca il grafico. Con − e + la sposti di poco.");
+    head("Passo 1 di 2","Traccia il livello che la formazione evidenziata difende.","Trascina la linea con il dito o tocca il grafico. Con − e + la sposti di poco.");
     var lg=document.createElement("div");lg.className="legenda";
-    lg.innerHTML="<b>Legenda</b><span>Inversione o continuazione non cambia nulla. Chiediti solo: dopo questa figura il prezzo dovrebbe <em>salire</em> o <em>scendere</em>?</span><span>Sale, quindi figura <em>rialzista</em>: la linea va sul <em>minimo</em> della figura. È il prezzo che i compratori hanno difeso.</span><span>Scende, quindi figura <em>ribassista</em>: la linea va sul <em>massimo</em> della figura. È il prezzo che i venditori hanno difeso.</span>";
+    lg.innerHTML="<b>Legenda</b><span>Inversione o continuazione non cambia nulla. Chiediti solo: dopo questa formazione il prezzo dovrebbe <em>salire</em> o <em>scendere</em>?</span><span>Sale, quindi formazione <em>rialzista</em>: la linea va sul <em>minimo</em> della formazione. È il prezzo che i compratori hanno difeso.</span><span>Scende, quindi formazione <em>ribassista</em>: la linea va sul <em>massimo</em> della formazione. È il prezzo che i venditori hanno difeso.</span>";
     pann.appendChild(lg);
-    if(r.help){var hp=document.createElement("p");hp.className="aiuto";hp.innerHTML="La figura è <b>"+html(r.p.name)+"</b>, "+(r.p.fam==="inv"?"inversione":"continuazione")+" <b>"+(r.p.bull?"rialzista":"ribassista")+"</b>.";pann.appendChild(hp)}
-    else row([btn("Aiuto: dimmi che figura è","indietro",function(){r.help=true;panel()})]);
+    if(r.help){var hp=document.createElement("p");hp.className="aiuto";hp.innerHTML="La formazione è <b>"+html(r.p.name)+"</b>, <span>"+(r.p.fam==="inv"?"inversione":"continuazione")+" <b>"+(r.p.bull?"rialzista":"ribassista")+"</b></span>.";pann.appendChild(hp)}
+    else row([btn("Aiuto: dimmi che formazione è","indietro",function(){r.help=true;panel()})]);
     var stepU=(r.hi-r.lo)*0.005;
     row([btn("−","mini",function(){setUser(r.user-stepU)}),btn("+","mini",function(){setUser(r.user+stepU)}),
       btn("Conferma la linea","pri",function(){r.step="sr";draw();panel()})]);
@@ -169,11 +169,11 @@ function reveal(){
 
 function spiegazione(){
   var p=r.p,s;
-  if(p.fam==="inv") s=p.bull?"Dopo il ribasso i compratori hanno fermato il prezzo sul minimo della figura: quel livello diventa supporto."
-                            :"Dopo il rialzo i venditori hanno respinto il prezzo sul massimo della figura: quel livello diventa resistenza.";
-  else s=p.bull?"È una pausa dentro il rialzo: il minimo della figura è il punto che il trend non deve perdere, quindi fa da supporto."
-               :"È una pausa dentro il ribasso: il massimo della figura è il punto che il trend non deve superare, quindi fa da resistenza.";
-  if(r.fail) return "Questa volta la figura ha fallito. "+s+" Il prezzo all'inizio lo ha rispettato, poi lo ha rotto ed è andato "+(p.bull?"giù":"su")+". Succede: una figura è una probabilità, non una certezza. La linea serve proprio a capire quando la figura è smentita.";
+  if(p.fam==="inv") s=p.bull?"Dopo il ribasso i compratori hanno fermato il prezzo sul minimo della formazione: quel livello diventa supporto."
+                            :"Dopo il rialzo i venditori hanno respinto il prezzo sul massimo della formazione: quel livello diventa resistenza.";
+  else s=p.bull?"È una pausa dentro il rialzo: il minimo della formazione è il punto che il trend non deve perdere, quindi fa da supporto."
+               :"È una pausa dentro il ribasso: il massimo della formazione è il punto che il trend non deve superare, quindi fa da resistenza.";
+  if(r.fail) return "Questa volta la formazione ha fallito. "+s+" Il prezzo all'inizio lo ha rispettato, poi lo ha rotto ed è andato "+(p.bull?"giù":"su")+". Succede: una formazione è una probabilità, non una certezza. La linea serve proprio a capire quando la formazione è smentita.";
   return s+" Il prezzo lo ha rispettato e ha proseguito "+(p.bull?"al rialzo":"al ribasso")+".";
 }
 
@@ -214,7 +214,7 @@ function fine(){
   var rows=game.res.map(function(x){return "<tr><td>"+html(x.p.name)+"</td><td>"+(x.p.bull?"supporto":"resistenza")+"</td><td class=\"num\">"+x.pts.prec+"%</td><td class=\"num\">"+x.pts.tot+"</td></tr>"}).join("");
   R.innerHTML="<h2>Partita finita</h2><div class=\"grande\">"+game.tot+" <small>/ 500 punti</small></div>"+
     "<p>"+giud+" Precisione media della linea "+prec+"%, supporto o resistenza indovinato "+srOk+" volte su 5.</p>"+
-    "<div class=\"tab\"><table><thead><tr><th>Figura</th><th>Livello</th><th class=\"num\">Precisione</th><th class=\"num\">Punti</th></tr></thead><tbody>"+rows+"</tbody></table></div>";
+    "<div class=\"tab\"><table><thead><tr><th>Formazione</th><th>Livello</th><th class=\"num\">Precisione</th><th class=\"num\">Punti</th></tr></thead><tbody>"+rows+"</tbody></table></div>";
   var b=btn("Gioca ancora","pri",nuova);
   row([b,btn("Torna al menu","",goHome)],R);
   if(game.tot>(+prefs.provaBest||0)){prefs.provaBest=game.tot;savePrefs()}
@@ -235,7 +235,7 @@ function start(){
   clearTimeout(timer);
   if(!unlocked()){
     box.innerHTML="<div class=\"panel pd-locked\"><h2>La Prova del Dojo si apre al livello "+(PROVA_LEVEL+1)+": "+html(LEVELS[PROVA_LEVEL].n)+"</h2>"+
-      "<p>È il gioco in cui tracci tu il supporto o la resistenza che una figura difende, e poi scopri il futuro candela per candela. È gratis: basta salire di livello rispondendo giusto in Studia e ripassa.</p>"+
+      "<p>È il gioco in cui tracci tu il supporto o la resistenza che una formazione difende, e poi scopri il futuro candela per candela. È gratis: basta salire di livello rispondendo giusto in Studia e ripassa.</p>"+
       "<div class=\"actions\"><button class=\"btn\" data-pd=\"go\">Vai a Studia e ripassa</button><button class=\"btn ghost\" data-pd=\"home\">Torna al menu</button></div></div>";
     box.querySelector("[data-pd='go']").onclick=function(){setTab("srs")};
     box.querySelector("[data-pd='home']").onclick=goHome;
@@ -244,7 +244,7 @@ function start(){
   var narrow=window.innerWidth<600;sizeFor(narrow);
   box.innerHTML="<div class=\"pd"+(narrow?" narrow":"")+"\">"+
     "<div class=\"pd-head\"><div class=\"stato\"><span>Grafico <b data-pd=\"nGraf\">1</b> di 5</span><span>Punti <b data-pd=\"punti\">0</b></span><span class=\"pd-dots\" data-pd=\"dots\"></span></div></div>"+
-    "<div class=\"gioco\" data-pd=\"gioco\"><div class=\"carta grafico\"><svg class=\"pd-chart\" viewBox=\"0 0 600 "+H+"\" role=\"img\" aria-label=\"Grafico a candele con la figura evidenziata e la linea da posizionare\"></svg></div><div class=\"carta pann\"></div></div>"+
+    "<div class=\"gioco\" data-pd=\"gioco\"><div class=\"carta grafico\"><svg class=\"pd-chart\" viewBox=\"0 0 600 "+H+"\" role=\"img\" aria-label=\"Grafico a candele con la formazione evidenziata e la linea da posizionare\"></svg></div><div class=\"carta pann\"></div></div>"+
     "<div class=\"carta riass\" data-pd=\"riass\" hidden></div>"+
     "<p class=\"nota\">Grafici simulati, generati a caso: non sono prezzi reali e non è consulenza finanziaria.</p></div>";
   root=box.querySelector(".pd");svg=root.querySelector("svg");pann=root.querySelector(".pann");
@@ -253,7 +253,7 @@ function start(){
 function hint(){
   if(!unlocked()) return "Si apre al livello "+(PROVA_LEVEL+1)+": "+LEVELS[PROVA_LEVEL].n+". Rispondi giusto in Studia e ripassa per salire.";
   var best=+prefs.provaBest||0;
-  return "5 grafici: traccia il supporto o la resistenza che la figura difende."+(best?" Il tuo record è "+best+" punti su 500.":"");
+  return "5 grafici: traccia il supporto o la resistenza che la formazione difende."+(best?" Il tuo record è "+best+" punti su 500.":"");
 }
 function ill(){
   var box=document.getElementById("ill-prova");if(!box)return;

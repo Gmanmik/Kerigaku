@@ -6,7 +6,7 @@
 <script src="lingua.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dojo delle candele</title>
-<meta name="description" content="Allenamento sulle 66 figure candlestick giapponesi, con account e progressi salvati.">
+<meta name="description" content="Allenamento sulle 66 formazioni candlestick giapponesi, con account e progressi salvati.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -421,7 +421,7 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
   <section id="view-home">
     <div class="hero">
       <canvas id="heroCanvas" aria-hidden="true"></canvas>
-      <div class="eyebrow">Allenamento · 66 figure giapponesi</div>
+      <div class="eyebrow">Allenamento · 66 formazioni giapponesi</div>
       <h1 style="margin-top:10px">Dojo delle <em>candele</em></h1>
       <p class="lead">Impara a riconoscere le formazioni candlestick: prima le studi, poi le alleni su grafici sempre diversi.</p>
       <img class="logo" src="logo.svg" alt="Dojo delle candele, timbro 道場" height="104">
@@ -429,7 +429,7 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
 
     <button class="panel studylink" id="studyLink" type="button">
       <span class="ill" id="ill-studia"></span>
-      <span class="sl-txt"><span class="eyebrow">Sempre aperto</span><span class="sl-h">Studia</span><span class="sl-p">Tutte le figure con disegno, nome, spiegazione e la cintura che hanno raggiunto. Da qui si parte.</span></span>
+      <span class="sl-txt"><span class="eyebrow">Sempre aperto</span><span class="sl-h">Studia</span><span class="sl-p">Tutte le formazioni con disegno, nome, spiegazione e la cintura che hanno raggiunto. Da qui si parte.</span></span>
       <span class="sl-go" aria-hidden="true">Apri →</span>
     </button>
 
@@ -439,31 +439,31 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
         <span class="ill" id="ill-srs"></span>
         <span class="rec">Consigliato ogni giorno</span>
         <h3>Studia e ripassa <span class="tick"></span></h3>
-        <p>Le figure di oggi: prima le nuove da guardare, poi il ripasso. Ogni risposta giusta le fa salire di cintura.</p>
+        <p>Le formazioni di oggi: prima le nuove da guardare, poi il ripasso. Ogni risposta giusta le fa salire di cintura.</p>
         <span class="peekline" id="srsPeekLine"></span>
         <span class="peek" id="srsPeek" aria-hidden="true"></span>
       </button>
       <button class="mode" role="radio" data-mode="f2n" id="mode-f2n">
         <span class="ill" id="ill-f2n"></span>
-        <h3>Figura → Nome <span class="tick"></span></h3>
+        <h3>Formazione → Nome <span class="tick"></span></h3>
         <p>Guardi il grafico e scegli il nome giusto.</p>
       </button>
       <button class="mode" role="radio" data-mode="n2f" id="mode-n2f">
         <span class="ill" id="ill-n2f"></span>
-        <h3>Nome → Figura <span class="tick"></span></h3>
+        <h3>Nome → Formazione <span class="tick"></span></h3>
         <p>Leggi il nome e trovi il grafico giusto tra quattro.</p>
       </button>
       <button class="mode scen-mode" role="radio" data-mode="scen" id="mode-scen">
         <span class="ill" id="ill-scen"></span>
         <span class="rec">Novità</span>
         <h3>Scenari <span class="tick"></span></h3>
-        <p>Due o tre figure in fila su un grafico: riconoscile, poi leggi cosa dicono insieme.</p>
+        <p>Due o tre formazioni in fila su un grafico: riconoscile, poi leggi cosa dicono insieme.</p>
       </button>
       <button class="mode prova-mode" role="radio" data-mode="prova" id="mode-prova">
         <span class="ill" id="ill-prova"></span>
         <span class="lockchip" id="provaLock">Dal livello 2</span>
         <h3>La Prova del Dojo <span class="tick"></span></h3>
-        <p>Tracci tu il supporto o la resistenza che la figura difende, poi scopri il futuro candela per candela.</p>
+        <p>Tracci tu il supporto o la resistenza che la formazione difende, poi scopri il futuro candela per candela.</p>
       </button>
     </div>
 
@@ -473,7 +473,7 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
           <button data-v="all">Tutte</button><button data-v="inv">Inversione</button><button data-v="cont">Continuazione</button>
         </div>
       </div>
-      <label class="switch field"><input type="checkbox" id="hlToggle" checked> Evidenzia la figura</label>
+      <label class="switch field"><input type="checkbox" id="hlToggle" checked> Evidenzia la formazione</label>
     </div>
 
     <div class="startrow">
@@ -518,12 +518,12 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
 
   <section id="view-studia" hidden>
     <div class="studybar">
-      <input id="search" type="search" placeholder="Cerca una figura, per esempio harami" aria-label="Cerca una figura">
+      <input id="search" type="search" placeholder="Cerca una formazione, per esempio harami" aria-label="Cerca una formazione">
       <div class="seg" id="studySeg">
         <button data-v="all">Tutte</button><button data-v="bull">Rialziste</button><button data-v="bear">Ribassiste</button>
       </div>
     </div>
-    <p class="hint">Verde: il prezzo dovrebbe salire. Rosso: dovrebbe scendere. La freccia grigia mostra da dove arriva il prezzo. Sotto ogni scheda c'è la cintura della figura: sale con le risposte giuste in Studia e ripassa. Passaci sopra con il mouse, o toccala, per sapere ogni quanto torna e quando.</p>
+    <p class="hint">Verde: il prezzo dovrebbe salire. Rosso: dovrebbe scendere. La freccia grigia mostra da dove arriva il prezzo. Sotto ogni scheda c'è la cintura della formazione: sale con le risposte giuste in Studia e ripassa. Passaci sopra con il mouse, o toccala, per sapere ogni quanto torna e quando.</p>
     <div id="study"></div>
   </section>
   <footer class="sitefoot"><span>Dojo delle candele</span><a href="about.html">About</a><a href="about.html#crediti">Crediti</a><a href="about.html#contatti">Contatti</a><a href="privacy.html">Privacy</a><a href="privacy.html#cookie">Cookie</a><a class="foot-support" href="https://paypal.me/Gmanmik" target="_blank" rel="noopener noreferrer"><span class="cha" aria-hidden="true">茶</span>Sostieni il Dojo</a><a href="?lang=it" data-set-lang="it" translate="no" lang="it">Italiano</a><a href="?lang=en" data-set-lang="en" translate="no" lang="en">English</a></footer>
