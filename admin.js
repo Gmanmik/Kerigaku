@@ -86,7 +86,7 @@ async function load(){
   const {data, error} = await sb.rpc("admin_list_users");
   if(error){ $("#list").innerHTML = `<p class="empty">Non riesco a caricare gli allievi: ${esc(error.message)}</p>`; return; }
   users = data || [];
-  render();
+  render(); renderSignups();
   loadIps();
 }
 function render(){
@@ -335,8 +335,41 @@ async function loadBrevo(days){
     ${camps ? `<div class="tabwrap"><table><thead><tr><th>Newsletter</th><th class="num">Consegnate</th><th class="num">Rimbalzi</th><th class="num">Disiscritti</th></tr></thead><tbody>${camps}</tbody></table></div>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora nessuna newsletter mandata.</p>`}</div>
     <p class="meta">Aperture e clic non li contiamo: il tracciamento in Brevo è spento per scelta.</p></div>`;
 }
+// grafico a barre con la scala: valori a sinistra e linee orizzontali, così si capisce subito quanto sono grandi i numeri
+function niceTicks(max){
+  const raw = Math.max(1, max) / 4, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = Math.max(1, [1, 2, 5, 10].map(m => m * p).find(s => s >= raw));
+  const top = Math.max(step, Math.ceil(max / step) * step);
+  return {top, ticks: Array.from({length: Math.round(top / step) + 1}, (_, i) => i * step)};
+}
+function barChart(rows, label){
+  const {top, ticks} = niceTicks(Math.max(0, ...rows.map(d => d.v))), W = 600, H = 160, bw = W / rows.length;
+  const grid = ticks.map(t => { const y = (H - H * t / top).toFixed(1); return `<line x1="0" x2="${W}" y1="${y}" y2="${y}"/>`; }).join("");
+  const bars = rows.map((d, i) => { const h = H * d.v / top; return `<rect x="${(i * bw + bw * .12).toFixed(1)}" y="${(H - h).toFixed(1)}" width="${Math.max(.6, bw * .76).toFixed(1)}" height="${h.toFixed(1)}"><title>${esc(d.data)}: ${d.v}</title></rect>`; }).join("");
+  const labels = ticks.map(t => `<span style="top:${(100 - 100 * t / top).toFixed(2)}%">${t.toLocaleString("it-IT")}</span>`).join("");
+  return `<div class="chartwrap"><div class="yaxis" aria-hidden="true">${labels}</div><svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(label)}"><g class="grid">${grid}</g>${bars}</svg></div>
+    <div class="chart-dates"><span>${esc(rows[0].data)}</span><span>${esc(rows[rows.length - 1].data)}</span></div>`;
+}
+// nuovi iscritti per giorno, dalla data di registrazione degli account (nessun dato in più)
+function renderSignups(){
+  const box = $("#signBody"); if(!box) return;
+  if(!users.length){ box.innerHTML = `<p class="empty">Carico gli allievi…</p>`; return; }
+  const days = statsDays, now = new Date(), day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const since = days === 1 ? now.getTime() - 86400000 : day0.getTime() - (days - 1) * 86400000;
+  const inP = users.filter(u => Date.parse(u.created_at) >= since);
+  const tile = (v, l) => `<div class="panel tile"><span class="v">${v}</span><span class="l">${l}</span></div>`;
+  let chart = "";
+  if(days > 1){
+    const rows = Array.from({length: days}, (_, i) => { const d = new Date(day0.getTime() - (days - 1 - i) * 86400000); return {t: d.getTime(), data: d.toLocaleDateString("it-IT", {day: "numeric", month: "short"}), v: 0}; });
+    inP.forEach(u => { const c = new Date(u.created_at), k = rows.findIndex(r => r.t === new Date(c.getFullYear(), c.getMonth(), c.getDate()).getTime()); if(k >= 0) rows[k].v++; });
+    chart = barChart(rows, "Nuovi iscritti per giorno");
+  }
+  box.innerHTML = `<div style="display:grid;gap:14px;grid-template-columns:minmax(0,1fr)">
+    <div class="tiles">${tile(inP.length, days === 1 ? "iscritti nelle ultime 24 ore" : `iscritti negli ultimi ${days} giorni`)}${tile(users.length, "allievi registrati in tutto")}</div>${chart}
+    <p class="meta">Chi usa il Dojo senza account non viene contato: non lo tracciamo. Le visite anonime sono nel riquadro qui sopra.</p></div>`;
+}
 async function loadStats(days){
-  statsDays = days;
+  statsDays = days; renderSignups();
   document.querySelectorAll("#statsSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === days)));
   const box = $("#statsBody");
   box.innerHTML = `<p class="empty">Carico le statistiche…</p>`;
@@ -354,14 +387,12 @@ async function loadStats(days){
     return;
   }
   const n = v => Math.max(0, Math.round(Number(v) || 0));
-  const days_ = (data.perGiorno || []).map(d => ({data: String(d.data || ""), v: n(d.visualizzazioni)}));
-  const max = Math.max(1, ...days_.map(d => d.v)), W = 600, H = 120, bw = days_.length ? W / days_.length : W;
-  const bars = days_.map((d, i) => { const h = Math.round((H - 4) * d.v / max); return `<rect x="${(i * bw + 1).toFixed(1)}" y="${H - h}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h}"><title>${esc(d.data)}: ${d.v}</title></rect>`; }).join("");
-  const lab = days_.length ? `<div class="chart-dates"><span>${esc(days_[0].data)}</span><span>${esc(days_[days_.length - 1].data)}</span></div>` : "";
+  const itDay = t => { const d = new Date(t + "T12:00:00"); return isNaN(d) ? t : d.toLocaleDateString("it-IT", {day: "numeric", month: "short"}); };
+  const days_ = (data.perGiorno || []).map(d => ({data: itDay(String(d.data || "")), v: n(d.visualizzazioni)}));
   const list = (t, rows, fmt = r => esc(r.nome)) => `<div><h3>${t}</h3>${(rows || []).length ? `<ol>${rows.map(r => `<li><span>${fmt(r)}</span><span>${n(r.visualizzazioni)}</span></li>`).join("")}</ol>` : `<p class="empty" style="padding:6px 0;text-align:left">Ancora niente.</p>`}</div>`;
   box.innerHTML = `<div style="display:grid;gap:14px;grid-template-columns:minmax(0,1fr)">
-    <div class="tiles"><div class="panel tile"><span class="v">${n(data.visite)}</span><span class="l">visite</span></div><div class="panel tile"><span class="v">${n(data.visualizzazioni)}</span><span class="l">pagine viste</span></div></div>
-    ${days_.length > 1 ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pagine viste per giorno">${bars}</svg>${lab}` : ""}
+    <div class="tiles"><div class="panel tile"><span class="v">${n(data.visite).toLocaleString("it-IT")}</span><span class="l">visite</span></div><div class="panel tile"><span class="v">${n(data.visualizzazioni).toLocaleString("it-IT")}</span><span class="l">pagine viste</span></div></div>
+    ${days_.length > 1 ? barChart(days_, "Pagine viste per giorno") : ""}
     <div class="lists">${list("Pagine più viste", data.pagine)}${list("Da dove arrivano", data.provenienza)}${list("Paesi", data.paesi, countryHTML)}${list("Dispositivi", data.dispositivi)}</div></div>`;
 }
 document.querySelectorAll("#statsSeg button").forEach(b => b.onclick = () => loadStats(+b.dataset.d));

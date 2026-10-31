@@ -387,6 +387,20 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
 .support-line .support{font-size:13.5px;padding:5px 14px 5px 5px}
 .support-line .support .cha{width:22px;height:22px;font-size:14px}
 @media (max-width:600px){.support-line .support{width:100%;justify-content:center}}
+/* tessera Studia e ripassa: le prossime figure (riquadro al passaggio del mouse, riga sui touch) */
+.mode .peek{position:absolute;left:12px;right:12px;top:calc(100% - 10px);z-index:30;display:grid;gap:7px;background:var(--card);color:var(--ink);border:1px solid var(--line2);box-shadow:0 10px 28px rgba(0,0,0,.2);padding:12px 14px;font-size:12.5px;line-height:1.35;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none;min-width:220px}
+.mode .peek b{font-size:13px}
+.mode .peek .pk-row{display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:8px;align-items:center}
+.mode .peek .pk-row .belt{width:30px;height:auto;grid-row:span 2}
+.mode .peek .pk-n{font-weight:600;overflow-wrap:anywhere}
+.mode .peek .pk-w,.mode .peek .pk-empty{color:var(--muted)}
+.mode .peekline{font-size:12px;color:var(--muted);display:none}
+@media (hover:hover){.mode:hover,.mode:focus-visible{z-index:40}.mode:hover .peek,.mode:focus-visible .peek{opacity:1;visibility:visible;transform:none}}
+@media (hover:none){.mode .peek{display:none}.mode .peekline:not(:empty){display:block}}
+/* sigillo della home più grande sugli schermi larghi (16:9) */
+@media (min-width:1000px) and (min-aspect-ratio:4/3){.hero .logo{height:clamp(150px,13vw,230px)}}
+.danger-confirm{display:grid;gap:8px}
+.danger-confirm label{font-size:14px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -425,6 +439,8 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
         <span class="rec">Consigliato ogni giorno</span>
         <h3>Studia e ripassa <span class="tick"></span></h3>
         <p>Le figure di oggi: prima le nuove da guardare, poi il ripasso. Ogni risposta giusta le fa salire di cintura.</p>
+        <span class="peekline" id="srsPeekLine"></span>
+        <span class="peek" id="srsPeek" aria-hidden="true"></span>
       </button>
       <button class="mode" role="radio" data-mode="f2n" id="mode-f2n">
         <span class="ill" id="ill-f2n"></span>
@@ -478,7 +494,6 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
         <span><i style="border:1.5px dashed var(--line2);background:transparent"></i>chiusa</span>
       </div>
       <p class="hint" id="nextDue" style="margin:10px 0 0"></p>
-      <div class="reset" id="resetBox"><button class="linkbtn" id="resetBtn">Azzera i progressi</button></div>
     </div>
   </section>
 

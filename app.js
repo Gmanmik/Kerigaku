@@ -548,27 +548,39 @@ function renderHome(){
   if(prefs.mode === "srs") $("#startHint").textContent = srsHint();
   if(prefs.mode === "scen" && window.Scenari) $("#startHint").textContent = Scenari.hint();
   const pl = $("#provaLock"); if(pl) pl.hidden = !!(window.Prova && Prova.unlocked());
-  $("#resetBox").innerHTML = `<button class="linkbtn" id="resetBtn">Azzera i progressi</button>`;
-  $("#resetBtn").onclick = () => {
-    // con l'account l'azzeramento sta nella Danger zone della pagina Account
-    if(cloud.on) return showAccount().then(() => { const d = $("#dangerZone"); if(d) d.scrollIntoView({behavior:"smooth", block:"center"}); });
-    $("#resetBox").innerHTML = dangerHTML("rz", "Cancello tutti i progressi su questo dispositivo: figure imparate, ripasso, scenari e livello.") + `<button class="btn ghost small" id="resetNo">Annulla</button>`;
-    bindDanger("rz", () => { wipeProgress(Date.now()); renderHome(); });
-    $("#resetNo").onclick = renderHome;
-  };
+  renderPeek();
 }
-// conferma a prova di distrazione: il tasto si accende solo scrivendo CANCELLA
+// tessera "Studia e ripassa": le prime figure che ti chiederà, con cintura e ogni quanto tornano
+// (riquadro al passaggio del mouse; sui telefoni una riga nella tessera)
+function renderPeek(){
+  const box = $("#srsPeek"), line = $("#srsPeekLine"); if(!box || !line) return;
+  const {due, fresh} = srsQueue(), next = due.concat(fresh).slice(0, 4);
+  if(!next.length){
+    const nd = nextDueDay(), t = "Per oggi hai finito." + (nd !== null ? ` Il prossimo ripasso è ${whenText(nd)}.` : "");
+    box.innerHTML = `<b>Le prossime figure</b><span class="pk-empty">${t}</span>`; line.textContent = t; return;
+  }
+  box.innerHTML = `<b>Le prossime figure</b>` + next.map(p => { const b = sc(p.id).b;
+    return `<span class="pk-row">${BELT_SVG(b)}<span class="pk-n">${esc(label(p))}</span><span class="pk-w">${b ? BELTS[b] + " · " + (INT[b] === 1 ? "ogni giorno" : `ogni ${INT[b]} giorni`) : "nuova"}</span></span>`; }).join("");
+  line.textContent = "Prossime: " + next.map(label).join(", ");
+}
+// conferma a prova di distrazione: prima il pulsante, poi "Sei sicuro?" e la parola da scrivere (CANCELLA o ELIMINA)
 const DANGER_WORD = "CANCELLA", DELETE_WORD = "ELIMINA";
 function dangerHTML(id, text, label = "Azzera i progressi", word = DANGER_WORD){
   return `<div class="danger-box"><p>${esc(text)} <b>Non si può annullare.</b></p>
-    <label for="${id}-w">Per confermare scrivi <b>${word}</b></label>
-    <div class="row"><input id="${id}-w" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="${id}-m"><button class="btn danger" type="button" id="${id}-go" disabled>${label}</button></div>
+    <div class="row"><button class="btn danger" type="button" id="${id}-open" aria-expanded="false" aria-controls="${id}-c">${label}</button></div>
+    <div class="danger-confirm" id="${id}-c" hidden>
+      <label for="${id}-w">Sei sicuro di quello che vuoi fare? Scrivi <b>${word}</b> per confermare.</label>
+      <div class="row"><input id="${id}-w" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="${id}-m"><button class="btn danger" type="button" id="${id}-go" disabled>Conferma</button><button class="btn ghost small" type="button" id="${id}-no">Annulla</button></div>
+    </div>
     <p class="hint" id="${id}-m" role="status"></p></div>`;
 }
 function bindDanger(id, onYes, word = DANGER_WORD){
-  const w = $("#" + id + "-w"), go = $("#" + id + "-go");
+  const w = $("#" + id + "-w"), go = $("#" + id + "-go"), open = $("#" + id + "-open"), c = $("#" + id + "-c");
+  const show = on => { c.hidden = !on; open.hidden = on; open.setAttribute("aria-expanded", String(on)); w.value = ""; go.disabled = true; if(on) w.focus(); else open.focus(); };
+  open.onclick = () => { $("#" + id + "-m").textContent = ""; show(true); };
+  $("#" + id + "-no").onclick = () => show(false);
   w.oninput = () => { go.disabled = w.value.trim().toUpperCase() !== word; };
-  go.onclick = () => { if(w.value.trim().toUpperCase() !== word) return; go.disabled = true; w.value = ""; onYes(); };
+  go.onclick = () => { if(w.value.trim().toUpperCase() !== word) return; go.disabled = true; w.value = ""; c.hidden = true; open.hidden = false; open.setAttribute("aria-expanded", "false"); onYes(); };
 }
 function renderIllustrations(){
   const mini = (id, o) => chartSVG(BYID[id], Object.assign({arrow:true, w:90, h:80, maxSlot:16, maxBody:8}, o));
@@ -1082,8 +1094,13 @@ async function showAccount(){
   $("#view-account").hidden = false;
   heroAnim.stop(); window.scrollTo({top:0});
   if(!cloud.user){
-    $("#accountBox").innerHTML = trainHTML() + soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>`;
+    $("#accountBox").innerHTML = trainHTML() + soundHTML() + `<section class="panel acard"><div class="eyebrow">Account</div><p>Senza account i progressi restano solo su questo dispositivo. Con un account ti seguono ovunque.</p><button class="btn" type="button" id="st-login">Accedi o registrati</button></section>
+      <section class="panel acard danger-zone" id="dangerZone"><div class="eyebrow">Danger zone</div>
+      <h3>Azzera i progressi</h3>
+      ${dangerHTML("dz", "Cancello tutti i progressi su questo dispositivo: figure imparate, ripasso, statistiche, scenari, livello e record della Prova.")}
+      </section>`;
     $("#st-login").onclick = () => showAuth("in"); bindTrain();
+    bindDanger("dz", () => { wipeProgress(Date.now()); $("#dz-m").textContent = "Fatto: i progressi sono azzerati. Si riparte dal livello 1."; });
     if(window.DojoSuoni) DojoSuoni.paint();
     return;
   }
@@ -1137,7 +1154,7 @@ async function showAccount(){
   bindDanger("dz", async () => { wipeProgress(Date.now()); await cloud.flush(); $("#dz-m").textContent = "Fatto: i progressi sono azzerati. Si riparte dal livello 1."; });
   bindDanger("da", async () => {
     try{ await cloud.deleteAccount(); }
-    catch(e){ $("#da-m").textContent = /admin/i.test((e && e.message) || "") ? "Questo è un account admin: prima va tolto il ruolo admin." : cloud.errText(e); $("#da-w").value = ""; }
+    catch(e){ $("#da-m").textContent = /admin/i.test((e && e.message) || "") ? "Questo è un account admin: prima va tolto il ruolo admin." : cloud.errText(e); }
   }, DELETE_WORD);
   let newMail = "";
   $("#f-mail").onsubmit = async e => {

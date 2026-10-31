@@ -218,7 +218,12 @@ input,.exportbox textarea,.confirm{border-radius:2px;border-width:1px;border-col
 .stats-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.stats-head>*{min-width:0;max-width:100%}.stats-head .seg{flex-wrap:wrap}
 .stats-head h2{margin:0;font-size:20px}
 .stats .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
-.stats .chart{width:100%;height:auto;display:block}
+.stats .chartwrap{position:relative;padding-left:46px;height:180px}
+.stats .chart{width:100%;height:100%;display:block;overflow:visible}
+.stats .chart .grid line{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
+.stats .yaxis{position:absolute;left:0;top:0;bottom:0;width:40px}
+.stats .yaxis span{position:absolute;right:0;transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1}
+.stats .chart-dates{padding-left:46px;margin-top:4px!important}
 .stats .chart rect{fill:var(--seal)}
 .stats .chart-dates{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-6px}
 .stats .lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
@@ -370,6 +375,10 @@ body.adm-on .wrap{padding-left:calc(var(--rail) + max(16px, env(safe-area-inset-
         </div>
         <div id="statsBody"><p class="empty">Carico le statistiche…</p></div>
       </section>
+        <section class="panel stats" id="signStats" aria-labelledby="signTitle">
+          <div class="stats-head"><h2 id="signTitle">Nuovi iscritti</h2><span class="meta">periodo scelto sopra</span></div>
+          <div id="signBody"><p class="empty">Carico gli allievi…</p></div>
+        </section>
         <section class="panel stats" id="nlStats" aria-labelledby="nlTitle">
           <div class="stats-head"><h2 id="nlTitle">Newsletter (Brevo)</h2>
             <div class="seg" id="nlSeg" role="group" aria-label="Periodo"><button type="button" data-d="1">24 ore</button><button type="button" data-d="7" aria-pressed="true">7 giorni</button><button type="button" data-d="30">30 giorni</button><button type="button" data-d="90">90 giorni</button></div>
