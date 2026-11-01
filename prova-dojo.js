@@ -1,4 +1,4 @@
-/* Dojo delle candele · La Prova del Dojo: 5 grafici simulati, l'utente traccia il livello che la formazione difende
+/* KeriGaku · La Prova del Dojo: 5 grafici simulati, l'utente traccia il livello che la formazione difende
    (rialzista = minimo, supporto; ribassista = massimo, resistenza) e poi dice se è supporto o resistenza.
    50 punti alla linea (pieni entro ±2,5% del range, poi a scalare) e 50 alla risposta. 1 volta su 5 la formazione fallisce.
    Gratis dal livello 2. Usa i dati e le funzioni di app.js (openP, provaOpen, LEVELS, PROVA_LEVEL, goHome) ed espone window.Prova. */

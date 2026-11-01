@@ -1,4 +1,4 @@
-/* Dojo delle candele · La Prova del Dojo (gioco di supporti e resistenze) e cinture.
+/* KeriGaku · La Prova del Dojo (gioco di supporti e resistenze) e cinture.
    Stessi colori del tema Sumi (variabili di index.html). Tutto sotto .pd per non toccare il resto del sito. */
 .pd{--band:rgba(46,106,78,.18);display:flex;flex-direction:column;gap:14px}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pd{--band:rgba(134,194,156,.2)}}

@@ -1003,7 +1003,7 @@ function paintAuth(step){
   if(step === "forgot" || step === "otp") f = fieldHTML("au-email", "Email", `type="email" autocomplete="email" autocapitalize="none" spellcheck="false"`);
   if(step === "reset") f = fieldHTML("au-code", "Codice a 6 cifre", code) + fieldHTML("au-pw", "Nuova password", `type="password" autocomplete="new-password"`) + fieldHTML("au-pw2", "Ripeti la password", `type="password" autocomplete="new-password"`);
   const go = {in: "Entra", up: "Crea account", code: "Conferma", forgot: "Mandami il codice", reset: "Salva e entra", mfa: "Verifica", otp: "Mandami il codice", otpcode: "Entra"}[step];
-  card.innerHTML = `<div class="eyebrow">Dojo delle candele · 道場</div><h2></h2><p class="hint au-sub"></p>
+  card.innerHTML = `<div class="eyebrow">KeriGaku · 学</div><h2></h2><p class="hint au-sub"></p>
     ${tabs ? `<div class="seg" id="authSeg" role="group" aria-label="Accedi o registrati"><button type="button" data-v="in">Accedi</button><button type="button" data-v="up">Registrati</button></div>` : ""}
     <form id="authForm" novalidate>${f}${["in", "up", "code", "forgot", "otp", "otpcode"].includes(step) ? `<div class="cf-ts" id="au-ts"></div>` : ""}<p class="au-err" id="au-err" role="alert"></p><p class="au-ok" id="au-ok" role="status"></p><button class="btn big" id="au-go" type="submit">${go}</button></form>
     <div class="au-links">
@@ -1207,7 +1207,7 @@ async function showAccount(){
     }
     // toglie eventuali attivazioni lasciate a metà, poi ne crea una nuova
     for(const f of ((fac && fac.all) || []).filter(f => f.status !== "verified")) await sb.auth.mfa.unenroll({factorId: f.id});
-    const {data, error} = await sb.auth.mfa.enroll({factorType: "totp", issuer: "Dojo delle candele", friendlyName: "Dojo " + Date.now()});
+    const {data, error} = await sb.auth.mfa.enroll({factorType: "totp", issuer: "KeriGaku", friendlyName: "Dojo " + Date.now()});
     if(error) return say("#m-mfa", cloud.errText(error));
     $("#mfaBox").innerHTML = `<ol class="mfasteps"><li>Inquadra il codice QR con l'app di autenticazione.</li><li>Se non puoi inquadrarlo, inserisci a mano la chiave <code class="secret"></code></li><li>Scrivi qui il codice a 6 cifre che compare nell'app.</li></ol>
       <img class="qr" alt="Codice QR per l'app di autenticazione"><form id="f-mfa" class="row" novalidate><input id="ac-mfacode" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456" aria-label="Codice dell'app"><button class="btn" type="submit">Attiva</button></form>`;

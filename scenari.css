@@ -1,4 +1,4 @@
-/* Dojo delle candele · modulo Scenari. Stessi colori e filetti del tema Sumi (variabili di index.html). */
+/* KeriGaku · modulo Scenari. Stessi colori e filetti del tema Sumi (variabili di index.html). */
 @media (min-width:901px){#view-home .modes{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media (max-width:900px) and (min-width:641px){
   #view-home .mode.scen-mode{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}

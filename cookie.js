@@ -1,4 +1,4 @@
-/* Avviso cookie del Dojo delle candele.
+/* Avviso cookie di KeriGaku.
    Il sito usa solo strumenti tecnici necessari (accesso, progressi, tema, controllo anti-robot):
    per le regole UE e le linee guida del Garante non serve un consenso, basta informare.
    Le statistiche sono Cloudflare Web Analytics, senza cookie né memoria sul dispositivo, quindi restano fuori dal consenso.

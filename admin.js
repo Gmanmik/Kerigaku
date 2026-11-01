@@ -445,7 +445,7 @@ function textToRows(text){
     return `<tr><td style="padding:6px 32px 6px 32px;${TD}">${inline(b).replace(/\n/g, "<br>")}</td></tr>`;
   }).join("");
 }
-const FOOT = `<tr><td style="padding:22px 32px 28px 32px;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#5A6660;border-top:1px solid #EEF1EE;">Ricevi questa email perché ti sei iscritto alla newsletter del Dojo delle candele. Il Dojo serve a imparare, non dà consigli di investimento. <a href="{{ unsubscribe }}" style="color:#2C46A6;">Disiscriviti</a> con un clic, oppure dalla pagina Account.<br>Inviata da Michele, Dojo delle candele &middot; <a href="mailto:admin@dojodellecandele.com" style="color:#2C46A6;">admin@dojodellecandele.com</a> &middot; <a href="https://dojodellecandele.com/privacy.html" style="color:#2C46A6;">Privacy</a></td></tr>`;
+const FOOT = `<tr><td style="padding:22px 32px 28px 32px;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#5A6660;border-top:1px solid #EEF1EE;">Ricevi questa email perché ti sei iscritto alla newsletter di KeriGaku. Il Dojo serve a imparare, non dà consigli di investimento. <a href="{{ unsubscribe }}" style="color:#2C46A6;">Disiscriviti</a> con un clic, oppure dalla pagina Account.<br>Inviata da Michele, KeriGaku &middot; <a href="mailto:admin@dojodellecandele.com" style="color:#2C46A6;">admin@dojodellecandele.com</a> &middot; <a href="https://dojodellecandele.com/privacy.html" style="color:#2C46A6;">Privacy</a></td></tr>`;
 function wrapEmail(subject, pre, rows){
   return `<!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escE(subject)}</title></head>
@@ -453,13 +453,13 @@ function wrapEmail(subject, pre, rows){
 ${pre ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escE(pre)}</div>` : ""}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F1F4F0;"><tr><td align="center" style="padding:28px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#FFFFFF;border:1px solid #D7DDD8;border-radius:14px;">
-<tr><td style="padding:28px 32px 0 32px;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5A6660;">Dojo delle candele &middot; newsletter</td></tr>
+<tr><td style="padding:28px 32px 0 32px;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5A6660;">KeriGaku &middot; newsletter</td></tr>
 <tr><td style="padding:14px 32px 6px 32px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:#17201C;">${escE(subject)}</td></tr>
 ${rows}
-<tr><td style="padding:6px 32px 6px 32px;${TD}">A presto,<br>Michele &middot; Dojo delle candele</td></tr>
+<tr><td style="padding:6px 32px 6px 32px;${TD}">A presto,<br>Michele &middot; KeriGaku</td></tr>
 ${FOOT}
 </table>
-<p style="font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#7A857F;margin:14px 0 0 0;">Dojo delle candele &middot; allenamento sulle formazioni candlestick giapponesi</p>
+<p style="font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#7A857F;margin:14px 0 0 0;">KeriGaku &middot; allenamento sulle formazioni candlestick giapponesi</p>
 </td></tr></table>
 </body></html>`;
 }

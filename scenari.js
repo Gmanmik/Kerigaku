@@ -1,4 +1,4 @@
-/* Dojo delle candele · modulo Scenari (scenari.js, caricato dopo app.js).
+/* KeriGaku · modulo Scenari (scenari.js, caricato dopo app.js).
    Usa le funzioni e i dati di app.js (P, BYID, chartSVG, makeContext, store, Q...) ed espone window.Scenari. */
 (() => {
 "use strict";
