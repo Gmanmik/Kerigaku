@@ -7,7 +7,8 @@
 .btn,.opt,.mode,.support,.linkbtn,.back,.seg button,.fig{transition:transform .15s ease,filter .15s ease,background-color .15s,color .15s}
 @media (hover:hover){
   .btn:hover:not(:disabled),.opt:hover:not(:disabled),.support:hover,.seg button:hover,.linkbtn:hover,.fig:hover{transform:scale(1.04);filter:var(--hover-tint)}
-  .mode:hover{transform:scale(1.015);filter:var(--hover-tint)}
+  /* le carte delle modalità non si scuriscono: il filtro ingrigiva anche il riquadro «Le prossime formazioni» (Michele 31/10: di giorno lo vuole chiaro) */
+  .mode:hover{transform:scale(1.015)}
 }
 .btn:active:not(:disabled),.opt:active:not(:disabled){transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){.btn,.opt,.mode,.support,.linkbtn,.back,.seg button,.fig{transition:none}

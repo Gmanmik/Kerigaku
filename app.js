@@ -365,7 +365,6 @@ function nextDueDay(){
   const ds = Object.values(srs).filter(c => c.b > 0).map(c => c.due);
   return ds.length ? Math.min(...ds) : null;
 }
-const learnedFig = id => sc(id).b >= 2;
 // gruppo di formazioni aperto dal livello raggiunto
 function groupNow(){ return LEVEL_GROUP[levelInfo().i]; }
 // aperta: compresa nel gruppo del livello raggiunto, oppure già studiata
@@ -378,7 +377,6 @@ const $ = s => document.querySelector(s);
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-const dirWord = p => p.bull ? "rialzista" : "ribassista";
 const label = p => `${p.name} ${p.bull ? "+" : "–"}`;
 const chipDir = p => `<span class="chip ${p.bull?"bull":"bear"}">${p.bull?"▲ rialzo":"▼ ribasso"}</span>`;
 const chipN = p => `<span class="chip n">${p.n} candel${p.n===1?"a":"e"}</span>`;

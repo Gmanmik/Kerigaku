@@ -1,7 +1,7 @@
 /* Rinforzo positivo "D · Unione" (approvata da Michele il 31/10): tavolette, striscia omikuji, timbro, stella che brilla,
    coriandoli e festoni. Usa i token di sumi.css (--paper --card --ink --seal --bull --gold --display --body).
    Se manca --gold nel sito aggiungila: chiaro #B8963E, notte #D8B24E. */
-@font-face{font-family:"Yuji Rinforzo";font-weight:400;font-display:swap;src:url(font-yuji-boku-rinforzo.woff2) format("woff2");unicode-range:U+5927,U+5409,U+4E2D,U+5C0F,U+4E94,U+5341,U+4E09,U+9053,U+5834}
+/* i kanji usano Yuji Boku da fonts.css (font-yuji-boku.woff2) */
 @keyframes srotola{0%{transform:scaleY(0);opacity:0}60%{opacity:1}100%{transform:scaleY(1)}}
 .sigs{display:flex;gap:6px;margin-top:10px;min-height:30px}.sigs i{width:28px;height:28px;border-radius:50%;background:var(--seal);color:#fff;font:800 14px/28px var(--display);text-align:center;font-style:normal;animation:pop .35s both}
 @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
@@ -33,7 +33,7 @@ mix-blend-mode:screen;animation:stella var(--d,2.4s) ease-out both}
 @media (prefers-reduced-motion:reduce){.dim,.star,.flash,.cf,.fest{display:none}}
 .done{margin-top:10px;font:700 16px var(--display);color:var(--seal)}
 /* kanji in Yuji Boku (OFL): va dopo le regole con font: abbreviato */
-.omiBig .g,.sigBig,.sigs i{font-family:"Yuji Rinforzo",var(--display);font-weight:400}
+.omiBig .g,.sigBig,.sigs i{font-family:"Yuji Boku",var(--display);font-weight:400}
 /* omikuji leggermente piegato: inclinato, con una piega al centro e l'angolo in alto a destra arricciato */
 .omiBig{position:relative;transform:perspective(900px) rotateX(7deg) rotate(-3.5deg) skewX(-2deg);filter:drop-shadow(0 12px 18px rgba(0,0,0,.28));border-radius:2px 14px 2px 2px}
 .omiBig::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 0 46%,rgba(0,0,0,.16) 49%,rgba(255,255,255,.28) 51.5%,transparent 56%)}

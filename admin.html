@@ -14,26 +14,9 @@
 <link rel="stylesheet" href="tasti-hover.css">
 <style>
 /* Layout: same chart-paper as the Dojo; a summary strip, then one row per student. */
-:root{
-  color-scheme:light;
-  --paper:#F1F4F0; --grid:rgba(24,48,36,.055); --card:#FFFFFF; --well:#FAFBF9;
-  --ink:#17201C; --muted:#5A6660; --line:#D7DDD8;
-  --bull:#12875C; --bull-soft:#DCF0E5; --bear:#CF3F48; --bear-soft:#F7DFE0;
-  --accent:#2C46A6; --accent-soft:#E2E7F7; --hl-line:#D9B54A;
-  --display:"Young Serif", Georgia, "Times New Roman", serif;
-  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
-  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
-  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F; --bear-soft:#3A1D20;
-  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --paper:#111714; --grid:rgba(200,230,215,.05); --card:#19211D; --well:#151C18;
-  --ink:#E5ECE8; --muted:#9AA8A1; --line:#2B3530;
-  --bull:#33C487; --bull-soft:#173427; --bear:#F2696F; --bear-soft:#3A1D20;
-  --accent:#93A8FF; --accent-soft:#222B48; --hl-line:#9C8233; color-scheme:dark}
+:root{color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark}}
+:root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}

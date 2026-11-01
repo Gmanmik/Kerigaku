@@ -145,7 +145,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[role="radio"]:foc
 
 /* ---------- quiz ---------- */
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-#festa{flex-basis:100%}#festa .wall:empty,#festa .sigs:empty{display:none}
+#festa{flex-basis:100%}#festa .sigs:empty{display:none}
 .pips{display:flex;gap:7px;flex-wrap:wrap}
 .pip{width:11px;height:11px;border-radius:50%;background:transparent;border:1.5px solid var(--line2)}
 .pip.cur{background:var(--ink);border-color:var(--ink)}
@@ -406,6 +406,10 @@ svg.belt{width:30px;height:15px;flex:none;fill:var(--k);stroke:var(--k-edge);str
 .mode .peekline{font-size:12px;color:var(--muted);display:none}
 @media (hover:hover){.mode:hover,.mode:focus-visible{z-index:40}.mode:hover .peek,.mode:focus-visible .peek{opacity:1;visibility:visible;transform:none}}
 @media (hover:none){.mode .peek{display:none}.mode .peekline:not(:empty){display:block}}
+/* bugfix 31/10 (Tester): su telefono la riga «Prossime: …» sta nella colonna del testo, non in quella stretta del numero */
+@media (max-width:640px){.mode .peekline{grid-column:2/-1}.acct .txt{white-space:normal;text-overflow:clip;overflow-wrap:anywhere}}
+/* aree di tocco più comode al dito (almeno ~40 px) */
+@media (pointer:coarse){.seg button,.card .foot button{min-height:40px}.sitefoot a{display:inline-block;padding:10px 2px}.linkbtn{min-height:40px}}
 /* sigillo della home più grande sugli schermi larghi (16:9) */
 @media (min-width:1000px) and (min-aspect-ratio:4/3){.hero .logo{height:clamp(150px,13vw,230px)}}
 .danger-confirm{display:grid;gap:8px}

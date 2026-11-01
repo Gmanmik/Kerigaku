@@ -744,8 +744,7 @@ window.DOJO_I18N = {
 "Una alla volta, e il grafico si apre.": "One at a time, and the chart opens up.",
 "Fortuna": "Fortune",
 "Giusto. Avanti così.": "Correct. Keep it up.",
-"DI FILA": "IN A ROW",
-"Sessione completa: dieci tavolette!": "Session complete: ten tablets!"
+"DI FILA": "IN A ROW"
 },
 "h": {
 "Un dojo per allenare <em>l'occhio</em>": "A dojo to train <em>your eye</em>",
