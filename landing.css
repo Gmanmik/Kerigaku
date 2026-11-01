@@ -3,6 +3,8 @@
 #landing{display:none}
 body.is-landing #landing{display:block}
 body.is-landing .wrap{display:none}
+html.pre-landing #landing{display:block!important}
+html.pre-landing .wrap{display:none}
 #landing .eyebrow{font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
 #landing h2{font-family:var(--display);font-weight:800;line-height:1.1;margin:0 0 14px;text-wrap:balance;font-size:clamp(28px,5.5vw,44px)}
 #landing .muted{color:var(--muted);font-size:14px}

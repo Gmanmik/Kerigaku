@@ -270,10 +270,13 @@ const cloud = (() => {
     },
     async init(){
       paint();
-      if(!ready) return;
-      const {data} = await sb.auth.getSession();
-      if(data.session) await enter(data.session.user);
-      else if(!store.get("dojo-guest", false)) showLanding();
+      const pre = () => document.documentElement.classList.remove("pre-landing");   // la copertina provvisoria di theme-init.js
+      if(!ready){ pre(); return; }
+      try{
+        const {data} = await sb.auth.getSession();
+        if(data.session) await enter(data.session.user);
+        else if(!store.get("dojo-guest", false)) showLanding();
+      } finally { pre(); }
       sb.auth.onAuthStateChange((ev, s) => {
         if(ev === "SIGNED_OUT" && user){ user = null; setSpace(null); paint("guest"); goHome(); }
         if(ev === "USER_UPDATED" && s && user){ user = s.user; paint(); }
