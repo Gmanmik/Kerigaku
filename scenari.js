@@ -220,10 +220,10 @@ function scenAnswer(id){
   c.answered = true; c.pick = id;
   if(c.step < nz){
     const t = c.B.zones[c.step].id, ok = id === t;
-    c.picks[c.step] = ok; if(ok) pop();
+    c.picks[c.step] = ok;
     const st = stats[t] || (stats[t] = {r:0, w:0}); ok ? st.r++ : st.w++; saveStats();
   } else {
-    c.picks[nz] = id === c.s.v; if(c.picks[nz]) pop();
+    c.picks[nz] = id === c.s.v;
     const all = c.picks.every(Boolean), s = c.s;
     Q.res.push(all);
     if(window.DojoSuoni) DojoSuoni.play(all ? "giusto" : "sbagliato");
@@ -276,8 +276,6 @@ function renderScenSummary(){
 }
 
 // dati che app.js salva nell'account e unisce al login: per ogni scenario vince quello più avanti
-// frase scherzosa al centro dello schermo sulle risposte giuste (memePop sta in app.js)
-const pop = () => { if(typeof memePop === "function") memePop(); };
 const num = v => Number.isFinite(+v) ? +v : 0;
 function merge(raw){
   let changed = false;

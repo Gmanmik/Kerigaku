@@ -163,7 +163,7 @@ function reveal(){
   r.step="reveal";r.pts=score();panel();draw();
   var cur=r;
   function next(){if(r!==cur||!root.isConnected)return;r.shown++;draw();if(r.shown<F)timer=setTimeout(next,170);else{r.step="done";draw();
-    game.res.push({p:r.p,pts:r.pts});game.tot+=r.pts.tot;upd();panel();if(r.pts.tot>=80&&typeof memePop==="function")memePop()}}
+    game.res.push({p:r.p,pts:r.pts});game.tot+=r.pts.tot;upd();panel()}}
   if(reduce){r.shown=F-1;next()}else timer=setTimeout(next,250);
 }
 

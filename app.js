@@ -786,30 +786,13 @@ function answer(id){
   if(lvAfter > lvBefore) Q.opens = opensHTML(lvBefore, lvAfter);
   if(window.DojoSuoni) DojoSuoni.play(lvAfter > lvBefore ? "livello" : ok ? "giusto" : "sbagliato");
   renderQuestion();
-  if(ok){ const wait = festa(); if(wait) setTimeout(memePop, wait); else memePop(); }   // la frase scherzosa aspetta la fine della festa grande
+  if(ok) festa();
 }
 // rinforzo positivo «D · Unione» (Grafica, approvato da Michele il 31/10): tavolette, striscia della fortuna, timbro, coriandoli (rinforzo.js)
 // la fila di tavolette vive in un elemento che resta tra una domanda e l'altra: renderQuestion lo riattacca sotto i pallini
 const FESTA = document.createElement("div"); FESTA.id = "festa";
 function festaReset(){ if(window.DojoFesta) DojoFesta.reset(FESTA); }
 function festa(){ if(window.DojoFesta) try{ return DojoFesta.giusto({host: FESTA, streak: Q.streak, n: Q.res.filter(Boolean).length}) || 0; }catch(e){} return 0; }
-// frasi scherzose sulla finanza online, una a caso a ogni risposta giusta (mai la stessa due volte di fila)
-const MEME = ["Sei prossimo alla FIRE!", "Mantieni la mano d'oro!", "Pubblicato su r/wallstreetbets!", "To the moon! 🚀", "Stonks! 📈",
-  "Diamond hands! 💎🙌", "Warren Buffett ha messo like.", "Il tuo commercialista è fiero di te.", "Interesse composto sbloccato.",
-  "Hai battuto l'indice. Almeno oggi.", "Il tuo ETF ti ringrazia.", "Comprato sul minimo, venduto sul massimo.", "Margin call evitata!",
-  "Il mercato ti dà ragione (per ora).", "Altro che fuffaguru.", "Questa la metti nel portafoglio."];
-let lastMeme = -1;
-function memeLine(){ let i; do i = Math.floor(Math.random() * MEME.length); while(i === lastMeme && MEME.length > 1); lastMeme = i; return MEME[i]; }
-// la frase compare grande al centro dello schermo e sfuma da sola (animazione .meme-pop in index.html)
-function memePop(){
-  document.querySelectorAll(".meme-pop").forEach(e => e.remove());
-  const el = document.createElement("div"); el.className = "meme-pop"; el.setAttribute("role", "status"); el.textContent = memeLine();
-  // nasce leggermente inclinata e sparisce ruotando, ogni volta a sinistra o a destra a caso
-  const side = () => Math.random() < .5 ? -1 : 1, r0 = side() * (2 + Math.random() * 3);
-  el.style.setProperty("--r0", r0.toFixed(1) + "deg");
-  el.style.setProperty("--r1", (r0 + side() * (8 + Math.random() * 6)).toFixed(1) + "deg");
-  document.body.appendChild(el); setTimeout(() => el.remove(), 1600);
-}
 // la riga «Sostieni il Dojo» compare al massimo una volta al giorno
 function supportToday(){
   const d = new Date().toISOString().slice(0, 10);
