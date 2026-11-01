@@ -241,6 +241,8 @@ function start(){
     box.querySelector("[data-pd='home']").onclick=goHome;
     return;
   }
+  // la Prova 2.0 (Go/WebAssembly) vive in prova2/; ?prova=vecchia riapre quella in JavaScript
+  if(!/[?&]prova=vecchia/.test(location.search)){location.href="prova2/";return}
   var narrow=window.innerWidth<600;sizeFor(narrow);
   box.innerHTML="<div class=\"pd"+(narrow?" narrow":"")+"\">"+
     "<div class=\"pd-head\"><div class=\"stato\"><span>Grafico <b data-pd=\"nGraf\">1</b> di 5</span><span>Punti <b data-pd=\"punti\">0</b></span><span class=\"pd-dots\" data-pd=\"dots\"></span></div></div>"+
