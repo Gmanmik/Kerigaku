@@ -22,6 +22,8 @@ var lang = "it"; try{ lang = localStorage.getItem("dojo-lang") || "it"; }catch(e
 lang = lang === "pt" ? "pt-BR" : lang;
 var done = get("dojo-prova2-v1" + space, {});
 window.kerigakuConfig = {lang: lang, difficulty: done.tutorial ? "normale" : "tutorial", night: night, tutorialDone: !!done.tutorial, known: known, admin: false, suspended: ""};
+// «Torna al Dojo» nel menu del gioco: va alla pagina principale del sito
+window.kerigakuExit = function(){ location.href = "../"; };
 // risultato della partita: per ora resta solo sul dispositivo (nessun punto assegnato finché il server non lo ricalcola)
 window.kerigakuFinish = function(json){
   try{

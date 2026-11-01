@@ -5,7 +5,7 @@ const go = new Go();
 async function carica() {
   const r = await fetch('game.wasm');
   // il server può comprimere: Content-Length riguarda i byte compressi, quindi usiamo il valore noto come riserva
-  const tot = +r.headers.get('Content-Length') || 15080730;
+  const tot = +r.headers.get('Content-Length') || 15082980;
   const rd = r.body.getReader(), parti = []; let n = 0;
   for (;;) { const {done, value} = await rd.read(); if (done) break; parti.push(value); n += value.length;
     const p = Math.min(99, Math.round(n / tot * 100)); fill.style.width = p + '%'; pct.textContent = p + '%'; }
